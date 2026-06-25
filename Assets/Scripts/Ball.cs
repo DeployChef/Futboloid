@@ -1,36 +1,63 @@
-using System;
+using Assets.Scripts;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class Ball : MonoBehaviour
 {
-    [SerializeField] private float speed = 5f;
+    public Vector2 direction = Vector2.up;
+    public float speed = 5f;
+    public float minSpeed = 2f;
+    public float slowDownRate = 0.1f;
+    public float boostSpeed = 7f;
 
-    private Vector2 _direction = Vector2.up;
-    private Rigidbody2D _rb;
+    private Rigidbody2D rb;
 
     void Awake()
     {
-        _rb = GetComponent<Rigidbody2D>();
-        _rb.gravityScale = 0;
-        _rb.linearDamping = 0;
-        _rb.bodyType = RigidbodyType2D.Dynamic;
+        rb = GetComponent<Rigidbody2D>();
+        rb.gravityScale = 0;
+        rb.linearDamping = 0;
+        rb.bodyType = RigidbodyType2D.Dynamic;
     }
 
-    void Start()
+    void FixedUpdate()
     {
-        var angle = Random.Range(-30f, 30f);
-        _direction = Quaternion.Euler(0, 0, angle) * Vector2.up;
+        if (speed <= 0)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+        rb.linearVelocity = direction.normalized * speed;
+    }
+    void Update()
+    {
+        if (speed <= 0) return;
+
+        if (speed > minSpeed)
+            speed -= slowDownRate * Time.deltaTime;
     }
 
-    private void FixedUpdate()
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        _rb.linearVelocity = _direction.normalized * speed;
+        Debug.Log($"БАМ! Столкновение с: {collision.gameObject.name}");
+        Vector2 normal = collision.contacts[0].normal;
+        direction = Vector2.Reflect(direction, normal);
+
+        if (collision.gameObject.CompareTag("Player") || collision.gameObject.CompareTag("Enemy"))
+        {
+            speed = boostSpeed;
+        }
+
+        if (collision.gameObject.TryGetComponent<IDamageable>(out var damageable))
+        {
+            damageable.TakeDamage(1);
+        }
     }
 
-    private void OnCollisionEnter2D(Collision2D other)
+    void OnTriggerEnter2D(Collider2D other)
     {
-        var normal = other.contacts[0].normal;
-        _direction = Vector2.Reflect(_direction, normal);
+        if (other.CompareTag("DeadZone"))
+        {
+            Destroy(gameObject);
+        }
     }
 }
