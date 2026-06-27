@@ -16,6 +16,12 @@ public class GameManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI timerText;
 
+    [Header("UI Scores")]
+    [SerializeField] private TextMeshProUGUI scorePlayerText;
+    [SerializeField] private TextMeshProUGUI scoreEnemyText;
+
+    private int _scorePlayer;
+    private int _scoreEnemy;
     private int _remainingTime;
     private GameState _state;
     private Ball _ball;
@@ -86,7 +92,7 @@ public class GameManager : MonoBehaviour
         {
             _ball.enabled = false;
         }
-        timerText.text = "GAME OVER";
+        timerText.text = "Match over";
     }
 
     void UpdateTimerDisplay()
@@ -99,9 +105,19 @@ public class GameManager : MonoBehaviour
         }
         else if (_state == GameState.Playing)
         {
-            int minutes = _remainingTime / 60;
-            int seconds = _remainingTime % 60;
-            timerText.text = $"{minutes}:{seconds:D2}";
+            timerText.text = _remainingTime.ToString();
         }
+    }
+    public void RecordGoal(bool isEnemyGoal)
+    {
+        if (isEnemyGoal) _scoreEnemy++;
+        else _scorePlayer++;
+        UpdateScoreDisplay();
+    }
+
+    void UpdateScoreDisplay()
+    {
+        if (scorePlayerText != null) scorePlayerText.text = _scorePlayer.ToString();
+        if (scoreEnemyText != null) scoreEnemyText.text = _scoreEnemy.ToString();
     }
 }

@@ -46,9 +46,22 @@ public class Ball : MonoBehaviour
     // Проверка зоны смерти (триггеры)
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.CompareTag("GameOver"))
+        if (other.CompareTag("GameOver"))
         {
             GameManager.Instance.EndMatch();
+            return;
+        }
+
+        if (other.CompareTag("GoalEnemy"))
+        {
+            GameManager.Instance.RecordGoal(false); // Гол игрока
+            return;
+        }
+
+        if (other.CompareTag("GoalMe"))
+        {
+            GameManager.Instance.RecordGoal(true);  // Гол противника
+            return;
         }
     }
 }
