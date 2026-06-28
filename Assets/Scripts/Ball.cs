@@ -25,12 +25,43 @@ public class Ball : MonoBehaviour
 
     private void FixedUpdate()
     {
-        _rb.linearVelocity = _direction.normalized * speed;
+        if (GameManager.Instance != null && GameManager.Instance.currentState == GameManager.GameState.Playing)
+        {
+            _rb.linearVelocity = _direction.normalized * speed;
+        }
+        else
+        {
+            _rb.linearVelocity = Vector2.zero;
+        }
     }
+
+
 
     private void OnCollisionEnter2D(Collision2D other)
     {
         var normal = other.contacts[0].normal;
         _direction = Vector2.Reflect(_direction, normal);
+    }
+
+    // Проверка зоны смерти (триггеры)
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("GameOver"))
+        {
+            GameManager.Instance.EndMatch();
+            return;
+        }
+
+        if (other.CompareTag("GoalEnemy"))
+        {
+            GameManager.Instance.RecordGoal(false); // Гол игрока
+            return;
+        }
+
+        if (other.CompareTag("GoalMe"))
+        {
+            GameManager.Instance.RecordGoal(true);  // Гол противника
+            return;
+        }
     }
 }
