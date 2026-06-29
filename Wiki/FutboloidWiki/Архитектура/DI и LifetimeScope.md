@@ -10,7 +10,7 @@ aliases:
 
 # DI и LifetimeScope
 
-← [[Обзор архитектуры]] | [[Сцены и Bootstrap]]
+← [[Обзор архитектуры]] | [[Сцены и Startup]]
 
 **VContainer** + вложенные `LifetimeScope`. Регистрация сервисов — через **extension-методы** `Register*` на `IContainerBuilder`, не через классы `*Installer` с `Install()`.
 

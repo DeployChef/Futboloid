@@ -20,7 +20,7 @@ tags:
 | 300 | Tournament | `Navigation.Tournament` |
 | 400 | Pause | `Navigation.Pause` |
 | 1000 | Scene Transition | Во время переходов |
-| 1100 | Loading / blocking | Bootstrap |
+| 1100 | Loading / blocking | Startup |
 
 ## Главное меню ≠ отдельная сцена
 
