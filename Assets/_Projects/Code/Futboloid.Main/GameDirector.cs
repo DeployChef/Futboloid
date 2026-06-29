@@ -25,6 +25,9 @@ namespace Futboloid.Main
             RunInitializeAsync().Forget();
         }
 
+        public void GoOnField() =>
+            _overlay.SetState(NavigationState.OnField).Forget();
+
         public void RestartTournament() =>
             Debug.LogWarning("[GameDirector] RestartTournament — not implemented yet.");
 

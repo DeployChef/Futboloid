@@ -2,7 +2,8 @@
     "name": "Futboloid.UI",
     "rootNamespace": "Futboloid.UI",
     "references": [
-        "Futboloid.Core"
+        "Futboloid.Core",
+        "VContainer"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,4 +1,5 @@
 using Futboloid.UI;
+using Futboloid.UI.Views.MainMenu;
 using VContainer;
 using VContainer.Unity;
 
@@ -8,12 +9,19 @@ namespace Futboloid.Main.DI
     {
         public static IContainerBuilder RegisterRootScope(this IContainerBuilder builder)
         {
-            builder.Register<MainMenuWidget>(Lifetime.Singleton);
             builder.Register<MatchHudWidget>(Lifetime.Singleton);
             builder.Register<PauseWidget>(Lifetime.Singleton);
             builder.Register<TournamentWidget>(Lifetime.Singleton);
             builder.Register<UIService>(Lifetime.Singleton);
             builder.RegisterBuildCallback(RegisterUiWidgets);
+
+            return builder;
+        }
+
+        public static IContainerBuilder RegisterRootSceneUi(this IContainerBuilder builder)
+        {
+            builder.RegisterComponentInHierarchy<MainMenuWidget>();
+            builder.RegisterComponentInHierarchy<MainMenuLayout>();
 
             return builder;
         }
