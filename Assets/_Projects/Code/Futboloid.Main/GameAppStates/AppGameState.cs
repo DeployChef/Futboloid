@@ -14,6 +14,7 @@ namespace Futboloid.Main.GameAppStates
     {
         private readonly LifetimeScope _parentLifetimeScope;
         private GameState _gameState;
+        private bool _gameSceneIsLoaded;
 
         public LifetimeScope LifetimeScope { get; private set; }
         public GameState GameState => _gameState;
@@ -28,12 +29,10 @@ namespace Futboloid.Main.GameAppStates
         {
             LifetimeScope = _parentLifetimeScope.CreateChild(builder => builder.RegisterAppScope());
 
-            await SceneManager.LoadSceneAsync(GameScenes.Game, LoadSceneMode.Additive).ToUniTask();
-
-            var gameScene = SceneManager.GetSceneByName(GameScenes.Game);
+            var gameScene = await EnsureGameSceneAsync();
             if (!gameScene.IsValid())
             {
-                Debug.LogError($"[AppGameState] Scene '{GameScenes.Game}' not found after load. Is it in Build Settings?");
+                Debug.LogError($"[AppGameState] Scene '{GameScenes.Game}' not found. Is it in Build Settings?");
                 return;
             }
 
@@ -46,7 +45,7 @@ namespace Futboloid.Main.GameAppStates
             Overlay = LifetimeScope.Container.Resolve<OverlayStateController>();
             await Overlay.SetState(NavigationState.MainMenu);
 
-            Debug.Log($"[AppGameState] '{GameScenes.Game}' loaded, navigation → MainMenu.");
+            Debug.Log($"[AppGameState] '{GameScenes.Game}' ready, navigation → MainMenu.");
         }
 
         public async UniTask Exit()
@@ -63,11 +62,34 @@ namespace Futboloid.Main.GameAppStates
                 LifetimeScope = null;
             }
 
+            await UnloadGameSceneIfNeededAsync();
+
+            Debug.Log($"[AppGameState] '{GameScenes.Game}' exited.");
+        }
+
+        private async UniTask<Scene> EnsureGameSceneAsync()
+        {
+            var gameScene = SceneManager.GetSceneByName(GameScenes.Game);
+            _gameSceneIsLoaded = gameScene.IsValid();
+
+            if (_gameSceneIsLoaded)
+            {
+                Debug.Log($"[AppGameState] '{GameScenes.Game}' already loaded — skip additive load.");
+                return gameScene;
+            }
+
+            await SceneManager.LoadSceneAsync(GameScenes.Game, LoadSceneMode.Additive).ToUniTask();
+            return SceneManager.GetSceneByName(GameScenes.Game);
+        }
+
+        private async UniTask UnloadGameSceneIfNeededAsync()
+        {
+            if (_gameSceneIsLoaded)
+                return;
+
             var gameScene = SceneManager.GetSceneByName(GameScenes.Game);
             if (gameScene.IsValid())
                 await SceneManager.UnloadSceneAsync(gameScene).ToUniTask();
-
-            Debug.Log($"[AppGameState] '{GameScenes.Game}' unloaded.");
         }
     }
 }
