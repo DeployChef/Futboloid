@@ -69,12 +69,38 @@ namespace Futboloid.Main.GameAppStates
 
         private async UniTask<Scene> EnsureGameSceneAsync()
         {
-            if (TryFindLoadedGameScene(out var gameScene))
-                return gameScene;
+            // Editor: additive Game в иерархии может появиться в sceneCount на следующий кадр.
+            await UniTask.Yield();
 
-            await SceneManager.LoadSceneAsync(GameScenes.Game, LoadSceneMode.Additive).ToUniTask();
-            TryFindLoadedGameScene(out gameScene);
-            return gameScene;
+            if (!TryFindLoadedGameScene(out _))
+                await SceneManager.LoadSceneAsync(GameScenes.Game, LoadSceneMode.Additive).ToUniTask();
+
+            return await KeepSingleGameSceneAsync();
+        }
+
+        private static async UniTask<Scene> KeepSingleGameSceneAsync()
+        {
+            Scene first = default;
+            var found = false;
+
+            for (var i = 0; i < SceneManager.sceneCount; i++)
+            {
+                var scene = SceneManager.GetSceneAt(i);
+                if (scene.name != GameScenes.Game || !scene.isLoaded)
+                    continue;
+
+                if (!found)
+                {
+                    first = scene;
+                    found = true;
+                }
+                else
+                {
+                    await SceneManager.UnloadSceneAsync(scene).ToUniTask();
+                }
+            }
+
+            return first;
         }
 
         private static bool TryFindLoadedGameScene(out Scene gameScene)
