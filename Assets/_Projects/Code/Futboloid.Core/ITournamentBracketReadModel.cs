@@ -2,10 +2,8 @@ namespace Futboloid.Core
 {
     public interface ITournamentBracketReadModel
     {
+        TournamentRunState RunState { get; }
         string RoundLabel { get; }
         string StatusLine { get; }
-        bool CanStartNextMatch { get; }
-        bool IsEliminated { get; }
-        bool IsChampion { get; }
     }
 }

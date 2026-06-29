@@ -10,14 +10,11 @@ namespace Futboloid.Main.Session
     {
         private readonly int _matchesToWin;
 
-        public int MatchesCompleted { get; private set; }
-        public bool IsEliminated { get; private set; }
-        public bool LastMatchWon { get; private set; }
-        public int LastPlayerScore { get; private set; }
-        public int LastOpponentScore { get; private set; }
+        private int _matchesCompleted;
+        private int _lastPlayerScore;
+        private int _lastOpponentScore;
 
-        public bool IsChampion => LastMatchWon && MatchesCompleted >= _matchesToWin;
-        public bool CanStartNextMatch => !IsEliminated && !IsChampion;
+        public TournamentRunState RunState { get; private set; } = TournamentRunState.InProgress;
 
         public string RoundLabel => GetRoundLabel();
         public string StatusLine => GetStatusLine();
@@ -29,47 +26,51 @@ namespace Futboloid.Main.Session
 
         public void ResetRun()
         {
-            MatchesCompleted = 0;
-            IsEliminated = false;
-            LastMatchWon = false;
-            LastPlayerScore = 0;
-            LastOpponentScore = 0;
+            _matchesCompleted = 0;
+            _lastPlayerScore = 0;
+            _lastOpponentScore = 0;
+            RunState = TournamentRunState.InProgress;
         }
 
         public void RecordMatchResult(int playerScore, int opponentScore)
         {
-            LastPlayerScore = playerScore;
-            LastOpponentScore = opponentScore;
-            LastMatchWon = playerScore > opponentScore;
-            MatchesCompleted++;
+            _lastPlayerScore = playerScore;
+            _lastOpponentScore = opponentScore;
+            var wonMatch = playerScore > opponentScore;
+            _matchesCompleted++;
 
-            if (!LastMatchWon)
-                IsEliminated = true;
+            if (!wonMatch)
+                RunState = TournamentRunState.Eliminated;
+            else if (_matchesCompleted >= _matchesToWin)
+                RunState = TournamentRunState.Completed;
         }
 
         private string GetRoundLabel()
         {
-            if (IsChampion)
-                return "Финал пройден";
-
-            if (IsEliminated)
-                return $"Матч {MatchesCompleted}";
-
-            return $"Матч {MatchesCompleted + 1} из {_matchesToWin}";
+            switch (RunState)
+            {
+                case TournamentRunState.Completed:
+                    return "Финал пройден";
+                case TournamentRunState.Eliminated:
+                    return $"Матч {_matchesCompleted}";
+                default:
+                    return $"Матч {_matchesCompleted + 1} из {_matchesToWin}";
+            }
         }
 
         private string GetStatusLine()
         {
-            if (IsChampion)
-                return "Чемпион забега!";
-
-            if (IsEliminated)
-                return $"Счёт {LastPlayerScore}:{LastOpponentScore} — вылет из турнира";
-
-            if (MatchesCompleted == 0)
-                return "Готов к первому матчу";
-
-            return $"Счёт {LastPlayerScore}:{LastOpponentScore} — победа! Следующий соперник ждёт.";
+            switch (RunState)
+            {
+                case TournamentRunState.Completed:
+                    return "Чемпион забега!";
+                case TournamentRunState.Eliminated:
+                    return $"Счёт {_lastPlayerScore}:{_lastOpponentScore} — вылет из турнира";
+                default:
+                    if (_matchesCompleted == 0)
+                        return "Готов к первому матчу";
+                    return $"Счёт {_lastPlayerScore}:{_lastOpponentScore} — победа! Следующий соперник ждёт.";
+            }
         }
     }
 }

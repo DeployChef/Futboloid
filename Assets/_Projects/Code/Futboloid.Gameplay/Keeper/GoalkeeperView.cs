@@ -14,6 +14,9 @@ namespace Futboloid.Gameplay.Keeper
     public class GoalkeeperView : MonoBehaviour, IGameSceneInitializable, IGameplayInputConsumer
     {
         [SerializeField] private float speed = 8f;
+        [SerializeField] private float returnToCenterSpeed = 8f;
+        [SerializeField] private float centerX = 0f;
+        [SerializeField] private float centerArriveThreshold = 0.02f;
         [SerializeField] private float kickoffMinX = -1.5f;
         [SerializeField] private float kickoffMaxX = 1.5f;
         [SerializeField] private float playMinX = -4.2f;
@@ -25,6 +28,7 @@ namespace Futboloid.Gameplay.Keeper
 
         private PitchPhase _phase = PitchPhase.KickoffWait;
         private bool _onField;
+        private bool _returningToCenter;
         private IGameplayInput _input;
 
         public void BindInput(IGameplayInput input)
@@ -46,8 +50,19 @@ namespace Futboloid.Gameplay.Keeper
 
         private void Update()
         {
+            if (_returningToCenter)
+                AdvanceReturnToCenter();
+
             if (!_onField)
                 return;
+
+            if (_returningToCenter)
+            {
+                if (_phase == PitchPhase.KickoffWait)
+                    UpdateKickoffAim();
+
+                return;
+            }
 
             switch (_phase)
             {
@@ -78,6 +93,26 @@ namespace Futboloid.Gameplay.Keeper
             kickoffAnchor.UpdateAimFromKeeperX(transform.position.x, halfWidth);
         }
 
+        private void BeginReturnToCenter() => _returningToCenter = true;
+
+        private void AdvanceReturnToCenter()
+        {
+            var position = transform.position;
+            var delta = centerX - position.x;
+
+            if (Mathf.Abs(delta) <= centerArriveThreshold)
+            {
+                position.x = centerX;
+                transform.position = position;
+                _returningToCenter = false;
+                return;
+            }
+
+            var step = returnToCenterSpeed * Time.deltaTime;
+            position.x += Mathf.Sign(delta) * Mathf.Min(Mathf.Abs(delta), step);
+            transform.position = position;
+        }
+
         private void ApplyHorizontalMovement(float minX, float maxX)
         {
             var moveX = ReadMoveX();
@@ -99,12 +134,19 @@ namespace Futboloid.Gameplay.Keeper
 
         private void OnPitchPhaseChanged(PitchPhaseChangedEvent e)
         {
+            var previous = _phase;
             _phase = e.Phase;
+
+            if (e.Phase != PitchPhase.Simulating && previous != e.Phase)
+                BeginReturnToCenter();
         }
 
         private void OnNavigationChanged(NavigationChangedEvent e)
         {
             _onField = e.Current == NavigationState.OnField;
+
+            if (!_onField)
+                BeginReturnToCenter();
         }
 
         private void OnDestroy()

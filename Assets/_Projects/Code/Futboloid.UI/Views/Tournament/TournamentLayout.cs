@@ -53,16 +53,16 @@ namespace Futboloid.UI.Views.Tournament
             if (statusLabel != null)
                 statusLabel.text = run.StatusLine;
 
-            var showRunEndActions = run.IsEliminated || run.IsChampion;
+            var inProgress = run.RunState == TournamentRunState.InProgress;
 
             if (matchButton != null)
-                matchButton.gameObject.SetActive(run.CanStartNextMatch);
+                matchButton.gameObject.SetActive(inProgress);
 
             if (restartButton != null)
-                restartButton.gameObject.SetActive(showRunEndActions);
+                restartButton.gameObject.SetActive(!inProgress);
 
             if (mainMenuButton != null)
-                mainMenuButton.gameObject.SetActive(showRunEndActions);
+                mainMenuButton.gameObject.SetActive(!inProgress);
         }
 
         private void OnMatchClicked() => _director?.GoOnField();
