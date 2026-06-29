@@ -19,7 +19,7 @@ namespace Futboloid.Main.DI
     protected override void Configure(IContainerBuilder builder)
     {
       builder.RegisterInstance(this);
-      builder.Register<Futboloid.Main.GameDirector>(Lifetime.Singleton).As<IGameDirector>();
+      builder.Register<GameDirector>(Lifetime.Singleton).As<IGameDirector>();
       builder.RegisterRootScope();
     }
   }
