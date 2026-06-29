@@ -1,5 +1,10 @@
+using Futboloid.Core;
+using Futboloid.Gameplay.Input;
 using Futboloid.Gameplay.Match;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 using VContainer;
+using VContainer.Unity;
 
 namespace Futboloid.Main.DI
 {
@@ -10,10 +15,30 @@ namespace Futboloid.Main.DI
             builder.Register<MatchFlow>(Lifetime.Singleton);
             builder.Register<PitchStateMachine>(Lifetime.Singleton);
 
-            // Eager init: без Resolve конструктор не вызывается и шина молчит.
-            builder.RegisterBuildCallback(resolver => resolver.Resolve<PitchStateMachine>());
+            var inputHost = Object.FindAnyObjectByType<GameplayInputHost>();
+            if (inputHost != null)
+                builder.RegisterComponent(inputHost).As<IGameplayInput>();
+            else
+                Debug.LogError("[GameScope] GameplayInputHost not found on Game scene.");
+
+            builder.RegisterBuildCallback(OnGameScopeBuilt);
 
             return builder;
+        }
+
+        private static void OnGameScopeBuilt(IObjectResolver resolver)
+        {
+            resolver.Resolve<PitchStateMachine>();
+
+            var scene = SceneManager.GetSceneByName(GameScenes.Game);
+            if (!scene.IsValid() || !scene.isLoaded)
+            {
+                Debug.LogError($"[GameScope] Scene '{GameScenes.Game}' is not loaded.");
+                return;
+            }
+
+            foreach (var root in scene.GetRootGameObjects())
+                resolver.InjectGameObject(root);
         }
     }
 }

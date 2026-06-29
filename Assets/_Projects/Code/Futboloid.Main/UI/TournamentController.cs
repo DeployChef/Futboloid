@@ -3,36 +3,28 @@ using System.Collections.Generic;
 using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
-using Futboloid.Gameplay.Scene;
 using Futboloid.UI.Views.Tournament;
 using UnityEngine;
+using VContainer;
 
 namespace Futboloid.Main.UI
 {
     /// <summary>
     /// Турнирный оверлей на сцене Game — часть поля, не Root-меню.
     /// </summary>
-    public class TournamentController : MonoBehaviour, IGameSceneInitializable
+    public class TournamentController : MonoBehaviour
     {
         [SerializeField] private TournamentWidget widget;
 
-        private IGameDirector _director;
         private readonly List<IDisposable> _subscriptions = new();
 
-        public void BindDirector(IGameDirector director)
+        [Inject]
+        public void Construct(IGameEventBus bus, IGameDirector director)
         {
-            _director = director;
-
             if (widget == null)
                 widget = GetComponentInChildren<TournamentWidget>(true);
 
             widget?.BindDirector(director);
-        }
-
-        public void Initialize(IGameEventBus bus)
-        {
-            if (widget == null)
-                widget = GetComponentInChildren<TournamentWidget>(true);
 
             foreach (var subscription in _subscriptions)
                 subscription.Dispose();

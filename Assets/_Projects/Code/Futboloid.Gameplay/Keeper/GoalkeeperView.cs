@@ -5,12 +5,12 @@ using Futboloid.Gameplay.Ball;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
 using Futboloid.Gameplay.Input;
-using Futboloid.Gameplay.Scene;
 using UnityEngine;
+using VContainer;
 
 namespace Futboloid.Gameplay.Keeper
 {
-    public class GoalkeeperView : MonoBehaviour, IGameSceneInitializable, IGameplayInputConsumer
+    public class GoalkeeperView : MonoBehaviour
     {
         [SerializeField] private float speed = 8f;
         [SerializeField] private float returnToCenterSpeed = 8f;
@@ -30,13 +30,11 @@ namespace Futboloid.Gameplay.Keeper
         private bool _returningToCenter;
         private IGameplayInput _input;
 
-        public void BindInput(IGameplayInput input)
+        [Inject]
+        public void Construct(IGameEventBus bus, IGameplayInput input)
         {
             _input = input;
-        }
 
-        public void Initialize(IGameEventBus bus)
-        {
             if (ball == null)
                 ball = FindAnyObjectByType<BallView>();
 

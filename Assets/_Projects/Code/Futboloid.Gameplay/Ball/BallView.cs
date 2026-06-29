@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
-using Futboloid.Gameplay.Scene;
 using UnityEngine;
+using VContainer;
 
 namespace Futboloid.Gameplay.Ball
 {
-    public class BallView : MonoBehaviour, IGameSceneInitializable
+    public class BallView : MonoBehaviour
     {
         [SerializeField] private BallSettings settings = new();
         [SerializeField] private BallKickoffAnchor kickoffAnchor;
@@ -21,7 +21,8 @@ namespace Futboloid.Gameplay.Ball
         private bool _onField;
         private bool _simulating;
 
-        public void Initialize(IGameEventBus bus)
+        [Inject]
+        public void Construct(IGameEventBus bus)
         {
             _bus = bus;
             _motion = new BallMotion(settings, bus);
