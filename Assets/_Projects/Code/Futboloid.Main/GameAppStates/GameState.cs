@@ -59,9 +59,9 @@ namespace Futboloid.Main.GameAppStates
             var gameScene = SceneManager.GetActiveScene();
             var roots = gameScene.GetRootGameObjects();
             var count = 0;
-            var inputHost = Object.FindAnyObjectByType<GameplayInputHost>();
+            var input = FindGameplayInput();
 
-            if (inputHost == null)
+            if (input == null)
                 Debug.LogError("[GameState] GameplayInputHost not found on Game scene.");
 
             foreach (var root in roots)
@@ -74,12 +74,17 @@ namespace Futboloid.Main.GameAppStates
                         count++;
                     }
 
-                    if (inputHost != null && initializable is IGameplayInputConsumer inputConsumer)
-                        inputConsumer.BindInput(inputHost);
+                    if (input != null && initializable is IGameplayInputConsumer inputConsumer)
+                        inputConsumer.BindInput(input);
                 }
             }
 
             Debug.Log($"[GameState] IGameSceneInitializable count: {count}");
+        }
+
+        private static IGameplayInput FindGameplayInput()
+        {
+            return Object.FindAnyObjectByType<GameplayInputHost>();
         }
     }
 }

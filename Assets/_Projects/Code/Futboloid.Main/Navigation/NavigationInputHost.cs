@@ -5,6 +5,9 @@ using VContainer;
 
 namespace Futboloid.Main.Navigation
 {
+    /// <summary>
+    /// Читает UI map (Pause) из Futboloid.inputactions на Root.
+    /// </summary>
     public class NavigationInputHost : MonoBehaviour
     {
         private const string UiMapName = "UI";

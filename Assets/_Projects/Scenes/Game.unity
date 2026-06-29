@@ -261,6 +261,51 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &391308738
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 391308740}
+  - component: {fileID: 391308739}
+  m_Layer: 0
+  m_Name: GameplayInputHost
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &391308739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 391308738}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 536fd9c64e3f93e4fb907ce706e603aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Input.GameplayInputHost
+  inputActions: {fileID: -944628639613478452, guid: c978e8b3363f7f24b857c6021694129a, type: 3}
+--- !u!4 &391308740
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 391308738}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.30737, y: -5.9722, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &733644493
 GameObject:
   m_ObjectHideFlags: 0
@@ -356,6 +401,8 @@ MonoBehaviour:
   speed: 8
   kickoffMinX: -1.5
   kickoffMaxX: 1.5
+  playMinX: -4.2
+  playMaxX: 4.2
   ball: {fileID: 1203950916}
   kickoffAnchor: {fileID: 743293818}
 --- !u!1 &743293817
@@ -389,6 +436,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Ball.BallKickoffAnchor
   directionArrow: {fileID: 1253984576}
   fallbackServeDirection: {x: 0, y: 1}
+  maxAimAngleDegrees: 45
 --- !u!4 &743293819
 Transform:
   m_ObjectHideFlags: 0
@@ -1553,3 +1601,4 @@ SceneRoots:
   - {fileID: 1203950915}
   - {fileID: 294407854}
   - {fileID: 743293819}
+  - {fileID: 391308740}

@@ -196,6 +196,51 @@ Transform:
   - {fileID: 1470213083}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &405068184
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 405068186}
+  - component: {fileID: 405068185}
+  m_Layer: 0
+  m_Name: NavigationInputHost
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &405068185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 405068184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f4e2c1a9b3d4657e8f0a1b2c3d4e5f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.Main::Futboloid.Main.Navigation.NavigationInputHost
+  inputActions: {fileID: -944628639613478452, guid: c978e8b3363f7f24b857c6021694129a, type: 3}
+--- !u!4 &405068186
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 405068184}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.30737, y: -5.9722, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1470213082
 GameObject:
   m_ObjectHideFlags: 0
@@ -393,7 +438,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2120221327}
   - component: {fileID: 2120221326}
-  - component: {fileID: 2120221328}
   m_Layer: 0
   m_Name: RootLifetimeScope
   m_TagString: Untagged
@@ -417,19 +461,6 @@ MonoBehaviour:
     TypeName: 
   autoRun: 0
   autoInjectGameObjects: []
---- !u!114 &2120221328
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2120221325}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f4e2c1a9b3d4657e8f0a1b2c3d4e5f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Futboloid.Main::Futboloid.Main.Navigation.NavigationInputHost
-  inputActions: {fileID: -944628639613478452, guid: c978e8b3363f7f24b857c6021694129a, type: 3}
 --- !u!4 &2120221327
 Transform:
   m_ObjectHideFlags: 0
@@ -549,4 +580,5 @@ SceneRoots:
   - {fileID: 95831369}
   - {fileID: 2120221327}
   - {fileID: 1895521440}
+  - {fileID: 405068186}
   - {fileID: 158888704}
