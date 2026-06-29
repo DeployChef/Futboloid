@@ -5,42 +5,42 @@ using VContainer;
 
 namespace Futboloid.Main
 {
-  /// <summary>
-  /// Точка входа на сцене Root.unity (единственная сцена в Build Settings).
-  /// </summary>
-  public sealed class Startup : MonoBehaviour
-  {
-    [SerializeField] RootLifetimeScope rootScope;
-
-    static bool started;
-
-    void Awake()
+    /// <summary>
+    /// Точка входа на сцене Root.unity (единственная сцена в Build Settings).
+    /// </summary>
+    public class Startup : MonoBehaviour
     {
-      if (started)
-      {
-        Debug.LogWarning("[Startup] Already initialized — skipping duplicate Awake.");
-        return;
-      }
+        [SerializeField] private RootLifetimeScope rootScope;
 
-      if (rootScope == null)
-      {
-        Debug.LogError("[Startup] RootLifetimeScope is not assigned in the Inspector.");
-        return;
-      }
+        private static bool _started;
 
-      started = true;
+        private void Awake()
+        {
+            if (_started)
+            {
+                Debug.LogWarning("[Startup] Already initialized — skipping duplicate Awake.");
+                return;
+            }
 
-      rootScope.Build();
-      var director = rootScope.Container.Resolve<IGameDirector>();
-      director.InitializeGame();
+            if (rootScope == null)
+            {
+                Debug.LogError("[Startup] RootLifetimeScope is not assigned in the Inspector.");
+                return;
+            }
 
-      Application.quitting += OnApplicationQuitting;
+            _started = true;
+
+            rootScope.Build();
+            var director = rootScope.Container.Resolve<IGameDirector>();
+            director.InitializeGame();
+
+            Application.quitting += OnApplicationQuitting;
+        }
+
+        private static void OnApplicationQuitting()
+        {
+            _started = false;
+            Application.quitting -= OnApplicationQuitting;
+        }
     }
-
-    static void OnApplicationQuitting()
-    {
-      started = false;
-      Application.quitting -= OnApplicationQuitting;
-    }
-  }
 }

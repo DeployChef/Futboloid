@@ -5,23 +5,23 @@ using VContainer.Unity;
 
 namespace Futboloid.Main.GameAppStates
 {
-  public sealed class AppRootState
-  {
-    public LifetimeScope RootLifetimeScope { get; }
-    public AppGameState AppGameState { get; private set; }
-
-    public AppRootState(RootLifetimeScope rootLifetimeScope)
+    public class AppRootState
     {
-      RootLifetimeScope = rootLifetimeScope;
-    }
+        public LifetimeScope RootLifetimeScope { get; }
+        public AppGameState AppGameState { get; private set; }
 
-    public UniTask Enter()
-    {
-      AppGameState = new AppGameState(RootLifetimeScope);
+        public AppRootState(RootLifetimeScope rootLifetimeScope)
+        {
+            RootLifetimeScope = rootLifetimeScope;
+        }
 
-      var sceneName = RootLifetimeScope.gameObject.scene.name;
-      Debug.Log($"[AppRootState] Root scope ready (scene: {sceneName}).");
-      return UniTask.CompletedTask;
+        public UniTask Enter()
+        {
+            AppGameState = new AppGameState(RootLifetimeScope);
+
+            var sceneName = RootLifetimeScope.gameObject.scene.name;
+            Debug.Log($"[AppRootState] Root scope ready (scene: {sceneName}).");
+            return UniTask.CompletedTask;
+        }
     }
-  }
 }

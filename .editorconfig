@@ -16,6 +16,19 @@ resharper_use_indent_from_vs = false
 resharper_check_namespace_highlighting = none
 dotnet_diagnostic.IDE0130.severity = none
 
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:suggestion
+
+# Unity / Futboloid: приватные поля с _, SerializeField без _
+dotnet_naming_rule.private_fields.symbols = private_fields
+dotnet_naming_rule.private_fields.style = private_field_style
+dotnet_naming_rule.private_fields.severity = suggestion
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+
+dotnet_naming_style.private_field_style.capitalization = camel_case
+dotnet_naming_style.private_field_style.required_prefix = _
+
 [{Assets/_Projects/Code/**.cs}]
 resharper_check_namespace_highlighting = none
 dotnet_diagnostic.IDE0130.severity = none

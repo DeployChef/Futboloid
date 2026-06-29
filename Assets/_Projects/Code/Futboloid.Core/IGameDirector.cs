@@ -4,7 +4,6 @@ namespace Futboloid.Core
     {
         void InitializeGame();
         void RestartTournament();
-        void RestartMatch();
         void ReturnToMainMenu();
         void SaveGame();
         void LoadLastSave();

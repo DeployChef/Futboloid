@@ -1,11 +1,8 @@
 {
-    "name": "Futboloid.Main",
-    "rootNamespace": "Futboloid.Main",
+    "name": "Futboloid.Gameplay",
+    "rootNamespace": "Futboloid.Gameplay",
     "references": [
-        "Futboloid.Core",
-        "Futboloid.Gameplay",
-        "UniTask",
-        "VContainer"
+        "Futboloid.Core"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
