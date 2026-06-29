@@ -20,6 +20,12 @@ namespace Futboloid.Main
 
         public RootLifetimeScope Root => _rootLifetimeScope;
 
+        public NavigationState CurrentNavigation =>
+            _overlay?.Current ?? NavigationState.MainMenu;
+
+        public bool IsMatchPausedInMenu =>
+            _overlay != null && _overlay.IsMatchPausedInMenu;
+
         public void InitializeGame()
         {
             RunInitializeAsync().Forget();

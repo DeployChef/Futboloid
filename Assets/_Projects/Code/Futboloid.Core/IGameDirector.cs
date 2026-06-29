@@ -2,6 +2,9 @@ namespace Futboloid.Core
 {
     public interface IGameDirector
     {
+        NavigationState CurrentNavigation { get; }
+        bool IsMatchPausedInMenu { get; }
+
         void InitializeGame();
         void GoOnField();
         void RestartTournament();

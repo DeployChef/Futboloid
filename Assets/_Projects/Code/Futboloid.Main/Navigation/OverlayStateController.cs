@@ -12,7 +12,10 @@ namespace Futboloid.Main.Navigation
         private readonly GameSession _session;
         private readonly UIService _uiService;
 
+        private bool _initialized;
+
         public NavigationState Current { get; private set; }
+        public bool IsMatchPausedInMenu { get; private set; }
 
         public OverlayStateController(GameSession session, UIService uiService)
         {
@@ -22,31 +25,39 @@ namespace Futboloid.Main.Navigation
 
         public UniTask SetState(NavigationState next)
         {
-            if (Current == next)
+            if (_initialized && Current == next)
                 return UniTask.CompletedTask;
 
-            var previous = Current;
+            var previous = _initialized ? Current : next;
+            _initialized = true;
             Current = next;
 
-            ApplyState(next);
-            _uiService.ApplyNavigation(next);
-            _session.Bus?.Publish(new NavigationChangedEvent(previous, next));
+            if (next == NavigationState.MainMenu)
+                IsMatchPausedInMenu = previous == NavigationState.OnField;
+
+            ApplyState(next, previous);
+            _uiService.ApplyNavigation(next, IsMatchPausedInMenu);
+            _session.Bus?.Publish(new NavigationChangedEvent(previous, next, IsMatchPausedInMenu));
 
             Debug.Log($"[OverlayStateController] {previous} → {next}");
             return UniTask.CompletedTask;
         }
 
-        private void ApplyState(NavigationState next)
+        private void ApplyState(NavigationState next, NavigationState previous)
         {
             switch (next)
             {
                 case NavigationState.MainMenu:
-                    Time.timeScale = 1f;
+                    Time.timeScale = 0f;
                     break;
 
                 case NavigationState.OnField:
                     Time.timeScale = 1f;
-                    _session.Pitch?.EnterKickoffWait();
+                    var resumingFromPause = previous == NavigationState.MainMenu && IsMatchPausedInMenu;
+                    if (!resumingFromPause)
+                        _session.Pitch?.EnterKickoffWait();
+                    else
+                        IsMatchPausedInMenu = false;
                     break;
 
                 case NavigationState.Tournament:

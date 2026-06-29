@@ -37,13 +37,13 @@ namespace Futboloid.UI
             Debug.Log($"[UIService] Close<{typeof(T).Name}> — prefab позже");
         }
 
-        public void ApplyNavigation(NavigationState state)
+        public void ApplyNavigation(NavigationState state, bool isMatchPausedInMenu = false)
         {
             switch (state)
             {
                 case NavigationState.MainMenu:
                     Close<MatchHudWidget>();
-                    Show<MainMenuWidget>();
+                    ShowMainMenu(isMatchPausedInMenu);
                     break;
 
                 case NavigationState.OnField:
@@ -61,6 +61,17 @@ namespace Futboloid.UI
                     Show<PauseWidget>();
                     break;
             }
+        }
+
+        private void ShowMainMenu(bool showContinue)
+        {
+            if (_widgets.TryGetValue(typeof(MainMenuWidget), out var widget) && widget is MainMenuWidget mainMenu)
+            {
+                mainMenu.Open(showContinue);
+                return;
+            }
+
+            Debug.Log("[UIService] Show<MainMenuWidget> — prefab позже");
         }
     }
 }

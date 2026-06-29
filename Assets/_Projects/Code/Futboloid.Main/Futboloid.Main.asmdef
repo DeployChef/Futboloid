@@ -6,6 +6,7 @@
         "Futboloid.Gameplay",
         "Futboloid.UI",
         "UniTask",
+        "Unity.InputSystem",
         "VContainer"
     ],
     "includePlatforms": [],

@@ -1,3 +1,4 @@
+using Futboloid.Main.Navigation;
 using Futboloid.UI;
 using Futboloid.UI.Views.MainMenu;
 using VContainer;
@@ -22,6 +23,7 @@ namespace Futboloid.Main.DI
         {
             builder.RegisterComponentInHierarchy<MainMenuWidget>();
             builder.RegisterComponentInHierarchy<MainMenuLayout>();
+            builder.RegisterComponentInHierarchy<NavigationInputHost>();
 
             return builder;
         }
