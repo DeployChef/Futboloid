@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Futboloid.Gameplay.Bus;
+using Futboloid.Gameplay.Input;
 using Futboloid.Gameplay.Match;
 using Futboloid.Gameplay.Scene;
 using Futboloid.Main.DI;
@@ -58,16 +59,23 @@ namespace Futboloid.Main.GameAppStates
             var gameScene = SceneManager.GetActiveScene();
             var roots = gameScene.GetRootGameObjects();
             var count = 0;
+            var inputHost = Object.FindAnyObjectByType<GameplayInputHost>();
+
+            if (inputHost == null)
+                Debug.LogError("[GameState] GameplayInputHost not found on Game scene.");
 
             foreach (var root in roots)
             {
                 foreach (var initializable in root.GetComponentsInChildren<MonoBehaviour>(true))
                 {
-                    if (initializable is not IGameSceneInitializable sceneInit)
-                        continue;
+                    if (initializable is IGameSceneInitializable sceneInit)
+                    {
+                        sceneInit.Initialize(bus);
+                        count++;
+                    }
 
-                    sceneInit.Initialize(bus);
-                    count++;
+                    if (inputHost != null && initializable is IGameplayInputConsumer inputConsumer)
+                        inputConsumer.BindInput(inputHost);
                 }
             }
 
