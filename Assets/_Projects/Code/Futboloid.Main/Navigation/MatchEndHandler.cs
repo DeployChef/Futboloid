@@ -3,18 +3,18 @@ using Cysharp.Threading.Tasks;
 using Futboloid.Core;
 using Futboloid.Gameplay.Bus;
 using Futboloid.Gameplay.Bus.Events;
-using Futboloid.Main.Session;
+using Futboloid.Main.Navigation;
 
 namespace Futboloid.Main.Navigation
 {
     public class MatchEndHandler
     {
         private readonly OverlayStateController _overlay;
-        private readonly TournamentRunService _tournamentRun;
+        private readonly ITournamentRunService _tournamentRun;
 
         private IDisposable _subscription;
 
-        public MatchEndHandler(OverlayStateController overlay, TournamentRunService tournamentRun)
+        public MatchEndHandler(OverlayStateController overlay, ITournamentRunService tournamentRun)
         {
             _overlay = overlay;
             _tournamentRun = tournamentRun;

@@ -3,7 +3,6 @@ using Futboloid.Core;
 using Futboloid.Main.DI;
 using Futboloid.Main.GameAppStates;
 using Futboloid.Main.Navigation;
-using Futboloid.Main.Session;
 using UnityEngine;
 using VContainer;
 
@@ -60,7 +59,7 @@ namespace Futboloid.Main
             _appGameState = appRoot.AppGameState;
             await _appGameState.Enter();
             _overlay = _appGameState.Overlay;
-            TournamentBracket = _appGameState.LifetimeScope.Container.Resolve<TournamentRunService>();
+            TournamentBracket = _appGameState.LifetimeScope.Container.Resolve<ITournamentBracketReadModel>();
 
             Debug.Log("[GameDirector] Infrastructure ready (Root → App → Game → MainMenu).");
         }

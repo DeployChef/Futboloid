@@ -11,7 +11,7 @@ namespace Futboloid.Main.Navigation
     {
         private readonly GameSession _session;
         private readonly UIService _uiService;
-        private readonly TournamentRunService _tournamentRun;
+        private readonly ITournamentRunService _tournamentRun;
 
         private bool _initialized;
 
@@ -21,7 +21,7 @@ namespace Futboloid.Main.Navigation
         public OverlayStateController(
             GameSession session,
             UIService uiService,
-            TournamentRunService tournamentRun)
+            ITournamentRunService tournamentRun)
         {
             _session = session;
             _uiService = uiService;

@@ -13,24 +13,27 @@ namespace Futboloid.Gameplay.Match
     /// </summary>
     public class MatchFlow
     {
-        public const float MatchDurationSeconds = 90f;
-
         private readonly IGameEventBus _bus;
+        private readonly float _matchDurationSeconds;
 
         private CancellationTokenSource _timerCts;
         private bool _onField;
         private bool _matchEnded;
-        private float _totalDurationSeconds = MatchDurationSeconds;
+        private float _totalDurationSeconds;
 
         public int PlayerScore { get; private set; }
         public int OpponentScore { get; private set; }
-        public float RemainingSeconds { get; private set; } = MatchDurationSeconds;
+        public float RemainingSeconds { get; private set; }
         public float NormalizedTime =>
             _totalDurationSeconds > 0f ? RemainingSeconds / _totalDurationSeconds : 0f;
 
-        public MatchFlow(IGameEventBus bus)
+        public MatchFlow(IGameEventBus bus, GameplaySettings settings)
         {
             _bus = bus;
+            _matchDurationSeconds = settings.MatchDurationSeconds;
+            _totalDurationSeconds = _matchDurationSeconds;
+            RemainingSeconds = _matchDurationSeconds;
+
             _bus.Subscribe<GoalScoredEvent>(OnGoalScored);
             _bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged);
             _bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged);
@@ -43,8 +46,8 @@ namespace Futboloid.Gameplay.Match
 
             PlayerScore = 0;
             OpponentScore = 0;
-            RemainingSeconds = MatchDurationSeconds;
-            _totalDurationSeconds = MatchDurationSeconds;
+            RemainingSeconds = _matchDurationSeconds;
+            _totalDurationSeconds = _matchDurationSeconds;
             _matchEnded = false;
 
             PublishScore();

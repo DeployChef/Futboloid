@@ -96,6 +96,21 @@ sequenceDiagram
 
 ---
 
+## Настройки (`GameplaySettings`)
+
+ScriptableObject: **Assets → Create → Futboloid → Gameplay Settings**.
+
+Положить в `Assets/_Projects/Resources/Data/Settings/GameplaySettings.asset` (путь Resources: `Data/Settings/GameplaySettings`).
+
+| Поле | По умолчанию | Кто читает |
+|------|--------------|------------|
+| `matchDurationSeconds` | 90 | `MatchFlow` |
+| `matchesToWin` | 3 | `TournamentRunService` |
+
+Регистрация в **App scope**; Game scope наследует через VContainer.
+
+---
+
 ## События (шина)
 
 ```csharp
