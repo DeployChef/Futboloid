@@ -18,7 +18,7 @@ namespace Futboloid.Main.DI
 
     protected override void Configure(IContainerBuilder builder)
     {
-      builder.RegisterInstance(this);
+      // LifetimeScope на сцене уже регистрирует себя — RegisterInstance(this) даёт конфликт.
       builder.Register<GameDirector>(Lifetime.Singleton).As<IGameDirector>();
       builder.RegisterRootScope();
     }

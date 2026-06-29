@@ -8,6 +8,7 @@ namespace Futboloid.Main.GameAppStates
   public sealed class AppRootState
   {
     public LifetimeScope RootLifetimeScope { get; }
+    public AppGameState AppGameState { get; private set; }
 
     public AppRootState(RootLifetimeScope rootLifetimeScope)
     {
@@ -16,6 +17,8 @@ namespace Futboloid.Main.GameAppStates
 
     public UniTask Enter()
     {
+      AppGameState = new AppGameState(RootLifetimeScope);
+
       var sceneName = RootLifetimeScope.gameObject.scene.name;
       Debug.Log($"[AppRootState] Root scope ready (scene: {sceneName}).");
       return UniTask.CompletedTask;

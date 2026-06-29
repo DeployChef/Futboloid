@@ -29,8 +29,9 @@ namespace Futboloid.Main
 
       appRootState = new AppRootState(rootLifetimeScope);
       await appRootState.Enter();
+      await appRootState.AppGameState.Enter();
 
-      Debug.Log("[GameDirector] AppRoot ready. Next: AppGameState + Game scene (этап 2).");
+      Debug.Log("[GameDirector] AppGame ready. Next: GameState + Game scope (этап 3).");
     }
 
     public void RestartTournament() =>
