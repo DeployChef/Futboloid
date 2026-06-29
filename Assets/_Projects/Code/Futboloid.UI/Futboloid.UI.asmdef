@@ -3,6 +3,7 @@
     "rootNamespace": "Futboloid.UI",
     "references": [
         "Futboloid.Core",
+        "Unity.TextMeshPro",
         "VContainer"
     ],
     "includePlatforms": [],

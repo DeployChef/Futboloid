@@ -20,7 +20,7 @@ aliases:
 Связано: [[UI и оверлеи#Match HUD]], [[../GDD/02 Игровой цикл#Окончание матча|GDD: окончание матча]], [[Прогрессия и эффекты#7. HUD — события + анимация кольца|HUD на событиях (аналогия с баффами)]].
 
 > [!note] Статус
-> **Реализовано (MVP):** корутина таймера, события шины, `MatchHudBridge` → слайдер. Комбо, доп. время по правилам футбола — позже.
+> **Реализовано (MVP):** корутина таймера, события шины, `MatchHudController` на Game. Комбо, доп. время по правилам футбола — позже.
 
 ---
 
@@ -30,7 +30,7 @@ aliases:
 |-------|------------|----------------|
 | **`MatchFlow`** | Счёт, таймер, `MatchEndedEvent`, сдвиг времени | Не двигает мяч, не знает про UI |
 | **`PitchStateMachine`** | Фазы поля (`KickoffWait`, `Simulating`…) | Не считает секунды |
-| **`MatchHudController`** (Game) | Подписка на bus, Show при `OnField` | Не в `UIService` |
+| **`MatchHudController`** (Game) | Шина → виджет; видимость поля | Скрывает только при `Tournament` |
 | **`MatchHudWidget`** | Слайдер, тексты | Не знает про Navigation напрямую |
 
 **XP забега, перки, timed-баффы** — не здесь. См. [[Прогрессия и эффекты]].
@@ -53,7 +53,7 @@ sequenceDiagram
     participant Nav as Navigation OnField
     participant MF as MatchFlow
     participant Bus as IGameEventBus
-    participant Bridge as MatchHudBridge
+    participant Ctrl as MatchHudController
     participant HUD as MatchHudWidget
 
     Nav->>MF: NavigationChangedEvent
@@ -62,9 +62,11 @@ sequenceDiagram
     loop каждый кадр на поле
         MF->>MF: remaining -= Time.deltaTime
         MF->>Bus: MatchTimerChangedEvent
-        Bus->>Bridge: normalized, seconds
-        Bridge->>HUD: SetTimer(slider)
+        Bus->>Ctrl: normalized, seconds
+        Ctrl->>HUD: SetTimer(slider)
     end
+
+    Note over HUD: MainMenu/Pause — HUD виден, меню Root поверх
 
     Note over MF: или AdjustTime(-N) / до 0
     MF->>Bus: MatchEndedEvent
@@ -144,24 +146,48 @@ _bus.Publish(new MatchTimeAdjustedEvent(15f, "stoppage"));
 
 ## HUD: слайдер на сцене Game
 
-Match HUD **не на Root** — он живёт только там, где есть матч (**`Game.unity`**). Магазин, турнирная сетка и прочие оверлеи на Root **не тащат** за собой HUD матча.
+Match HUD **не на Root** — он живёт на **`Game.unity`** вместе с полем. Магазин и турнир на Root **не тащат** HUD матча.
+
+### Видимость vs оверлеи
+
+```mermaid
+flowchart TB
+    subgraph game [Game Canvas order 100]
+        HUD[Match HUD — таймер, счёт]
+        Field[Поле, мяч, вратарь]
+    end
+
+    subgraph root [Root Canvas order 200+]
+        Menu[MainMenu / пауза]
+        Tourn[Tournament]
+    end
+
+    Field --> HUD
+    Menu -.->|поверх, HUD остаётся| HUD
+    Tourn -->|HUD скрыт| x[ ]
+```
+
+| Navigation | HUD |
+|------------|-----|
+| `MainMenu`, `OnField`, `Pause` | **Включён** — меню/пауза рисуются поверх, не выключают HUD |
+| `Tournament` | **Выключен** |
 
 ```
 Game.unity
-└── UI / MatchHud          ← Canvas (Screen Space Overlay)
+└── UI / MatchHud          ← Canvas (Screen Space Overlay, order 100)
     ├── MatchHudController  IGameSceneInitializable
     ├── MatchHudWidget
     └── TimerSlider, тексты…
 ```
 
-Инициализация — как у `GoalkeeperView`: `GameState` → `Initialize(bus)`.
+Инициализация — как у `GoalkeeperView`: `GameState` → `Initialize(bus)` → HUD **сразу виден**.
 
 | Компонент | Где | Роль |
 |-----------|-----|------|
-| `MatchHudController` | Game scene | шина → виджет; виден только при `Navigation.OnField` |
-| `MatchHudWidget` + `MatchHudLayout` | Game scene | слайдер 0…1, тексты счёта/секунд |
+| `MatchHudController` | Game scene | шина → слайдер/счёт; `Close` только при `Tournament` |
+| `MatchHudWidget` + `MatchHudLayout` | Game scene | слайдер 0…1, тексты |
 
-**Не** регистрируется в `UIService` на Root — показ/скрытие по `NavigationChangedEvent`.
+**Не** в `UIService` на Root. Подписка на `NavigationChangedEvent` — **только** чтобы скрыть при уходе с поля, не при меню/паузе.
 
 **Inspector (слайдер):** Min = 0, Max = 1, Value = 1, Interactable = off.
 

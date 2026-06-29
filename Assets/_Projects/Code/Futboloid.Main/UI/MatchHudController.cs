@@ -10,7 +10,8 @@ using UnityEngine;
 namespace Futboloid.Main.UI
 {
     /// <summary>
-    /// Match HUD на сцене Game: слушает шину, показывает виджет только при Navigation.OnField.
+    /// Match HUD на сцене Game — часть поля. Меню и пауза (Root overlay) не скрывают HUD;
+    /// прячем только когда уходим с поля (Tournament и т.п.).
     /// </summary>
     public class MatchHudController : MonoBehaviour, IGameSceneInitializable
     {
@@ -32,7 +33,7 @@ namespace Futboloid.Main.UI
             _subscriptions.Add(bus.Subscribe<MatchTimerChangedEvent>(OnTimerChanged));
             _subscriptions.Add(bus.Subscribe<MatchScoreChangedEvent>(OnScoreChanged));
 
-            SetVisible(false);
+            hud?.Open();
         }
 
         private void OnDestroy()
@@ -42,7 +43,10 @@ namespace Futboloid.Main.UI
         }
 
         private void OnNavigationChanged(NavigationChangedEvent e) =>
-            SetVisible(e.Current == NavigationState.OnField);
+            SetVisible(IsFieldHudVisible(e.Current));
+
+        private static bool IsFieldHudVisible(NavigationState state) =>
+            state != NavigationState.Tournament;
 
         private void OnTimerChanged(MatchTimerChangedEvent e) =>
             hud?.SetTimer(e.Normalized, e.RemainingSeconds);

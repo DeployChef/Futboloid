@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,9 +7,9 @@ namespace Futboloid.UI.Views.MatchHud
     public class MatchHudLayout : MonoBehaviour
     {
         [SerializeField] private Slider timerSlider;
-        [SerializeField] private Text remainingTimeText;
-        [SerializeField] private Text playerScoreText;
-        [SerializeField] private Text opponentScoreText;
+        [SerializeField] private TextMeshProUGUI remainingTimeText;
+        [SerializeField] private TextMeshProUGUI playerScoreText;
+        [SerializeField] private TextMeshProUGUI opponentScoreText;
 
         private void Awake()
         {
