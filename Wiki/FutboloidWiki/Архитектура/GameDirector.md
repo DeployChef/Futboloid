@@ -34,14 +34,14 @@ sequenceDiagram
     participant R as AppRootState
     participant G as AppGameState
     participant O as OverlayStateController
-    participant P as PitchStateMachine
+    participant B as IGameEventBus
 
     D->>D: LoadingScreen.ShowImmediate (опц.)
     D->>R: Enter()
     D->>G: Enter(saveData)
     G->>G: Load GameScene additive
-    G->>G: Create Game LifetimeScope
-    G->>P: Initialize (KickoffWait)
+    G->>G: Create Game LifetimeScope (child)
+    G->>G: InitializeSceneViews(bus)
     G->>O: SetState(MainMenu)
     Note over O: Боты на фоне
     D->>D: LoadingScreen.Hide
@@ -49,10 +49,10 @@ sequenceDiagram
 
 ## RestartMatch
 
-Без выгрузки сцены:
+Без выгрузки сцены — через шину и Navigation:
 
-1. `PitchStateMachine.Reset()`
-2. `MatchFlow.ResetScores()`, таймер, защитники
+1. `OverlayStateController` публикует `PitchResetRequestedEvent`
+2. `PitchStateMachine` слушает → `Reset()`; `MatchFlow.Reset()` — счёт, таймер
 3. `Navigation → OnField`, `Pitch → KickoffWait`
 
 ## RestartTournament

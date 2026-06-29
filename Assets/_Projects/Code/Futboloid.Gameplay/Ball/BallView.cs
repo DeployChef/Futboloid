@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Futboloid.Core;
-using Futboloid.Gameplay.Bus;
-using Futboloid.Gameplay.Bus.Events;
-using Futboloid.Gameplay.Match;
+using Futboloid.Core.Bus;
+using Futboloid.Core.Bus.Events;
 using Futboloid.Gameplay.Scene;
 using UnityEngine;
 

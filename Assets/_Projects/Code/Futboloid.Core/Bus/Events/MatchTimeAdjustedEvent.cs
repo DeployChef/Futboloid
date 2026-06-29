@@ -1,4 +1,4 @@
-namespace Futboloid.Gameplay.Bus.Events
+namespace Futboloid.Core.Bus.Events
 {
     /// <summary>
     /// Сдвиг оставшегося времени матча: положительный — доп. время, отрицательный — штраф.

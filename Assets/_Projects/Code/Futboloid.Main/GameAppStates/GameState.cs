@@ -1,12 +1,9 @@
 using Cysharp.Threading.Tasks;
 using Futboloid.Core;
-using Futboloid.Gameplay.Bus;
+using Futboloid.Core.Bus;
 using Futboloid.Gameplay.Input;
-using Futboloid.Gameplay.Match;
 using Futboloid.Gameplay.Scene;
 using Futboloid.Main.DI;
-using Futboloid.Main.Navigation;
-using Futboloid.Main.Session;
 using Futboloid.Main.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -18,29 +15,19 @@ namespace Futboloid.Main.GameAppStates
     public class GameState
     {
         private readonly LifetimeScope _parentLifetimeScope;
-        private readonly GameSession _gameSession;
-        private MatchEndHandler _matchEndHandler;
 
         public LifetimeScope LifetimeScope { get; private set; }
 
-        public GameState(LifetimeScope parentLifetimeScope, GameSession gameSession)
+        public GameState(LifetimeScope parentLifetimeScope)
         {
             _parentLifetimeScope = parentLifetimeScope;
-            _gameSession = gameSession;
         }
 
         public UniTask Enter()
         {
             LifetimeScope = _parentLifetimeScope.CreateChild(builder => builder.RegisterGameScope());
 
-            var bus = LifetimeScope.Container.Resolve<IGameEventBus>();
-            var matchFlow = LifetimeScope.Container.Resolve<MatchFlow>();
-            var pitch = LifetimeScope.Container.Resolve<PitchStateMachine>();
-
-            _gameSession.BindGameScope(bus, matchFlow, pitch);
-            _matchEndHandler = _parentLifetimeScope.Container.Resolve<MatchEndHandler>();
-            _matchEndHandler.Bind(bus);
-
+            var bus = _parentLifetimeScope.Container.Resolve<IGameEventBus>();
             var director = _parentLifetimeScope.Parent.Container.Resolve<IGameDirector>();
             InitializeSceneViews(bus, director);
 
@@ -50,10 +37,6 @@ namespace Futboloid.Main.GameAppStates
 
         public UniTask Exit()
         {
-            _matchEndHandler?.Unbind();
-            _matchEndHandler = null;
-            _gameSession.ClearGameScope();
-
             if (LifetimeScope != null)
             {
                 LifetimeScope.Dispose();

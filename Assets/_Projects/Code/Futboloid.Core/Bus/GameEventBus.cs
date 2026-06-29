@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Futboloid.Gameplay.Bus
+namespace Futboloid.Core.Bus
 {
     public class GameEventBus : IGameEventBus
     {
@@ -33,10 +33,7 @@ namespace Futboloid.Gameplay.Bus
         {
             private readonly Action _onDispose;
 
-            public Subscription(Action onDispose)
-            {
-                _onDispose = onDispose;
-            }
+            public Subscription(Action onDispose) => _onDispose = onDispose;
 
             public void Dispose() => _onDispose();
         }

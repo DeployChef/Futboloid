@@ -37,9 +37,10 @@ namespace Futboloid.Main.GameAppStates
 
             SceneManager.SetActiveScene(gameScene);
 
-            var gameSession = LifetimeScope.Container.Resolve<GameSession>();
-            _gameState = new GameState(LifetimeScope, gameSession);
+            _gameState = new GameState(LifetimeScope);
             await _gameState.Enter();
+
+            LifetimeScope.Container.Resolve<MatchEndHandler>();
 
             Overlay = LifetimeScope.Container.Resolve<OverlayStateController>();
             await Overlay.SetState(NavigationState.MainMenu);

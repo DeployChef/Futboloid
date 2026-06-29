@@ -1,11 +1,11 @@
-namespace Futboloid.Gameplay.Bus.Events
+namespace Futboloid.Core.Bus.Events
 {
-    public readonly struct MatchScoreChangedEvent
+    public readonly struct MatchEndedEvent
     {
         public int PlayerScore { get; }
         public int OpponentScore { get; }
 
-        public MatchScoreChangedEvent(int playerScore, int opponentScore)
+        public MatchEndedEvent(int playerScore, int opponentScore)
         {
             PlayerScore = playerScore;
             OpponentScore = opponentScore;

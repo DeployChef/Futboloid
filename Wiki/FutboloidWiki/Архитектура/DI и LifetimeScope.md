@@ -32,12 +32,12 @@ flowchart TB
     Root --- R5[ISaveStorage]
     Root --- R6[PlayerProgressionService post-MVP]
 
-    App --- A1[GameSession]
+    App --- A1[IGameEventBus]
     App --- A2[OverlayController]
-    App --- A3[RunStateService MVP]
+    App --- A3[TournamentRunService]
+    App --- A4[MatchEndHandler]
 
     Game --- G1[MatchFlow / PitchFSM]
-    Game --- G2[IGameEventBus]
     Game --- G3[BotSimulation]
     Game --- G4[StatusEffectService]
 ```
@@ -92,39 +92,36 @@ public static class RootScopeExtensions
 }
 ```
 
-### Пример: App
+### App scope
 
 ```csharp
 public static class AppScopeExtensions
 {
     public static IContainerBuilder RegisterAppScope(this IContainerBuilder builder)
     {
-        builder.RegisterBuildCallback(RootServiceLocator.Initialize);
-        builder.Register<GameSession>(Lifetime.Singleton);
+        builder.RegisterInstance(GameplaySettings.Load());
+        builder.Register<IGameEventBus, GameEventBus>(Lifetime.Singleton);
+        builder.Register<TournamentRunService>(Lifetime.Singleton)
+            .As<ITournamentRunService>()
+            .As<ITournamentBracketReadModel>();
         builder.Register<OverlayStateController>(Lifetime.Singleton);
-        builder.Register<RunStateService>(Lifetime.Singleton);
+        builder.Register<MatchEndHandler>(Lifetime.Singleton);
 
         return builder;
     }
 }
 ```
 
-### Пример: Game
+### Game scope
 
 ```csharp
 public static class GameScopeExtensions
 {
     public static IContainerBuilder RegisterGameScope(this IContainerBuilder builder)
     {
-        builder.RegisterBuildCallback(G.Initialize);
-
-        builder.Register<IGameEventBus, GameEventBus>(Lifetime.Singleton);
         builder.Register<MatchFlow>(Lifetime.Singleton);
         builder.Register<PitchStateMachine>(Lifetime.Singleton);
-        builder.Register<BotSimulationController>(Lifetime.Singleton);
-        builder.Register<ComboScoreService>(Lifetime.Singleton);
-        builder.Register<IStatusEffectService, StatusEffectService>(Lifetime.Singleton);
-        // BallMotion внутри BallView — не в DI
+        // post-MVP: BotSimulationController, ComboScoreService, StatusEffectService…
 
         return builder;
     }
@@ -153,11 +150,28 @@ LifetimeScope = parentLifetimeScope.CreateChild(builder => builder
 
 ```csharp
 LifetimeScope = parentLifetimeScope.CreateChild(builder => builder
-    .RegisterGameScope()
-    .RegisterBuildCallback(OnGameScopeBuilt)); // при необходимости — ещё inline
+    .RegisterGameScope());
 ```
 
-Цепочка: extension возвращает тот же `builder`, дальше можно вызывать любые `Register*` / `RegisterBuildCallback`.
+`GameState` резолвит `IGameEventBus` из **parent App scope** и передаёт в `Initialize(bus)` на view.
+
+---
+
+## Связь App ↔ Game (без bridge)
+
+> [!important] Не используем `GameSession` / scope-bridge
+> Раньше App-сервисы тянулись к Game через ручной `Bind(bus, pitch)`. **Сейчас нет:** шина в App, связь через **события** и constructor injection из parent scope.
+
+| Задача | Как |
+|--------|-----|
+| Навигация → UI / views | `OverlayStateController` → `NavigationChangedEvent` |
+| Сброс поля перед матчем | `PitchResetRequestedEvent` → `PitchStateMachine` слушает и `Reset()` |
+| Конец матча → турнир | `MatchEndedEvent` → `MatchEndHandler` → `Navigation.Tournament` |
+| View на сцене | `GameState.Enter` → `Initialize(IGameEventBus)` — bus из App |
+
+**Правило:** App **не держит ссылку** на `PitchStateMachine` и не вызывает его напрямую. Game-сервисы **не инжектятся** в App-конструкторы — только общие из parent (`IGameEventBus`) или реакция на шину.
+
+Child scope нужен пока `MatchFlow` / `PitchStateMachine` живут отдельным lifetime от… *(см. обсуждение: сейчас Game child dispose вместе с App — кандидат на слияние в App).*
 
 ---
 
@@ -181,9 +195,9 @@ LifetimeScope = parentLifetimeScope.CreateChild(builder => builder
 | Локатор | Scope | Пример |
 |---------|-------|--------|
 | `RootServiceLocator` | App+ | `UIService`, `IGameDirector` |
-| `G` | Game | `MatchFlow`, `IGameEventBus`, `IStatusEffectService` |
+| `G` | Game (если понадобится) | `MatchFlow` — **не** шина; шина только через DI |
 
-Новая логика — constructor injection; локатор не трогаем.
+Новая логика — constructor injection; локатор не трогаем. **`IGameEventBus` в App scope**, не в `G`.
 
 ---
 
@@ -191,8 +205,8 @@ LifetimeScope = parentLifetimeScope.CreateChild(builder => builder
 
 MonoBehaviour получает `IGameEventBus` в `Initialize`. `BallView` держит `BallMotion` (pure C#). См. [[Шина событий]], [[Связь сцены с кодом]].
 
-- `GameState.Enter`: `RegisterGameScope()` → `Initialize` на view
-- Сброс матча: `MatchResetEvent` на шине
+- `GameState.Enter`: `RegisterGameScope()` → `Initialize(bus)` на view (bus из App)
+- Сброс поля перед матчем: `PitchResetRequestedEvent` на шине
 
 ---
 
@@ -232,4 +246,4 @@ builder
 | `GameState.Enter` | child + `RegisterGameScope`, Initialize views |
 | `AppGameState.Exit` | Dispose, unload scene |
 | Restart турнира | `AppGameState.Exit` → `Enter` |
-| Restart матча | reset внутри Game scope / событие на шине |
+| Restart матча | `PitchResetRequestedEvent` / `PitchStateMachine.Reset()` |

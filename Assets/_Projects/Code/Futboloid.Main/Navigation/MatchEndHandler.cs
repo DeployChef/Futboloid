@@ -1,36 +1,29 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Futboloid.Core;
-using Futboloid.Gameplay.Bus;
-using Futboloid.Gameplay.Bus.Events;
+using Futboloid.Core.Bus;
+using Futboloid.Core.Bus.Events;
 using Futboloid.Main.Navigation;
 
 namespace Futboloid.Main.Navigation
 {
-    public class MatchEndHandler
+    public class MatchEndHandler : IDisposable
     {
         private readonly OverlayStateController _overlay;
         private readonly ITournamentRunService _tournamentRun;
+        private readonly IDisposable _subscription;
 
-        private IDisposable _subscription;
-
-        public MatchEndHandler(OverlayStateController overlay, ITournamentRunService tournamentRun)
+        public MatchEndHandler(
+            IGameEventBus bus,
+            OverlayStateController overlay,
+            ITournamentRunService tournamentRun)
         {
             _overlay = overlay;
             _tournamentRun = tournamentRun;
-        }
-
-        public void Bind(IGameEventBus bus)
-        {
-            Unbind();
             _subscription = bus.Subscribe<MatchEndedEvent>(OnMatchEnded);
         }
 
-        public void Unbind()
-        {
-            _subscription?.Dispose();
-            _subscription = null;
-        }
+        public void Dispose() => _subscription?.Dispose();
 
         private void OnMatchEnded(MatchEndedEvent e)
         {

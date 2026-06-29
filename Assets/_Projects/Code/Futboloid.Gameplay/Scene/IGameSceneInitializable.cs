@@ -1,4 +1,4 @@
-using Futboloid.Gameplay.Bus;
+using Futboloid.Core.Bus;
 
 namespace Futboloid.Gameplay.Scene
 {

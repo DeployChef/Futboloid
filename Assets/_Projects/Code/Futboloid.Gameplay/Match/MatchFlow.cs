@@ -1,8 +1,8 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Futboloid.Core;
-using Futboloid.Gameplay.Bus;
-using Futboloid.Gameplay.Bus.Events;
+using Futboloid.Core.Bus;
+using Futboloid.Core.Bus.Events;
 using UnityEngine;
 
 namespace Futboloid.Gameplay.Match

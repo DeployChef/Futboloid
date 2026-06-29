@@ -88,7 +88,7 @@ sequenceDiagram
 | `Navigation → OnField` | `StartTimerLoop()` (если матч не кончен) |
 | Пауза (`Pause` во время **забега**, см. [[UI и оверлеи#Главное меню ≠ пауза]]) | `StopTimerLoop()` — секунды **сохраняются** |
 | Continue → `OnField` | снова `StartTimerLoop()` с тем же `RemainingSeconds` |
-| `Pitch.Reset()` (новый Play) | стоп корутины, счёт и таймер → 90 с |
+| `PitchResetRequestedEvent` (новый Play) | стоп корутины, счёт и таймер → 90 с |
 | `RemainingSeconds ≤ 0` | `MatchEndedEvent`, стоп корутины |
 | `PitchPhase → MatchEnded` | стоп корутины, флаг конца матча |
 
@@ -222,7 +222,7 @@ flowchart LR
 ```
 
 - Гол: `PitchStateMachine` → `Reshuffle` → `KickoffWait` (матч-таймер **не** сбрасывается).
-- Новый матч: `OverlayStateController` → `Pitch.Reset()` → `MatchFlow.Reset()` + `KickoffWait`.
+- Новый матч: `OverlayStateController` → `PitchResetRequestedEvent` → `PitchStateMachine.Reset()` + `MatchFlow.Reset()` + `KickoffWait`.
 
 ---
 
@@ -277,7 +277,7 @@ stateDiagram-v2
 | Файл | Сборка |
 |------|--------|
 | `Futboloid.Gameplay/Match/MatchFlow.cs` | Game |
-| `Futboloid.Gameplay/Bus/Events/Match*.cs` | Game |
+| `Futboloid.Core/Bus/Events/Match*.cs` | Core |
 | `Futboloid.Main/UI/MatchHudController.cs` | Game scene |
 | `Futboloid.UI/Views/MatchHud/*` | Game scene UI |
 

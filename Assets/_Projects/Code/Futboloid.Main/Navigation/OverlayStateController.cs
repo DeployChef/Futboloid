@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Futboloid.Core;
-using Futboloid.Gameplay.Bus.Events;
-using Futboloid.Main.Session;
+using Futboloid.Core.Bus;
+using Futboloid.Core.Bus.Events;
 using Futboloid.UI;
 using UnityEngine;
 
@@ -9,7 +9,7 @@ namespace Futboloid.Main.Navigation
 {
     public class OverlayStateController
     {
-        private readonly GameSession _session;
+        private readonly IGameEventBus _bus;
         private readonly UIService _uiService;
         private readonly ITournamentRunService _tournamentRun;
 
@@ -19,11 +19,11 @@ namespace Futboloid.Main.Navigation
         public bool IsMatchPausedInMenu { get; private set; }
 
         public OverlayStateController(
-            GameSession session,
+            IGameEventBus bus,
             UIService uiService,
             ITournamentRunService tournamentRun)
         {
-            _session = session;
+            _bus = bus;
             _uiService = uiService;
             _tournamentRun = tournamentRun;
         }
@@ -42,7 +42,7 @@ namespace Futboloid.Main.Navigation
 
             ApplyState(next, previous);
             _uiService.ApplyNavigation(next, IsMatchPausedInMenu);
-            _session.Bus?.Publish(new NavigationChangedEvent(previous, next, IsMatchPausedInMenu));
+            _bus.Publish(new NavigationChangedEvent(previous, next, IsMatchPausedInMenu));
 
             Debug.Log($"[OverlayStateController] {previous} → {next}");
             return UniTask.CompletedTask;
@@ -64,7 +64,7 @@ namespace Futboloid.Main.Navigation
                     {
                         if (newRunFromMenu)
                             _tournamentRun.ResetRun();
-                        _session.Pitch?.Reset();
+                        _bus.Publish(new PitchResetRequestedEvent());
                     }
                     else
                         IsMatchPausedInMenu = false;

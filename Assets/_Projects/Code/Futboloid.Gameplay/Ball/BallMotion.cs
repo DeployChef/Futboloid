@@ -1,5 +1,6 @@
-using Futboloid.Gameplay.Bus;
-using Futboloid.Gameplay.Bus.Events;
+using Futboloid.Core;
+using Futboloid.Core.Bus;
+using Futboloid.Core.Bus.Events;
 using Futboloid.Gameplay.Physics;
 using UnityEngine;
 
