@@ -1,0 +1,30 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = crlf
+trim_trailing_whitespace = false
+insert_final_newline = false
+indent_style = space
+indent_size = 4
+
+# ReSharper / Rider
+resharper_autodetect_indent_settings = true
+resharper_use_indent_from_vs = false
+
+# Unity asmdef: сборка Futboloid.Main и namespace Futboloid.Main — нормальная схема (как Game.Main в LD-57).
+resharper_check_namespace_highlighting = none
+dotnet_diagnostic.IDE0130.severity = none
+
+[{Assets/_Projects/Code/**.cs}]
+resharper_check_namespace_highlighting = none
+dotnet_diagnostic.IDE0130.severity = none
+
+[*.asmdef]
+indent_style = space
+indent_size = 2
+
+[*.{cs,csx}]
+indent_style = space
+indent_size = 4
+tab_width = 4

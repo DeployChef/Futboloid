@@ -1,5 +1,5 @@
 ﻿<Solution>
   <Project Path="Futboloid.Main.csproj" />
-  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="Futboloid.Core.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
 </Solution>

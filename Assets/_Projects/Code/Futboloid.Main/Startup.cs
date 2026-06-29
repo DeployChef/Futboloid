@@ -1,33 +1,46 @@
 using Futboloid.Core;
+using Futboloid.Main.DI;
 using UnityEngine;
+using VContainer;
 
 namespace Futboloid.Main
 {
-    public sealed class Startup : MonoBehaviour
+  /// <summary>
+  /// Точка входа на сцене Root.unity (единственная сцена в Build Settings).
+  /// </summary>
+  public sealed class Startup : MonoBehaviour
+  {
+    [SerializeField] RootLifetimeScope rootScope;
+
+    static bool started;
+
+    void Awake()
     {
-        static bool started;
-        static GameDirector director;
+      if (started)
+      {
+        Debug.LogWarning("[Startup] Already initialized — skipping duplicate Awake.");
+        return;
+      }
 
-        void Awake()
-        {
-            if (started)
-            {
-                Debug.LogWarning("[Startup] Already initialized — skipping duplicate Awake.");
-                return;
-            }
+      if (rootScope == null)
+      {
+        Debug.LogError("[Startup] RootLifetimeScope is not assigned in the Inspector.");
+        return;
+      }
 
-            started = true;
-            director = new GameDirector();
-            director.InitializeGame();
+      started = true;
 
-            Application.quitting += OnApplicationQuitting;
-        }
+      rootScope.Build();
+      var director = rootScope.Container.Resolve<IGameDirector>();
+      director.InitializeGame();
 
-        static void OnApplicationQuitting()
-        {
-            director = null;
-            started = false;
-            Application.quitting -= OnApplicationQuitting;
-        }
+      Application.quitting += OnApplicationQuitting;
     }
+
+    static void OnApplicationQuitting()
+    {
+      started = false;
+      Application.quitting -= OnApplicationQuitting;
+    }
+  }
 }
