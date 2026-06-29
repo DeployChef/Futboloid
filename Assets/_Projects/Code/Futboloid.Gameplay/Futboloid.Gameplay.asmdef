@@ -2,7 +2,8 @@
     "name": "Futboloid.Gameplay",
     "rootNamespace": "Futboloid.Gameplay",
     "references": [
-        "Futboloid.Core"
+        "Futboloid.Core",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

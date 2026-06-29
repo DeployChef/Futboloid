@@ -1,3 +1,4 @@
+using System;
 using Futboloid.Gameplay.Bus;
 using Futboloid.Gameplay.Bus.Events;
 using UnityEngine;
@@ -8,6 +9,8 @@ namespace Futboloid.Gameplay.Match
     {
         private readonly IGameEventBus _bus;
         private readonly MatchFlow _matchFlow;
+        private readonly IDisposable _ballServedSubscription;
+        private readonly IDisposable _goalScoredSubscription;
 
         public PitchPhase Current { get; private set; } = PitchPhase.KickoffWait;
 
@@ -15,6 +18,8 @@ namespace Futboloid.Gameplay.Match
         {
             _bus = bus;
             _matchFlow = matchFlow;
+            _ballServedSubscription = bus.Subscribe<BallServedEvent>(_ => StartSimulation());
+            _goalScoredSubscription = bus.Subscribe<GoalScoredEvent>(_ => OnGoalScored());
         }
 
         public bool IsSimulating => Current == PitchPhase.Simulating;
@@ -36,6 +41,12 @@ namespace Futboloid.Gameplay.Match
         public void EnterMatchEnded() => TransitionTo(PitchPhase.MatchEnded);
 
         public void CompleteReshuffle() => EnterKickoffWait();
+
+        private void OnGoalScored()
+        {
+            EnterReshuffle();
+            CompleteReshuffle();
+        }
 
         private void TransitionTo(PitchPhase phase)
         {
