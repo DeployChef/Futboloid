@@ -1,3 +1,6 @@
 ﻿<Solution>
-  <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="Futboloid.Gameplay.csproj" />
+  <Project Path="Futboloid.Main.csproj" />
+  <Project Path="Futboloid.Core.csproj" />
+  <Project Path="Futboloid.UI.csproj" />
 </Solution>

@@ -1,0 +1,21 @@
+{
+    "name": "Futboloid.Main",
+    "rootNamespace": "Futboloid.Main",
+    "references": [
+        "Futboloid.Core",
+        "Futboloid.Gameplay",
+        "Futboloid.UI",
+        "UniTask",
+        "Unity.InputSystem",
+        "VContainer"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

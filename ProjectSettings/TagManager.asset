@@ -12,13 +12,13 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - ' '
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
+  - Wall
+  - GoalEnemy
+  - GoalPlayer
+  - Keeper
   - 
   - 
   - 
@@ -44,6 +44,15 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Field
+    uniqueID: 2381144709
+    locked: 0
+  - name: Gameplay
+    uniqueID: 3117749993
+    locked: 0
+  - name: FX
+    uniqueID: 1230648873
     locked: 0
   m_RenderingLayers:
   - Default
