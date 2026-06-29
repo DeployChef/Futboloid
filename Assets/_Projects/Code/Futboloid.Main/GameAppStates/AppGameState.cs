@@ -14,7 +14,6 @@ namespace Futboloid.Main.GameAppStates
     {
         private readonly LifetimeScope _parentLifetimeScope;
         private GameState _gameState;
-        private bool _gameSceneIsLoaded;
 
         public LifetimeScope LifetimeScope { get; private set; }
         public GameState GameState => _gameState;
@@ -30,7 +29,7 @@ namespace Futboloid.Main.GameAppStates
             LifetimeScope = _parentLifetimeScope.CreateChild(builder => builder.RegisterAppScope());
 
             var gameScene = await EnsureGameSceneAsync();
-            if (!gameScene.IsValid())
+            if (!gameScene.IsValid() || !gameScene.isLoaded)
             {
                 Debug.LogError($"[AppGameState] Scene '{GameScenes.Game}' not found. Is it in Build Settings?");
                 return;
@@ -62,34 +61,36 @@ namespace Futboloid.Main.GameAppStates
                 LifetimeScope = null;
             }
 
-            await UnloadGameSceneIfNeededAsync();
+            if (TryFindLoadedGameScene(out var gameScene))
+                await SceneManager.UnloadSceneAsync(gameScene).ToUniTask();
 
             Debug.Log($"[AppGameState] '{GameScenes.Game}' exited.");
         }
 
         private async UniTask<Scene> EnsureGameSceneAsync()
         {
-            var gameScene = SceneManager.GetSceneByName(GameScenes.Game);
-            _gameSceneIsLoaded = gameScene.IsValid();
-
-            if (_gameSceneIsLoaded)
-            {
-                Debug.Log($"[AppGameState] '{GameScenes.Game}' already loaded — skip additive load.");
+            if (TryFindLoadedGameScene(out var gameScene))
                 return gameScene;
-            }
 
             await SceneManager.LoadSceneAsync(GameScenes.Game, LoadSceneMode.Additive).ToUniTask();
-            return SceneManager.GetSceneByName(GameScenes.Game);
+            TryFindLoadedGameScene(out gameScene);
+            return gameScene;
         }
 
-        private async UniTask UnloadGameSceneIfNeededAsync()
+        private static bool TryFindLoadedGameScene(out Scene gameScene)
         {
-            if (_gameSceneIsLoaded)
-                return;
+            for (var i = 0; i < SceneManager.sceneCount; i++)
+            {
+                var scene = SceneManager.GetSceneAt(i);
+                if (scene.name == GameScenes.Game && scene.isLoaded)
+                {
+                    gameScene = scene;
+                    return true;
+                }
+            }
 
-            var gameScene = SceneManager.GetSceneByName(GameScenes.Game);
-            if (gameScene.IsValid())
-                await SceneManager.UnloadSceneAsync(gameScene).ToUniTask();
+            gameScene = default;
+            return false;
         }
     }
 }
