@@ -55,7 +55,7 @@ namespace Futboloid.Main.Navigation
                     Time.timeScale = 1f;
                     var resumingFromPause = previous == NavigationState.MainMenu && IsMatchPausedInMenu;
                     if (!resumingFromPause)
-                        _session.Pitch?.EnterKickoffWait();
+                        _session.Pitch?.Reset();
                     else
                         IsMatchPausedInMenu = false;
                     break;

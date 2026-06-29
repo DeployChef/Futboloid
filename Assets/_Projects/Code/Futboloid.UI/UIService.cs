@@ -42,18 +42,15 @@ namespace Futboloid.UI
             switch (state)
             {
                 case NavigationState.MainMenu:
-                    Close<MatchHudWidget>();
                     ShowMainMenu(isMatchPausedInMenu);
                     break;
 
                 case NavigationState.OnField:
                     Close<MainMenuWidget>();
                     Close<PauseWidget>();
-                    Show<MatchHudWidget>();
                     break;
 
                 case NavigationState.Tournament:
-                    Close<MatchHudWidget>();
                     Show<TournamentWidget>();
                     break;
 

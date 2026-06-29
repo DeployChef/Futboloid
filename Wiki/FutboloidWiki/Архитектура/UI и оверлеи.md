@@ -8,17 +8,17 @@ tags:
 
 ← [[Обзор архитектуры]] | [[Машины состояний]]
 
-Главный принцип: **все экраны — оверлеи на Root Canvas**, игровая сцена всегда снизу.
+Главный принцип: **навигационные оверлеи (меню, турнир, магазин…) — Root Canvas**; **Match HUD — только на сцене Game**, потому что матч есть не везде.
 
 ## Слои canvas (sorting order)
 
-| Order | Слой | Когда виден |
-|-------|------|-------------|
-| 0 | Game world | Всегда (после boot) |
-| 100 | Match HUD | `Navigation.OnField` |
-| 200 | Main Menu | `Navigation.MainMenu` |
-| 300 | Tournament | `Navigation.Tournament` |
-| 400 | Pause | `Navigation.Pause` |
+| Order | Слой | Сцена | Когда виден |
+|-------|------|-------|-------------|
+| 0 | Game world | Game | Всегда (после boot) |
+| 100 | Match HUD | **Game** | `Navigation.OnField` |
+| 200 | Main Menu | Root | `Navigation.MainMenu` |
+| 300 | Tournament | Root | `Navigation.Tournament` |
+| 400 | Pause / Shop / … | Root | по Navigation |
 | 1000 | Scene Transition | Во время переходов |
 | 1100 | Loading / blocking | Startup |
 
@@ -48,21 +48,22 @@ tags:
 
 ```csharp
 uiService.Show<MainMenuWidget>();
-uiService.Show<MatchHudWidget>();
 uiService.Close<MainMenuWidget>();
 ```
 
-Виджеты — prefab в `Resources/UI/` или Addressables позже.
+Только **Root-оверлеи** регистрируются в `UIService`. Match HUD — **не здесь** (см. [[MatchFlow и таймер#HUD: слайдер на сцене Game]]).
 
 ## Match HUD
 
 Элементы из [[../GDD/06 HUD и визуальный фидбек|GDD §6]]:
 
-- Таймер 90 с
-- Счёт + комбо
+- Таймер 90 с (слайдер)
+- Счёт + комбо (комбо — позже)
 - Стек баффов
 
-Подписывается на `MatchFlow` / `ComboScoreService`, не на `Update` напрямую.
+**Не** опрашивает `MatchFlow` в `Update`. На сцене **Game**: `MatchHudController` слушает шину (`MatchTimerChangedEvent`, `MatchScoreChangedEvent`, `NavigationChangedEvent`). Детали: [[MatchFlow и таймер#HUD: слайдер на сцене Game]].
+
+Стек баффов — тот же принцип «события + локальная анимация», см. [[Прогрессия и эффекты#7. HUD — события + анимация кольца]].
 
 ## Scene Transition
 

@@ -10,7 +10,6 @@ namespace Futboloid.Main.DI
     {
         public static IContainerBuilder RegisterRootScope(this IContainerBuilder builder)
         {
-            builder.Register<MatchHudWidget>(Lifetime.Singleton);
             builder.Register<PauseWidget>(Lifetime.Singleton);
             builder.Register<TournamentWidget>(Lifetime.Singleton);
             builder.Register<UIService>(Lifetime.Singleton);
@@ -32,7 +31,6 @@ namespace Futboloid.Main.DI
         {
             var ui = container.Resolve<UIService>();
             ui.Register(container.Resolve<MainMenuWidget>());
-            ui.Register(container.Resolve<MatchHudWidget>());
             ui.Register(container.Resolve<PauseWidget>());
             ui.Register(container.Resolve<TournamentWidget>());
         }

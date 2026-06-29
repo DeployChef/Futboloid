@@ -3,7 +3,8 @@
     "rootNamespace": "Futboloid.Gameplay",
     "references": [
         "Futboloid.Core",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

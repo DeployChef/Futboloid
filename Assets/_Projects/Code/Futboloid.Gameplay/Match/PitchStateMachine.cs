@@ -11,6 +11,7 @@ namespace Futboloid.Gameplay.Match
         private readonly MatchFlow _matchFlow;
         private readonly IDisposable _ballServedSubscription;
         private readonly IDisposable _goalScoredSubscription;
+        private readonly IDisposable _matchEndedSubscription;
 
         public PitchPhase Current { get; private set; } = PitchPhase.KickoffWait;
 
@@ -20,6 +21,7 @@ namespace Futboloid.Gameplay.Match
             _matchFlow = matchFlow;
             _ballServedSubscription = bus.Subscribe<BallServedEvent>(_ => StartSimulation());
             _goalScoredSubscription = bus.Subscribe<GoalScoredEvent>(_ => OnGoalScored());
+            _matchEndedSubscription = bus.Subscribe<MatchEndedEvent>(_ => EnterMatchEnded());
         }
 
         public bool IsSimulating => Current == PitchPhase.Simulating;
