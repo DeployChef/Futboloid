@@ -8,17 +8,17 @@ tags:
 
 ← [[Обзор архитектуры]] | [[Машины состояний]]
 
-Главный принцип: **навигационные оверлеи (меню, турнир, магазин…) — Root Canvas**; **Match HUD — только на сцене Game**, потому что матч есть не везде.
+Главный принцип: **Root** — только глобальные оверлеи (меню, магазин…). **Game** — всё, что относится к полю: Match HUD, турнирная сетка после матча.
 
 ## Слои canvas (sorting order)
 
 | Order | Слой | Сцена | Когда виден |
 |-------|------|-------|-------------|
 | 0 | Game world | Game | Пока загружена Game |
-| 100 | **Match HUD** | **Game** | Пока на поле: `MainMenu`, `OnField`, `Pause` (не `Tournament`) |
-| 200 | Main Menu / пауза | Root | `Navigation.MainMenu` (в т.ч. Escape-пауза в MVP) |
-| 300 | Tournament | Root | `Navigation.Tournament` |
-| 400 | Shop / прочее | Root | по Navigation |
+| 100 | **Match HUD** | **Game** | Пока на поле: `MainMenu`, `OnField`, `Pause` |
+| 150 | **Tournament** | **Game** | `Navigation.Tournament` (после матча) |
+| 200 | Main Menu / пауза | Root | `Navigation.MainMenu` |
+| 300 | Shop / прочее | Root | по Navigation |
 | 1000 | Scene Transition | Во время переходов |
 | 1100 | Loading / blocking | Startup |
 
@@ -70,9 +70,20 @@ uiService.Close<MainMenuWidget>();
 | `Pause` / `MainMenu` + `IsMatchPausedInMenu` | **Виден** — меню поверх поля |
 | `Tournament` | **Скрыт** — ушли с экрана матча |
 
-`MatchHudController` обновляет слайдер/счёт с шины; **не** прячет HUD при меню/паузе — только при `Tournament`. Детали: [[MatchFlow и таймер#HUD: слайдер на сцене Game]].
+`MatchHudController` обновляет слайдер/счёт с шины; скрывает HUD только при `Tournament` (сетка перекрывает). Детали: [[MatchFlow и таймер#HUD: слайдер на сцене Game]].
 
-Стек баффов — тот же принцип «события + локальная анимация», см. [[Прогрессия и эффекты#7. HUD — события + анимация кольца]].
+## Tournament overlay (после матча)
+
+Тоже на **`Game.unity`**, не Root — часть игрового поля, как HUD.
+
+| Navigation | Tournament overlay |
+|------------|-------------------|
+| `Tournament` | **Виден** — сетка, счёт матча, кнопка **МАТЧ!** |
+| Остальное | Скрыт (`TournamentController` по `NavigationChangedEvent`) |
+
+`TournamentController` + `TournamentWidget` / `TournamentLayout`. Данные — `IGameDirector.TournamentBracket` (App `TournamentRunService`). Кнопка **МАТЧ!** → `GoOnField()`.
+
+Root `UIService` турнир **не** показывает — только закрывает MainMenu при переходе в `Tournament`.
 
 ## Scene Transition
 

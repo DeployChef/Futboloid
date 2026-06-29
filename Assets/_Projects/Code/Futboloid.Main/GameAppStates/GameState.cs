@@ -1,10 +1,13 @@
 using Cysharp.Threading.Tasks;
+using Futboloid.Core;
 using Futboloid.Gameplay.Bus;
 using Futboloid.Gameplay.Input;
 using Futboloid.Gameplay.Match;
 using Futboloid.Gameplay.Scene;
 using Futboloid.Main.DI;
+using Futboloid.Main.Navigation;
 using Futboloid.Main.Session;
+using Futboloid.Main.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer;
@@ -16,6 +19,7 @@ namespace Futboloid.Main.GameAppStates
     {
         private readonly LifetimeScope _parentLifetimeScope;
         private readonly GameSession _gameSession;
+        private MatchEndHandler _matchEndHandler;
 
         public LifetimeScope LifetimeScope { get; private set; }
 
@@ -34,7 +38,11 @@ namespace Futboloid.Main.GameAppStates
             var pitch = LifetimeScope.Container.Resolve<PitchStateMachine>();
 
             _gameSession.BindGameScope(bus, matchFlow, pitch);
-            InitializeSceneViews(bus);
+            _matchEndHandler = _parentLifetimeScope.Container.Resolve<MatchEndHandler>();
+            _matchEndHandler.Bind(bus);
+
+            var director = _parentLifetimeScope.Parent.Container.Resolve<IGameDirector>();
+            InitializeSceneViews(bus, director);
 
             Debug.Log("[GameState] Game scope ready, views initialized.");
             return UniTask.CompletedTask;
@@ -42,6 +50,8 @@ namespace Futboloid.Main.GameAppStates
 
         public UniTask Exit()
         {
+            _matchEndHandler?.Unbind();
+            _matchEndHandler = null;
             _gameSession.ClearGameScope();
 
             if (LifetimeScope != null)
@@ -54,7 +64,7 @@ namespace Futboloid.Main.GameAppStates
             return UniTask.CompletedTask;
         }
 
-        private static void InitializeSceneViews(IGameEventBus bus)
+        private void InitializeSceneViews(IGameEventBus bus, IGameDirector director)
         {
             var gameScene = SceneManager.GetActiveScene();
             var roots = gameScene.GetRootGameObjects();
@@ -68,6 +78,9 @@ namespace Futboloid.Main.GameAppStates
             {
                 foreach (var initializable in root.GetComponentsInChildren<MonoBehaviour>(true))
                 {
+                    if (initializable is TournamentController tournamentController)
+                        tournamentController.BindDirector(director);
+
                     if (initializable is IGameSceneInitializable sceneInit)
                     {
                         sceneInit.Initialize(bus);

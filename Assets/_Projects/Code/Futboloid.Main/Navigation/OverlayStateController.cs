@@ -11,16 +11,21 @@ namespace Futboloid.Main.Navigation
     {
         private readonly GameSession _session;
         private readonly UIService _uiService;
+        private readonly TournamentRunService _tournamentRun;
 
         private bool _initialized;
 
         public NavigationState Current { get; private set; }
         public bool IsMatchPausedInMenu { get; private set; }
 
-        public OverlayStateController(GameSession session, UIService uiService)
+        public OverlayStateController(
+            GameSession session,
+            UIService uiService,
+            TournamentRunService tournamentRun)
         {
             _session = session;
             _uiService = uiService;
+            _tournamentRun = tournamentRun;
         }
 
         public UniTask SetState(NavigationState next)
@@ -54,8 +59,13 @@ namespace Futboloid.Main.Navigation
                 case NavigationState.OnField:
                     Time.timeScale = 1f;
                     var resumingFromPause = previous == NavigationState.MainMenu && IsMatchPausedInMenu;
+                    var newRunFromMenu = previous == NavigationState.MainMenu && !IsMatchPausedInMenu;
                     if (!resumingFromPause)
+                    {
+                        if (newRunFromMenu)
+                            _tournamentRun.ResetRun();
                         _session.Pitch?.Reset();
+                    }
                     else
                         IsMatchPausedInMenu = false;
                     break;

@@ -3,7 +3,9 @@ using Futboloid.Core;
 using Futboloid.Main.DI;
 using Futboloid.Main.GameAppStates;
 using Futboloid.Main.Navigation;
+using Futboloid.Main.Session;
 using UnityEngine;
+using VContainer;
 
 namespace Futboloid.Main
 {
@@ -25,6 +27,8 @@ namespace Futboloid.Main
 
         public bool IsMatchPausedInMenu =>
             _overlay != null && _overlay.IsMatchPausedInMenu;
+
+        public ITournamentBracketReadModel TournamentBracket { get; private set; }
 
         public void InitializeGame()
         {
@@ -56,6 +60,7 @@ namespace Futboloid.Main
             _appGameState = appRoot.AppGameState;
             await _appGameState.Enter();
             _overlay = _appGameState.Overlay;
+            TournamentBracket = _appGameState.LifetimeScope.Container.Resolve<TournamentRunService>();
 
             Debug.Log("[GameDirector] Infrastructure ready (Root → App → Game → MainMenu).");
         }

@@ -51,7 +51,8 @@ namespace Futboloid.UI
                     break;
 
                 case NavigationState.Tournament:
-                    Show<TournamentWidget>();
+                    Close<MainMenuWidget>();
+                    Close<PauseWidget>();
                     break;
 
                 case NavigationState.Pause:

@@ -4,6 +4,7 @@ namespace Futboloid.Core
     {
         NavigationState CurrentNavigation { get; }
         bool IsMatchPausedInMenu { get; }
+        ITournamentBracketReadModel TournamentBracket { get; }
 
         void InitializeGame();
         void GoOnField();
