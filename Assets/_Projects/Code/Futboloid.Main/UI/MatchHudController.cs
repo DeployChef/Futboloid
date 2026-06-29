@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Futboloid.Core;
-using Futboloid.Gameplay.Bus;
-using Futboloid.Gameplay.Bus.Events;
-using Futboloid.Gameplay.Scene;
+using Futboloid.Core.Bus;
+using Futboloid.Core.Bus.Events;
 using Futboloid.UI.Views.MatchHud;
 using UnityEngine;
+using VContainer;
 
 namespace Futboloid.Main.UI
 {
@@ -13,13 +13,14 @@ namespace Futboloid.Main.UI
     /// Match HUD на сцене Game — часть поля. Меню и пауза (Root overlay) не скрывают HUD;
     /// прячем только когда уходим с поля (Tournament и т.п.).
     /// </summary>
-    public class MatchHudController : MonoBehaviour, IGameSceneInitializable
+    public class MatchHudController : MonoBehaviour
     {
         [SerializeField] private MatchHudWidget hud;
 
         private readonly List<IDisposable> _subscriptions = new();
 
-        public void Initialize(IGameEventBus bus)
+        [Inject]
+        public void Construct(IGameEventBus bus)
         {
             if (hud == null)
                 hud = GetComponentInChildren<MatchHudWidget>(true);

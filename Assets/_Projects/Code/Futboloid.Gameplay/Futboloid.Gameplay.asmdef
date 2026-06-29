@@ -4,7 +4,8 @@
     "references": [
         "Futboloid.Core",
         "Unity.InputSystem",
-        "UniTask"
+        "UniTask",
+        "VContainer"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

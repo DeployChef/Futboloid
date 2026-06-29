@@ -66,7 +66,7 @@ sequenceDiagram
         Ctrl->>HUD: SetTimer(slider)
     end
 
-    Note over HUD: MainMenu/Pause — HUD виден, меню Root поверх
+    Note over HUD: Pause во время забега — HUD виден, оверлей поверх
 
     Note over MF: или AdjustTime(-N) / до 0
     MF->>Bus: MatchEndedEvent
@@ -86,9 +86,9 @@ sequenceDiagram
 | Событие | Поведение |
 |---------|-----------|
 | `Navigation → OnField` | `StartTimerLoop()` (если матч не кончен) |
-| Пауза (`MainMenu`, `timeScale = 0`) | `StopTimerLoop()` — секунды **сохраняются** |
+| Пауза (`Pause` во время **забега**, см. [[UI и оверлеи#Главное меню ≠ пауза]]) | `StopTimerLoop()` — секунды **сохраняются** |
 | Continue → `OnField` | снова `StartTimerLoop()` с тем же `RemainingSeconds` |
-| `Pitch.Reset()` (новый Play) | стоп корутины, счёт и таймер → 90 с |
+| `PitchResetRequestedEvent` (новый Play) | стоп корутины, счёт и таймер → 90 с |
 | `RemainingSeconds ≤ 0` | `MatchEndedEvent`, стоп корутины |
 | `PitchPhase → MatchEnded` | стоп корутины, флаг конца матча |
 
@@ -184,7 +184,8 @@ flowchart TB
 
 | Navigation | HUD |
 |------------|-----|
-| `MainMenu`, `OnField`, `Pause` | **Включён** — меню/пауза рисуются поверх, не выключают HUD |
+| `OnField`, `Pause` (во время забега) | **Включён** — пауза рисуется поверх |
+| `MainMenu` | **Выключен** — фоновые боты без матча, см. [[UI и оверлеи#Главное меню ≠ пауза]] |
 | `Tournament` | **Выключен** |
 
 ```
@@ -220,8 +221,43 @@ flowchart LR
     GS --> PSM
 ```
 
-- Гол: `PitchStateMachine` → `Reshuffle` → `KickoffWait` (таймер **не** сбрасывается).
-- Новый матч: `OverlayStateController` → `Pitch.Reset()` → `MatchFlow.Reset()` + `KickoffWait`.
+- Гол: `PitchStateMachine` → `Reshuffle` → `KickoffWait` (матч-таймер **не** сбрасывается).
+- Новый матч: `OverlayStateController` → `PitchResetRequestedEvent` → `PitchStateMachine.Reset()` + `MatchFlow.Reset()` + `KickoffWait`.
+
+---
+
+## KickoffWait: окно ввода (идея, не реализовано)
+
+> [!idea] Не пауза матч-таймера
+> **Не** останавливаем 90-секундный таймер в `KickoffWait`. Вместо этого — **отдельный короткий таймер ввода** (kickoff window), не связанный с `MatchFlow`.
+
+| Таймер | Когда | Что делает |
+|--------|-------|------------|
+| **Матч** (`MatchFlow`) | `Simulating` | Обратный отсчёт 90 с, счёт голов |
+| **Окно ввода** (kickoff) | `KickoffWait` | Короткая задержка перед автосервом |
+
+### Поведение окна ввода
+
+1. Фаза `KickoffWait`: мяч на `BallKickoffAnchor`, матч-таймер **не тикает** (или ещё не запущен — только после первого `Simulating`).
+2. Стартует **отдельный** отсчёт (например 3–5 с) — «окно», пока игрок может **сам** пнуть (Пробел / тап).
+3. Если игрок пнул раньше — окно отменяется, переход в `Simulating`, матч-таймер идёт.
+4. Если окно **истекло** — **автоматический** удар по мячу (серв без игрока), затем `Simulating`.
+
+```mermaid
+stateDiagram-v2
+    [*] --> KickoffWait: после гола / старт матча
+    KickoffWait --> Simulating: игрок пнул
+    KickoffWait --> Simulating: окно истекло → автосерв
+    Simulating --> KickoffWait: гол → Reshuffle
+```
+
+### Зачем так
+
+- Не нужно «замораживать» матч-таймер на каждом кик-оффе — проще модель: таймер = только активная игра.
+- Игрок не застревает, если забыл Пробел — автосерв после задержки.
+- Окно ввода — зона `PitchStateMachine` + `BallView` / anchor; в шину можно позже добавить `KickoffWindowChangedEvent` (не в MVP).
+
+**Сейчас в коде:** только ручной серв по Пробелу, без окна и без автосерва. Матч-таймер крутится всё время на `OnField` — это временно, до реализации идеи выше.
 
 ---
 
@@ -230,7 +266,7 @@ flowchart LR
 | Фича | Как добавить позже |
 |------|---------------------|
 | Доп. время при голе в концовке | подписчик публикует `MatchTimeAdjustedEvent` |
-| Остановка таймера только в `KickoffWait` | условие в корутине по `PitchPhase` |
+| Окно ввода в `KickoffWait` + автосерв | отдельный таймер в Pitch FSM, см. § выше |
 | Анимация счёта (bounce) | `MatchHudLayout` на `MatchScoreChangedEvent` + DOTween |
 | `ComboScoreService` | отдельные события, тот же `MatchHudController` |
 
@@ -241,7 +277,7 @@ flowchart LR
 | Файл | Сборка |
 |------|--------|
 | `Futboloid.Gameplay/Match/MatchFlow.cs` | Game |
-| `Futboloid.Gameplay/Bus/Events/Match*.cs` | Game |
+| `Futboloid.Core/Bus/Events/Match*.cs` | Core |
 | `Futboloid.Main/UI/MatchHudController.cs` | Game scene |
 | `Futboloid.UI/Views/MatchHud/*` | Game scene UI |
 

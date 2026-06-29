@@ -95,8 +95,8 @@ SceneManager.SetActiveScene(gameScene);
 | Поле, коллайдеры / хитбоксы | Статика уровня (не dynamic physics для мяча) |
 | View + registry | Мяч, вратарь, защитники — см. [[Связь сцены с кодом]] |
 | Вратарь, мяч, защитники | Геймплейные объекты |
-| `BotSimulationController` | Боты играют, когда игрок в меню или не управляет |
-| `Game LifetimeScope` | Child DI: `MatchFlow`, `Ball`, `Goalkeeper`… |
+| `BotSimulationController` | Боты играют, когда игрок в меню или не управляет (post-MVP) |
+| `Game LifetimeScope` | Child DI: `MatchFlow`, `PitchStateMachine` |
 
 **Главное меню здесь НЕ сцена** — только контент поля. Меню рисуется из Root UI поверх.
 
@@ -106,7 +106,7 @@ SceneManager.SetActiveScene(gameScene);
 
 | Ситуация | Действие |
 |----------|----------|
-| Рестарт матча | **Не** выгружать GameScene — сброс через `PitchStateMachine` + `MatchFlow.Reset()` |
+| Рестарт матча | **Не** выгружать GameScene — `PitchResetRequestedEvent` → `PitchStateMachine.Reset()` + `MatchFlow.Reset()` |
 | Рестарт турнира | `AppGameState.Exit()` → `Enter()` или soft reset |
 | Выход в «главное меню» | Показать overlay, боты продолжают / перезапускают фоновую игру |
 | Полный рестарт приложения | Только dev / крайний случай |

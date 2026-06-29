@@ -1,6 +1,4 @@
-using Futboloid.Core;
-
-namespace Futboloid.Gameplay.Bus.Events
+namespace Futboloid.Core.Bus.Events
 {
     public readonly struct NavigationChangedEvent
     {

@@ -2,16 +2,15 @@ using System;
 using System.Collections.Generic;
 using Futboloid.Core;
 using Futboloid.Gameplay.Ball;
-using Futboloid.Gameplay.Bus;
-using Futboloid.Gameplay.Bus.Events;
+using Futboloid.Core.Bus;
+using Futboloid.Core.Bus.Events;
 using Futboloid.Gameplay.Input;
-using Futboloid.Gameplay.Match;
-using Futboloid.Gameplay.Scene;
 using UnityEngine;
+using VContainer;
 
 namespace Futboloid.Gameplay.Keeper
 {
-    public class GoalkeeperView : MonoBehaviour, IGameSceneInitializable, IGameplayInputConsumer
+    public class GoalkeeperView : MonoBehaviour
     {
         [SerializeField] private float speed = 8f;
         [SerializeField] private float returnToCenterSpeed = 8f;
@@ -31,13 +30,11 @@ namespace Futboloid.Gameplay.Keeper
         private bool _returningToCenter;
         private IGameplayInput _input;
 
-        public void BindInput(IGameplayInput input)
+        [Inject]
+        public void Construct(IGameEventBus bus, IGameplayInput input)
         {
             _input = input;
-        }
 
-        public void Initialize(IGameEventBus bus)
-        {
             if (ball == null)
                 ball = FindAnyObjectByType<BallView>();
 
@@ -56,18 +53,9 @@ namespace Futboloid.Gameplay.Keeper
             if (!_onField)
                 return;
 
-            if (_returningToCenter)
-            {
-                if (_phase == PitchPhase.KickoffWait)
-                    UpdateKickoffAim();
-
-                return;
-            }
-
             switch (_phase)
             {
                 case PitchPhase.KickoffWait:
-                    ApplyHorizontalMovement(kickoffMinX, kickoffMaxX);
                     UpdateKickoffAim();
 
                     if (WasServePressed())
@@ -76,9 +64,16 @@ namespace Futboloid.Gameplay.Keeper
                         ball?.TryServe(direction);
                     }
 
+                    if (_returningToCenter)
+                        return;
+
+                    ApplyHorizontalMovement(kickoffMinX, kickoffMaxX);
                     break;
 
                 case PitchPhase.Simulating:
+                    if (_returningToCenter)
+                        return;
+
                     ApplyHorizontalMovement(playMinX, playMaxX);
                     break;
             }
@@ -137,7 +132,9 @@ namespace Futboloid.Gameplay.Keeper
             var previous = _phase;
             _phase = e.Phase;
 
-            if (e.Phase != PitchPhase.Simulating && previous != e.Phase)
+            if (e.Phase == PitchPhase.KickoffWait && previous != PitchPhase.KickoffWait)
+                BeginReturnToCenter();
+            else if (previous == PitchPhase.Simulating && e.Phase != PitchPhase.Simulating && e.Phase != PitchPhase.KickoffWait)
                 BeginReturnToCenter();
         }
 
@@ -145,7 +142,19 @@ namespace Futboloid.Gameplay.Keeper
         {
             _onField = e.Current == NavigationState.OnField;
 
-            if (!_onField)
+            if (_onField)
+            {
+                _returningToCenter = false;
+                return;
+            }
+
+            if (e.IsMatchPausedInMenu)
+            {
+                _returningToCenter = false;
+                return;
+            }
+
+            if (e.Previous == NavigationState.OnField)
                 BeginReturnToCenter();
         }
 

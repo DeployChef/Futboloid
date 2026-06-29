@@ -1,17 +1,19 @@
 using System;
-using Futboloid.Gameplay.Bus;
-using Futboloid.Gameplay.Bus.Events;
+using Futboloid.Core;
+using Futboloid.Core.Bus;
+using Futboloid.Core.Bus.Events;
 using UnityEngine;
 
 namespace Futboloid.Gameplay.Match
 {
-    public class PitchStateMachine
+    public class PitchStateMachine : IDisposable
     {
         private readonly IGameEventBus _bus;
         private readonly MatchFlow _matchFlow;
         private readonly IDisposable _ballServedSubscription;
         private readonly IDisposable _goalScoredSubscription;
         private readonly IDisposable _matchEndedSubscription;
+        private readonly IDisposable _pitchResetSubscription;
 
         public PitchPhase Current { get; private set; } = PitchPhase.KickoffWait;
 
@@ -22,6 +24,7 @@ namespace Futboloid.Gameplay.Match
             _ballServedSubscription = bus.Subscribe<BallServedEvent>(_ => StartSimulation());
             _goalScoredSubscription = bus.Subscribe<GoalScoredEvent>(_ => OnGoalScored());
             _matchEndedSubscription = bus.Subscribe<MatchEndedEvent>(_ => EnterMatchEnded());
+            _pitchResetSubscription = bus.Subscribe<PitchResetRequestedEvent>(_ => Reset());
         }
 
         public bool IsSimulating => Current == PitchPhase.Simulating;
@@ -30,6 +33,14 @@ namespace Futboloid.Gameplay.Match
         {
             _matchFlow.Reset();
             TransitionTo(PitchPhase.KickoffWait);
+        }
+
+        public void Dispose()
+        {
+            _ballServedSubscription?.Dispose();
+            _goalScoredSubscription?.Dispose();
+            _matchEndedSubscription?.Dispose();
+            _pitchResetSubscription?.Dispose();
         }
 
         public void EnterKickoffWait() => TransitionTo(PitchPhase.KickoffWait);

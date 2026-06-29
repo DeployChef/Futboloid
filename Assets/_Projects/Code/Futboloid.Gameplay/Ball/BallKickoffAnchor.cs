@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Futboloid.Core;
-using Futboloid.Gameplay.Bus;
-using Futboloid.Gameplay.Bus.Events;
-using Futboloid.Gameplay.Match;
-using Futboloid.Gameplay.Scene;
+using Futboloid.Core.Bus;
+using Futboloid.Core.Bus.Events;
 using UnityEngine;
+using VContainer;
 
 namespace Futboloid.Gameplay.Ball
 {
@@ -13,7 +12,7 @@ namespace Futboloid.Gameplay.Ball
     /// Фиксированная стартовая позиция мяча (центр X, у ног вратаря).
     /// Стрелка — визуал и источник направления подачи.
     /// </summary>
-    public class BallKickoffAnchor : MonoBehaviour, IBallAnchor, IGameSceneInitializable
+    public class BallKickoffAnchor : MonoBehaviour, IBallAnchor
     {
         [SerializeField] private Transform directionArrow;
         [SerializeField] private Vector2 fallbackServeDirection = Vector2.up;
@@ -53,7 +52,8 @@ namespace Futboloid.Gameplay.Ball
             directionArrow.localRotation = Quaternion.Euler(0f, 0f, angle);
         }
 
-        public void Initialize(IGameEventBus bus)
+        [Inject]
+        public void Construct(IGameEventBus bus)
         {
             _subscriptions.Add(bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged));
             SetDirectionArrowVisible(true);
