@@ -37,8 +37,15 @@ namespace Futboloid.Main
         public void GoOnField() =>
             _overlay.SetState(NavigationState.OnField).Forget();
 
-        public void RestartTournament() =>
-            Debug.LogWarning("[GameDirector] RestartTournament — not implemented yet.");
+        public void RestartTournament()
+        {
+            if (_appGameState?.LifetimeScope == null)
+                return;
+
+            var run = _appGameState.LifetimeScope.Container.Resolve<ITournamentRunService>();
+            run.ResetRun();
+            _overlay.SetState(NavigationState.OnField).Forget();
+        }
 
         public void ReturnToMainMenu() =>
             _overlay.SetState(NavigationState.MainMenu).Forget();

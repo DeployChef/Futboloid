@@ -5,5 +5,7 @@ namespace Futboloid.Core
         string RoundLabel { get; }
         string StatusLine { get; }
         bool CanStartNextMatch { get; }
+        bool IsEliminated { get; }
+        bool IsChampion { get; }
     }
 }
