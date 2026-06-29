@@ -1,3 +1,5 @@
+using Futboloid.Main.Navigation;
+using Futboloid.Main.Session;
 using VContainer;
 
 namespace Futboloid.Main.DI
@@ -6,8 +8,8 @@ namespace Futboloid.Main.DI
     {
         public static IContainerBuilder RegisterAppScope(this IContainerBuilder builder)
         {
-            builder.Register<Session.GameSession>(Lifetime.Singleton);
-            builder.Register<Navigation.OverlayStateController>(Lifetime.Singleton);
+            builder.Register<GameSession>(Lifetime.Singleton);
+            builder.Register<OverlayStateController>(Lifetime.Singleton);
 
             return builder;
         }

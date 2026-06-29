@@ -1,4 +1,5 @@
 using Futboloid.Core;
+using Futboloid.Main;
 using VContainer;
 using VContainer.Unity;
 
@@ -18,7 +19,7 @@ namespace Futboloid.Main.DI
 
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.Register<Futboloid.Main.GameDirector>(Lifetime.Singleton).As<IGameDirector>();
+            builder.Register<GameDirector>(Lifetime.Singleton).As<IGameDirector>();
             builder.RegisterRootScope();
         }
     }

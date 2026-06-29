@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using Futboloid.Core;
 using Futboloid.Gameplay.Bus.Events;
 using Futboloid.Main.Session;
+using Futboloid.UI;
 using UnityEngine;
 
 namespace Futboloid.Main.Navigation
@@ -9,12 +10,14 @@ namespace Futboloid.Main.Navigation
     public class OverlayStateController
     {
         private readonly GameSession _session;
+        private readonly UIService _uiService;
 
         public NavigationState Current { get; private set; }
 
-        public OverlayStateController(GameSession session)
+        public OverlayStateController(GameSession session, UIService uiService)
         {
             _session = session;
+            _uiService = uiService;
         }
 
         public UniTask SetState(NavigationState next)
@@ -25,14 +28,15 @@ namespace Futboloid.Main.Navigation
             var previous = Current;
             Current = next;
 
-            ApplyState(previous, next);
+            ApplyState(next);
+            _uiService.ApplyNavigation(next);
             _session.Bus?.Publish(new NavigationChangedEvent(previous, next));
 
             Debug.Log($"[OverlayStateController] {previous} → {next}");
             return UniTask.CompletedTask;
         }
 
-        private void ApplyState(NavigationState previous, NavigationState next)
+        private void ApplyState(NavigationState next)
         {
             switch (next)
             {
