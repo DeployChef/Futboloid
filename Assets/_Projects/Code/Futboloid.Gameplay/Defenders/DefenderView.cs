@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
+using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
 using Futboloid.Gameplay.Ball;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VContainer;
 
 namespace Futboloid.Gameplay.Defenders
@@ -18,17 +21,28 @@ namespace Futboloid.Gameplay.Defenders
         [SerializeField] private Collider2D bodyCollider;
         [SerializeField] private TextMeshProUGUI hpLabel;
 
+        [Header("Goalkeeper")]
+        [SerializeField] private Transform goalAnchor;
+        [SerializeField] private BallView ball;
+        [SerializeField] private DefenderGoalkeeperBehavior goalkeeperBehavior;
+
         [Header("Gizmos")]
         [SerializeField] private bool drawGizmos = true;
         [SerializeField] private float gizmoLabelHeight = 0.35f;
         [SerializeField] private float gizmoLabelPadding = 0.12f;
         [SerializeField] private float gizmoGoalHalfWidth = 2f;
-        [SerializeField] private float gizmoHyperbolaA = 0.35f;
+        [FormerlySerializedAs("gizmoHyperbolaA")]
+        [SerializeField] private float gizmoParabolaHeight = 0.35f;
 
         private IGameEventBus _bus;
         private DefenderGridRegistry _registry;
+        private readonly DefenderMotor _motor = new();
+        private readonly List<IDisposable> _subscriptions = new();
         private int _hp;
         private bool _isAlive = true;
+        private bool _onField;
+        private bool _simulating;
+        private bool _warnedMissingGoalAnchor;
         private Vector2 _homePosition;
 
         public int SlotId => slotId;
@@ -50,6 +64,26 @@ namespace Futboloid.Gameplay.Defenders
         public void Construct(IGameEventBus bus)
         {
             _bus = bus;
+            _subscriptions.Add(bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged));
+            _subscriptions.Add(bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged));
+
+            if (ball == null)
+                ball = FindAnyObjectByType<BallView>();
+        }
+
+        private void Update()
+        {
+            if (!_onField || !_simulating || !_isAlive || role != DefenderRole.Goalkeeper)
+                return;
+
+            var zone = ResolveGoalAnchor();
+            if (zone == null)
+                return;
+
+            var trackSpeed = goalkeeperBehavior != null ? goalkeeperBehavior.TrackSpeed : 2.5f;
+            var ballX = ResolveBallWorldX();
+            var position = _motor.TickGoalkeeperOnParabola(zone, ballX, trackSpeed, Time.deltaTime);
+            transform.position = new Vector3(position.x, position.y, transform.position.z);
         }
 
         private void Start()
@@ -61,6 +95,69 @@ namespace Futboloid.Gameplay.Defenders
         private void OnDestroy()
         {
             _registry?.Unregister(this);
+
+            foreach (var subscription in _subscriptions)
+                subscription.Dispose();
+        }
+
+        private void OnPitchPhaseChanged(PitchPhaseChangedEvent e)
+        {
+            _simulating = e.Phase == PitchPhase.Simulating;
+
+            if (role != DefenderRole.Goalkeeper)
+                return;
+
+            if (e.Phase == PitchPhase.KickoffWait)
+                SnapGoalkeeperToParabolaStart();
+            else if (e.Phase == PitchPhase.Simulating)
+                SnapGoalkeeperToBall();
+        }
+
+        private void OnNavigationChanged(NavigationChangedEvent e)
+        {
+            _onField = e.Current == NavigationState.OnField;
+
+            if (_onField && role == DefenderRole.Goalkeeper)
+                SnapGoalkeeperToParabolaStart();
+        }
+
+        private void SnapGoalkeeperToParabolaStart()
+        {
+            SnapGoalkeeperToBall();
+        }
+
+        private void SnapGoalkeeperToBall()
+        {
+            var zone = ResolveGoalAnchor();
+            if (zone == null)
+                return;
+
+            var t = zone.ParamFromWorldX(ResolveBallWorldX());
+            _motor.ResetGoalkeeperParam(t);
+            var position = zone.PositionOnParabola(t);
+            transform.position = new Vector3(position.x, position.y, transform.position.z);
+        }
+
+        private float ResolveBallWorldX()
+        {
+            return ball != null ? ball.Position.x : transform.position.x;
+        }
+
+        private GoalAnchor ResolveGoalAnchor()
+        {
+            if (goalAnchor == null)
+                return null;
+
+            var zone = goalAnchor.GetComponent<GoalAnchor>();
+            if (zone == null && !_warnedMissingGoalAnchor)
+            {
+                _warnedMissingGoalAnchor = true;
+                Debug.LogWarning(
+                    $"[DefenderView] Slot {slotId}: goalAnchor '{goalAnchor.name}' has no GoalAnchor component — GK cannot move.",
+                    goalAnchor);
+            }
+
+            return zone;
         }
 
         public bool TryHandleBallHit(BallMotion motion, RaycastHit2D hit, HashSet<int> hitsThisFrame)
@@ -156,7 +253,9 @@ namespace Futboloid.Gameplay.Defenders
                 ? movementBehavior.MovementType
                 : DefenderMovementType.Idle;
 
-            var label = $"#{slotId}  {role}\nHit: {hitType}\nMove: {moveType}";
+            var label = $"#{slotId}  {role}\nHit: {hitType}";
+            if (role == DefenderRole.Field)
+                label += $"\nMove: {moveType}";
             if (Application.isPlaying)
                 label += $"\nHP: {_hp}/{maxHp}";
 
@@ -164,11 +263,19 @@ namespace Futboloid.Gameplay.Defenders
 
             if (role == DefenderRole.Goalkeeper)
             {
-                DefenderGizmoDrawer.DrawGoalkeeperHyperbola(
-                    center,
-                    gizmoGoalHalfWidth,
-                    gizmoHyperbolaA,
-                    selected ? new Color(1f, 0.4f, 1f, 0.9f) : new Color(1f, 0.4f, 1f, 0.45f));
+                var zone = ResolveGoalAnchor();
+                var gkCenter = zone != null
+                    ? new Vector3(zone.Center.x, zone.GoalLineY, transform.position.z)
+                    : center;
+                var halfWidth = zone != null ? zone.HalfWidth : gizmoGoalHalfWidth;
+                var parabolaHeight = zone != null ? zone.ParabolaHeight : gizmoParabolaHeight;
+
+                DefenderGizmoDrawer.DrawGoalkeeperParabola(
+                    gkCenter,
+                    halfWidth,
+                    parabolaHeight,
+                    selected ? new Color(1f, 0.4f, 1f, 0.9f) : new Color(1f, 0.4f, 1f, 0.45f),
+                    selected);
                 return;
             }
 

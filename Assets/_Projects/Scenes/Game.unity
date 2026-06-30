@@ -403,7 +403,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2102887386}
+  - {fileID: 844577608}
   - {fileID: 1721164268429103025}
+  - {fileID: 1830009754}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &361219380
@@ -1250,6 +1252,52 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 17.23378}
   m_EdgeRadius: 0
+--- !u!1 &844577607
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 844577608}
+  - component: {fileID: 844577609}
+  m_Layer: 0
+  m_Name: GoalAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &844577608
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844577607}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.05, y: 4.28, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 294407854}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &844577609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 844577607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d6c3066ea4f66a4694604db8c8ef179, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.GoalAnchor
+  halfWidth: 2.17
+  parabolaHeight: 0.85
 --- !u!1 &978479066
 GameObject:
   m_ObjectHideFlags: 0
@@ -2602,6 +2650,96 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Futboloid.Main::Futboloid.Main.UI.MatchHudController
   hud: {fileID: 255520970}
+--- !u!1001 &1830009753
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 294407854}
+    m_Modifications:
+    - target: {fileID: 4969127172605605462, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: m_Name
+      value: Defender GK
+      objectReference: {fileID: 0}
+    - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: ball
+      value: 
+      objectReference: {fileID: 1203950916}
+    - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: role
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: maxHp
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: slotId
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: goalAnchor
+      value: 
+      objectReference: {fileID: 844577608}
+    - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: movementBehavior
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: goalkeeperBehavior
+      value: 
+      objectReference: {fileID: 11400000, guid: c09cac6beeeaaac418d9c1d51ff32823, type: 2}
+    - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.95
+      objectReference: {fileID: 0}
+    - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+--- !u!4 &1830009754 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+  m_PrefabInstance: {fileID: 1830009753}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1836943539
 GameObject:
   m_ObjectHideFlags: 0
@@ -3874,13 +4012,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: Defender
       objectReference: {fileID: 0}
+    - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: movementBehavior
+      value: 
+      objectReference: {fileID: 11400000, guid: 7643cafdcd13c7748bc2ac5a7a7a4b19, type: 2}
     - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -2.01
       objectReference: {fileID: 0}
     - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 1.15
       objectReference: {fileID: 0}
     - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: m_LocalPosition.z

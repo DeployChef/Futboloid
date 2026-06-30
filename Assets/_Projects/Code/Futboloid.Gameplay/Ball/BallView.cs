@@ -21,6 +21,8 @@ namespace Futboloid.Gameplay.Ball
         private bool _onField;
         private bool _simulating;
 
+        public Vector2 Position => _motion != null ? _motion.Position : (Vector2)transform.position;
+
         [Inject]
         public void Construct(IGameEventBus bus)
         {
