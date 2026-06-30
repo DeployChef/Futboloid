@@ -127,6 +127,15 @@ namespace Futboloid.Gameplay.Match
             }
         }
 
+        public void EndMatchFromWipe()
+        {
+            if (_matchEnded)
+                return;
+
+            Debug.Log("[MatchFlow] All defenders eliminated — early win.");
+            EndMatch();
+        }
+
         private void EndMatch()
         {
             if (_matchEnded)

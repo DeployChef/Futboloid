@@ -1,4 +1,5 @@
 using Futboloid.Core;
+using Futboloid.Gameplay.Defenders;
 using Futboloid.Gameplay.Input;
 using Futboloid.Gameplay.Match;
 using UnityEngine;
@@ -20,6 +21,12 @@ namespace Futboloid.Main.DI
                 builder.RegisterComponent(inputHost).As<IGameplayInput>();
             else
                 Debug.LogError("[GameScope] GameplayInputHost not found on Game scene.");
+
+            var defenderRegistry = Object.FindAnyObjectByType<DefenderGridRegistry>();
+            if (defenderRegistry != null)
+                builder.RegisterComponent(defenderRegistry);
+            else
+                Debug.LogWarning("[GameScope] DefenderGridRegistry not found on Game scene.");
 
             builder.RegisterBuildCallback(OnGameScopeBuilt);
 

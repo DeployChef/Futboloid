@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
+using Futboloid.Gameplay.Defenders;
 using Futboloid.Gameplay.Physics;
 using UnityEngine;
 
@@ -21,6 +23,7 @@ namespace Futboloid.Gameplay.Ball
         public bool IsHeld => _holdAnchor != null;
 
         private IBallAnchor _holdAnchor;
+        private readonly HashSet<int> _defenderHitsThisFrame = new();
 
         public BallMotion(BallSettings settings, IGameEventBus bus)
         {
@@ -64,6 +67,8 @@ namespace Futboloid.Gameplay.Ball
 
         public void Tick(float deltaTime)
         {
+            _defenderHitsThisFrame.Clear();
+
             if (_holdAnchor != null)
             {
                 Position = _holdAnchor.WorldPosition;
@@ -93,19 +98,39 @@ namespace Futboloid.Gameplay.Ball
             Speed = Mathf.MoveTowards(Speed, _settings.BaseSpeed, _settings.Deceleration * deltaTime);
         }
 
+        public void ReflectFromHit(RaycastHit2D hit)
+        {
+            Direction = ClampMinAngle(Reflect(Direction, hit.normal));
+        }
+
         private void ResolveHit(RaycastHit2D hit)
         {
             Position = hit.point + hit.normal * (_settings.Radius + _settings.Skin);
 
             if (hit.collider.gameObject.layer == PhysicsLayers.KeeperId)
             {
-                Direction = ClampMinAngle(Reflect(Direction, hit.normal));
+                ReflectFromHit(hit);
                 Speed = Mathf.Min(Speed + _settings.KeeperBoost, _settings.MaxSpeed);
                 _bus.Publish(new BallReturnedToKeeperEvent());
                 return;
             }
 
-            Direction = ClampMinAngle(Reflect(Direction, hit.normal));
+            if (hit.collider.gameObject.layer == PhysicsLayers.DefenderId)
+            {
+                if (TryResolveDefenderHit(hit))
+                    return;
+            }
+
+            ReflectFromHit(hit);
+        }
+
+        private bool TryResolveDefenderHit(RaycastHit2D hit)
+        {
+            var contact = hit.collider.GetComponentInParent<IDefenderBallContact>();
+            if (contact == null || !contact.IsAlive)
+                return false;
+
+            return contact.TryHandleBallHit(this, hit, _defenderHitsThisFrame);
         }
 
         private bool TryScoreGoal()

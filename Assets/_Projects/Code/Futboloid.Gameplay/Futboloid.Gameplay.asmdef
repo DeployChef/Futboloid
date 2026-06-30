@@ -4,6 +4,7 @@
     "references": [
         "Futboloid.Core",
         "Unity.InputSystem",
+        "Unity.TextMeshPro",
         "UniTask",
         "VContainer"
     ],
