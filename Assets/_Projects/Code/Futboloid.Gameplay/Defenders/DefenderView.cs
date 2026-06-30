@@ -14,8 +14,16 @@ namespace Futboloid.Gameplay.Defenders
         [SerializeField] private DefenderRole role = DefenderRole.Field;
         [SerializeField] private int maxHp = 3;
         [SerializeField] private DefenderHitBehavior hitBehavior;
+        [SerializeField] private DefenderMovementBehavior movementBehavior;
         [SerializeField] private Collider2D bodyCollider;
         [SerializeField] private TextMeshProUGUI hpLabel;
+
+        [Header("Gizmos")]
+        [SerializeField] private bool drawGizmos = true;
+        [SerializeField] private float gizmoLabelHeight = 0.35f;
+        [SerializeField] private float gizmoLabelPadding = 0.12f;
+        [SerializeField] private float gizmoGoalHalfWidth = 2f;
+        [SerializeField] private float gizmoHyperbolaA = 0.35f;
 
         private IGameEventBus _bus;
         private DefenderGridRegistry _registry;
@@ -119,6 +127,101 @@ namespace Futboloid.Gameplay.Defenders
                 return;
 
             hpLabel.text = _hp.ToString();
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            if (!drawGizmos)
+                return;
+
+            DrawGizmos(selected: true);
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (!drawGizmos)
+                return;
+
+            DrawGizmos(selected: false);
+        }
+
+        private void DrawGizmos(bool selected)
+        {
+            var home = Application.isPlaying ? _homePosition : (Vector2)transform.position;
+            var center = new Vector3(home.x, home.y, transform.position.z);
+            var labelPos = GetGizmoLabelPosition(center);
+
+            var hitType = hitBehavior != null ? hitBehavior.HitType : DefenderHitType.Reflect;
+            var moveType = movementBehavior != null
+                ? movementBehavior.MovementType
+                : DefenderMovementType.Idle;
+
+            var label = $"#{slotId}  {role}\nHit: {hitType}\nMove: {moveType}";
+            if (Application.isPlaying)
+                label += $"\nHP: {_hp}/{maxHp}";
+
+            DefenderGizmoDrawer.DrawLabel(labelPos, label);
+
+            if (role == DefenderRole.Goalkeeper)
+            {
+                DefenderGizmoDrawer.DrawGoalkeeperHyperbola(
+                    center,
+                    gizmoGoalHalfWidth,
+                    gizmoHyperbolaA,
+                    selected ? new Color(1f, 0.4f, 1f, 0.9f) : new Color(1f, 0.4f, 1f, 0.45f));
+                return;
+            }
+
+            if (movementBehavior == null)
+                return;
+
+            var alpha = selected ? 0.85f : 0.4f;
+            DefenderGizmoDrawer.DrawWireCircle(
+                center,
+                movementBehavior.SeparationRadius,
+                new Color(1f, 0.55f, 0.1f, alpha * 0.7f));
+
+            switch (movementBehavior.MovementType)
+            {
+                case DefenderMovementType.PatrolGenerated:
+                    DefenderGizmoDrawer.DrawWireCircle(
+                        center,
+                        movementBehavior.PatrolRadius,
+                        new Color(0.3f, 1f, 0.45f, alpha));
+                    var path = PatrolPathGenerator.Generate(
+                        home,
+                        movementBehavior.PatrolPointCount,
+                        movementBehavior.PatrolRadius,
+                        slotId * 7919 + 17);
+                    DefenderGizmoDrawer.DrawPatrolPath(
+                        path,
+                        new Color(1f, 0.92f, 0.2f, alpha),
+                        closed: true);
+                    break;
+
+                case DefenderMovementType.WanderInRadius:
+                    DefenderGizmoDrawer.DrawWireCircle(
+                        center,
+                        movementBehavior.WanderRadius,
+                        new Color(0.3f, 0.75f, 1f, alpha));
+                    break;
+
+                case DefenderMovementType.ChaseBallInRadius:
+                    DefenderGizmoDrawer.DrawWireCircle(
+                        center,
+                        movementBehavior.ChaseRadius,
+                        new Color(0.2f, 0.95f, 1f, alpha));
+                    break;
+            }
+        }
+
+        private Vector3 GetGizmoLabelPosition(Vector3 center)
+        {
+            var collider = bodyCollider != null ? bodyCollider : GetComponent<Collider2D>();
+            if (collider != null)
+                return new Vector3(center.x, collider.bounds.max.y + gizmoLabelPadding, center.z);
+
+            return center + Vector3.up * gizmoLabelHeight;
         }
     }
 }

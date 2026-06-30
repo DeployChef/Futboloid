@@ -101,5 +101,13 @@ namespace Futboloid.Gameplay.Ball
             foreach (var subscription in _subscriptions)
                 subscription.Dispose();
         }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = new Color(1f, 0.85f, 0.2f, 0.65f);
+            Gizmos.DrawWireSphere(transform.position, settings.Radius);
+        }
+#endif
     }
 }
