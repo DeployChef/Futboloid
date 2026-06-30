@@ -49,6 +49,7 @@ namespace Futboloid.UI.Views.Tournament
 
             if (roundLabel != null)
                 roundLabel.text = run.RoundLabel;
+                
 
             if (statusLabel != null)
                 statusLabel.text = run.StatusLine;

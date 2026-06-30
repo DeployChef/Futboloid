@@ -54,22 +54,23 @@ namespace Futboloid.Main.Session
                 case TournamentRunState.Eliminated:
                     return $"Матч {_matchesCompleted}";
                 default:
-                    return $"Матч {_matchesCompleted + 1} из {_matchesToWin}";
+                    return $"Матч {_matchesCompleted} из {_matchesToWin}";
             }
         }
 
         private string GetStatusLine()
         {
+            
             switch (RunState)
             {
                 case TournamentRunState.Completed:
                     return "Чемпион забега!";
                 case TournamentRunState.Eliminated:
-                    return $"Счёт {_lastPlayerScore}:{_lastOpponentScore} — вылет из турнира";
+                    return $"Счёт\n <color=red><size=150%>{_lastPlayerScore}:{_lastOpponentScore}</size></color> \n вылет из турнира";
                 default:
                     if (_matchesCompleted == 0)
                         return "Готов к первому матчу";
-                    return $"Счёт {_lastPlayerScore}:{_lastOpponentScore} — победа! Следующий соперник ждёт.";
+                    return $"Счёт\n<color=red><size=150%>{_lastPlayerScore}:{_lastOpponentScore}</size></color>\n победа!";
             }
         }
     }
