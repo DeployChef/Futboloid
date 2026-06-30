@@ -6,6 +6,7 @@ using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
 using Futboloid.Gameplay.Ball;
+using Futboloid.Gameplay.Keeper;
 using Futboloid.Gameplay.Match;
 using UnityEngine;
 
@@ -57,6 +58,11 @@ namespace Futboloid.Gameplay.Defenders
                 var ballView = UnityEngine.Object.FindAnyObjectByType<BallView>();
                 if (ballView != null)
                     tasks.Add(ballView.PlayReshuffleToKickoffAsync(ct));
+
+                var keeperView = UnityEngine.Object.FindAnyObjectByType<GoalkeeperView>();
+                var moveDuration = _registry != null ? _registry.ReshuffleMoveDuration : 0.55f;
+                if (keeperView != null)
+                    tasks.Add(keeperView.PlayReshuffleToCenterAsync(moveDuration, ct));
 
                 if (_registry != null)
                 {
