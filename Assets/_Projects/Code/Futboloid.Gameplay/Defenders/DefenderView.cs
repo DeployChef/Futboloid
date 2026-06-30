@@ -12,7 +12,7 @@ using VContainer;
 
 namespace Futboloid.Gameplay.Defenders
 {
-    public class DefenderView : MonoBehaviour, IDefenderBallContact
+    public class DefenderView : MonoBehaviour
     {
         [SerializeField] private int slotId;
         [SerializeField] private DefenderRole role = DefenderRole.Field;
@@ -45,15 +45,20 @@ namespace Futboloid.Gameplay.Defenders
         private bool _simulating;
         private bool _warnedMissingGoalAnchor;
         private bool _runningToGoal;
+        private bool _returningHome;
         private float _runSpeed = 4f;
+        private float _runAcceleration = 18f;
         private float _runArriveThreshold = 0.08f;
         private Vector2 _runTarget;
         private Vector2 _homePosition;
+        private int _lastDamageFrame = -1;
 
         public int SlotId => slotId;
+        public Collider2D ContactCollider => bodyCollider != null ? bodyCollider : GetComponent<Collider2D>();
         public DefenderRole Role => role;
         public bool IsAlive => _isAlive;
         public bool RunningToGoal => _runningToGoal;
+        public bool ReturningHome => _returningHome;
         public Vector2 HomePosition => _homePosition;
 
         private void Awake()
@@ -67,9 +72,14 @@ namespace Futboloid.Gameplay.Defenders
         }
 
         [Inject]
-        public void Construct(IGameEventBus bus, PitchStateMachine pitch, MatchFlow matchFlow)
+        public void Construct(
+            IGameEventBus bus,
+            PitchStateMachine pitch,
+            MatchFlow matchFlow,
+            DefenderGridRegistry registry)
         {
             _bus = bus;
+            _registry = registry;
             _subscriptions.Add(bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged));
             _subscriptions.Add(bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged));
 
@@ -90,6 +100,12 @@ namespace Futboloid.Gameplay.Defenders
             if (!_isAlive)
                 return;
 
+            if (_returningHome)
+            {
+                TickReturningHome();
+                return;
+            }
+
             if (_runningToGoal)
             {
                 TickRunningToGoal();
@@ -109,15 +125,17 @@ namespace Futboloid.Gameplay.Defenders
             transform.position = new Vector3(position.x, position.y, transform.position.z);
         }
 
-        public void BeginRunToGoal(Transform anchor, float speed, float arriveThreshold)
+        public void BeginRunToGoal(Transform anchor, float maxSpeed, float acceleration, float arriveThreshold)
         {
             if (!_isAlive || role != DefenderRole.Field)
                 return;
 
             goalAnchor = anchor;
-            _runSpeed = speed;
+            _runSpeed = maxSpeed;
+            _runAcceleration = acceleration;
             _runArriveThreshold = arriveThreshold;
             _runTarget = ResolveRunTarget(anchor);
+            _motor.ResetRunVelocity();
             _runningToGoal = true;
         }
 
@@ -131,19 +149,120 @@ namespace Futboloid.Gameplay.Defenders
             _bus?.Publish(new DefenderRoleChangedEvent(slotId, newRole == DefenderRole.Goalkeeper));
 
             if (newRole == DefenderRole.Goalkeeper)
-                SnapGoalkeeperToBall();
+                SyncGoalkeeperMotorFromPosition();
         }
 
         private void TickRunningToGoal()
         {
             var current = (Vector2)transform.position;
-            var next = _motor.TickRunTowards(current, _runTarget, _runSpeed, Time.deltaTime, out var arrived);
+            var next = _motor.TickRunTowards(
+                current,
+                _runTarget,
+                _runSpeed,
+                _runAcceleration,
+                _runArriveThreshold,
+                Time.deltaTime,
+                out var arrived);
             transform.position = new Vector3(next.x, next.y, transform.position.z);
 
-            if (!arrived && (next - _runTarget).sqrMagnitude > _runArriveThreshold * _runArriveThreshold)
+            if (!arrived)
                 return;
 
             CompleteRunToGoal();
+        }
+
+        /// <returns>true, если нужно ждать прибытия (событие придёт из <see cref="CompleteReturningHome"/>).</returns>
+        public bool BeginReshuffleReturn(float maxSpeed, float acceleration, float arriveThreshold)
+        {
+            if (!_isAlive)
+                return false;
+
+            ApplyReshuffleHeal();
+
+            // Замена вратаря: продолжает бежать к воротам, не уходит на field-слот.
+            if (_runningToGoal)
+                return false;
+
+            if (_returningHome)
+            {
+                _runSpeed = maxSpeed;
+                _runAcceleration = acceleration;
+                _runArriveThreshold = arriveThreshold;
+                _runTarget = ResolveReshuffleTarget();
+
+                if (IsNearReshuffleTarget())
+                {
+                    CompleteReturningHome();
+                    return false;
+                }
+
+                return true;
+            }
+
+            _runSpeed = maxSpeed;
+            _runAcceleration = acceleration;
+            _runArriveThreshold = arriveThreshold;
+            _runTarget = ResolveReshuffleTarget();
+
+            if (IsNearReshuffleTarget())
+                return false;
+
+            _motor.ResetRunVelocity();
+            _returningHome = true;
+            return true;
+        }
+
+        private void TickReturningHome()
+        {
+            var current = (Vector2)transform.position;
+            var next = _motor.TickRunTowards(
+                current,
+                _runTarget,
+                _runSpeed,
+                _runAcceleration,
+                _runArriveThreshold,
+                Time.deltaTime,
+                out var arrived);
+            transform.position = new Vector3(next.x, next.y, transform.position.z);
+
+            if (!arrived)
+                return;
+
+            CompleteReturningHome();
+        }
+
+        private void CompleteReturningHome()
+        {
+            _returningHome = false;
+            _bus?.Publish(new DefenderReturnedHomeEvent(slotId));
+        }
+
+        private Vector2 ResolveReshuffleTarget()
+        {
+            if (role == DefenderRole.Goalkeeper)
+            {
+                var zone = ResolveGoalAnchor();
+                if (zone != null)
+                    return zone.PositionOnParabola(0f);
+            }
+
+            return _homePosition;
+        }
+
+        private bool IsNearReshuffleTarget()
+        {
+            var offset = _runTarget - (Vector2)transform.position;
+            return offset.sqrMagnitude <= _runArriveThreshold * _runArriveThreshold;
+        }
+
+        private void ApplyReshuffleHeal()
+        {
+            var heal = Mathf.CeilToInt(maxHp * 0.25f);
+            if (heal <= 0)
+                return;
+
+            _hp = Mathf.Min(maxHp, _hp + heal);
+            RefreshHpLabel();
         }
 
         private void CompleteRunToGoal()
@@ -164,7 +283,9 @@ namespace Futboloid.Gameplay.Defenders
 
         private void Start()
         {
-            _registry = FindAnyObjectByType<DefenderGridRegistry>();
+            if (_registry == null)
+                _registry = FindAnyObjectByType<DefenderGridRegistry>();
+
             _registry?.Register(this);
         }
 
@@ -184,7 +305,7 @@ namespace Futboloid.Gameplay.Defenders
                 return;
 
             if (e.Phase == PitchPhase.KickoffWait)
-                SnapGoalkeeperToParabolaStart();
+                SyncGoalkeeperMotorFromPosition();
             else if (e.Phase == PitchPhase.Simulating)
                 SnapGoalkeeperToBall();
         }
@@ -194,12 +315,16 @@ namespace Futboloid.Gameplay.Defenders
             _onField = e.Current == NavigationState.OnField;
 
             if (_onField && role == DefenderRole.Goalkeeper)
-                SnapGoalkeeperToParabolaStart();
+                SyncGoalkeeperMotorFromPosition();
         }
 
-        private void SnapGoalkeeperToParabolaStart()
+        private void SyncGoalkeeperMotorFromPosition()
         {
-            SnapGoalkeeperToBall();
+            var zone = ResolveGoalAnchor();
+            if (zone == null)
+                return;
+
+            _motor.ResetGoalkeeperParam(zone.ParamFromWorldX(transform.position.x));
         }
 
         private void SnapGoalkeeperToBall()
@@ -236,37 +361,22 @@ namespace Futboloid.Gameplay.Defenders
             return zone;
         }
 
-        public bool TryHandleBallHit(BallMotion motion, RaycastHit2D hit, HashSet<int> hitsThisFrame)
+        public void HandleBallContact(BallMotion motion, RaycastHit2D hit)
         {
-            if (!_isAlive || motion == null)
-                return false;
+            DefenderHitResolver.Resolve(motion, hit, this, hitBehavior);
 
-            ResolveBallResponse(motion, hit);
-
-            if (!hitsThisFrame.Contains(slotId))
+            if (Time.frameCount != _lastDamageFrame)
             {
-                hitsThisFrame.Add(slotId);
-                ApplyDamage(1, isIncomingPass: false);
+                _lastDamageFrame = Time.frameCount;
+                ApplyDamage(1);
             }
 
             _bus?.Publish(new DefenderHitEvent(slotId));
-            return true;
         }
 
-        private void ResolveBallResponse(BallMotion motion, RaycastHit2D hit)
+        private void ApplyDamage(int amount)
         {
-            var type = hitBehavior != null ? hitBehavior.HitType : DefenderHitType.Reflect;
-
-            // MVP-1: только Reflect. Остальные типы — в следующих итерациях.
-            if (type != DefenderHitType.Reflect)
-                Debug.LogWarning($"[DefenderView] Hit type {type} not implemented yet on slot {slotId}; using Reflect.");
-
-            motion.ReflectFromHit(hit);
-        }
-
-        private void ApplyDamage(int amount, bool isIncomingPass)
-        {
-            if (isIncomingPass || !_isAlive)
+            if (!_isAlive)
                 return;
 
             _hp = Mathf.Max(0, _hp - amount);
@@ -285,6 +395,7 @@ namespace Futboloid.Gameplay.Defenders
             var wasGoalkeeper = role == DefenderRole.Goalkeeper;
             _isAlive = false;
             _runningToGoal = false;
+            _returningHome = false;
 
             if (bodyCollider != null)
                 bodyCollider.enabled = false;
@@ -336,7 +447,9 @@ namespace Futboloid.Gameplay.Defenders
             var label = $"#{slotId}  {role}\nHit: {hitType}";
             if (_runningToGoal)
                 label += "\n→ GK";
-            if (role == DefenderRole.Field && !_runningToGoal)
+            if (_returningHome)
+                label += "\n↩ home";
+            if (role == DefenderRole.Field && !_runningToGoal && !_returningHome)
                 label += $"\nMove: {moveType}";
             if (Application.isPlaying)
                 label += $"\nHP: {_hp}/{maxHp}";

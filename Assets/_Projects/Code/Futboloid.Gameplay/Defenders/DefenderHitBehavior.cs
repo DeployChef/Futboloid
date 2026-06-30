@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Futboloid.Gameplay.Defenders
 {
@@ -6,15 +7,15 @@ namespace Futboloid.Gameplay.Defenders
     public class DefenderHitBehavior : ScriptableObject
     {
         [SerializeField] private DefenderHitType hitType = DefenderHitType.Reflect;
-        [SerializeField] private DefenderHitType fallbackWhenNoPass = DefenderHitType.Reflect;
         [SerializeField] private float launchSpeed = 12f;
-        [SerializeField] private float openGoalWeight = 0.7f;
-        [SerializeField] private float atKeeperWeight = 0.3f;
+
+        [Header("ToPlayerGoal")]
+        [Tooltip("Шанс 0–100 пнуть в пустую зону ворот. Иначе — в вратаря игрока.")]
+        [FormerlySerializedAs("openGoalWeight")]
+        [SerializeField] [Range(0, 100)] private int openGoalChancePercent = 70;
 
         public DefenderHitType HitType => hitType;
-        public DefenderHitType FallbackWhenNoPass => fallbackWhenNoPass;
         public float LaunchSpeed => launchSpeed;
-        public float OpenGoalWeight => openGoalWeight;
-        public float AtKeeperWeight => atKeeperWeight;
+        public int OpenGoalChancePercent => openGoalChancePercent;
     }
 }

@@ -14,14 +14,23 @@ namespace Futboloid.Gameplay.Defenders
         [Header("Goalkeeper promotion (read by DefenderPromotionService)")]
         [SerializeField] private Transform goalAnchor;
         [SerializeField] private float runToGoalSpeed = 4f;
+        [SerializeField] private float runToGoalAcceleration = 18f;
         [SerializeField] private float arriveThreshold = 0.08f;
 
+        [Header("Reshuffle after goal")]
+        [SerializeField] private float reshuffleSpeed = 3.5f;
+        [SerializeField] private float reshuffleAcceleration = 14f;
+
+        private readonly Dictionary<EntityId, DefenderView> _byColliderId = new();
         private readonly List<DefenderView> _defenders = new();
 
         private IGameEventBus _bus;
         private MatchFlow _matchFlow;
 
         public float RunToGoalSpeed => runToGoalSpeed;
+        public float RunToGoalAcceleration => runToGoalAcceleration;
+        public float ReshuffleSpeed => reshuffleSpeed;
+        public float ReshuffleAcceleration => reshuffleAcceleration;
         public float ArriveThreshold => arriveThreshold;
 
         [Inject]
@@ -38,6 +47,7 @@ namespace Futboloid.Gameplay.Defenders
                 return;
 
             _defenders.Add(defender);
+            RegisterCollider(defender.ContactCollider, defender);
         }
 
         public void Unregister(DefenderView defender)
@@ -45,7 +55,33 @@ namespace Futboloid.Gameplay.Defenders
             if (defender == null)
                 return;
 
+            UnregisterCollider(defender.ContactCollider);
             _defenders.Remove(defender);
+        }
+
+        public bool TryGetDefender(Collider2D contactCollider, out DefenderView defender)
+        {
+            defender = null;
+            if (contactCollider == null)
+                return false;
+
+            return _byColliderId.TryGetValue(contactCollider.GetEntityId(), out defender);
+        }
+
+        private void RegisterCollider(Collider2D contactCollider, DefenderView defender)
+        {
+            if (contactCollider == null || defender == null)
+                return;
+
+            _byColliderId[contactCollider.GetEntityId()] = defender;
+        }
+
+        private void UnregisterCollider(Collider2D contactCollider)
+        {
+            if (contactCollider == null)
+                return;
+
+            _byColliderId.Remove(contactCollider.GetEntityId());
         }
 
         public int AliveCount
@@ -98,6 +134,19 @@ namespace Futboloid.Gameplay.Defenders
             }
 
             return best;
+        }
+
+        public void ForEachLiving(Action<DefenderView> action)
+        {
+            if (action == null)
+                return;
+
+            for (var i = 0; i < _defenders.Count; i++)
+            {
+                var defender = _defenders[i];
+                if (defender != null && defender.IsAlive)
+                    action(defender);
+            }
         }
 
         public Transform ResolveGoalAnchor()

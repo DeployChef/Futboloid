@@ -33,6 +33,7 @@ namespace Futboloid.Main.Navigation
             if (_initialized && Current == next)
                 return UniTask.CompletedTask;
 
+            var isColdStart = !_initialized;
             var previous = _initialized ? Current : next;
             _initialized = true;
             Current = next;
@@ -40,7 +41,7 @@ namespace Futboloid.Main.Navigation
             if (next == NavigationState.MainMenu)
                 IsMatchPausedInMenu = previous == NavigationState.OnField;
 
-            ApplyState(next, previous);
+            ApplyState(next, previous, isColdStart);
             _uiService.ApplyNavigation(next, IsMatchPausedInMenu);
             _bus.Publish(new NavigationChangedEvent(previous, next, IsMatchPausedInMenu));
 
@@ -48,7 +49,7 @@ namespace Futboloid.Main.Navigation
             return UniTask.CompletedTask;
         }
 
-        private void ApplyState(NavigationState next, NavigationState previous)
+        private void ApplyState(NavigationState next, NavigationState previous, bool isColdStart)
         {
             switch (next)
             {
@@ -62,7 +63,7 @@ namespace Futboloid.Main.Navigation
                     var newRunFromMenu = previous == NavigationState.MainMenu && !IsMatchPausedInMenu;
                     if (!resumingFromPause)
                     {
-                        if (newRunFromMenu)
+                        if (newRunFromMenu || isColdStart)
                             _tournamentRun.ResetRun();
                         _bus.Publish(new PitchResetRequestedEvent());
                     }

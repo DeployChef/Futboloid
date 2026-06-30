@@ -5,18 +5,44 @@ namespace Futboloid.Gameplay.Defenders
     public class DefenderMotor
     {
         private float _param;
+        private Vector2 _runVelocity;
 
         public float Param => _param;
+
+        public void ResetRunVelocity() => _runVelocity = Vector2.zero;
 
         public Vector2 TickRunTowards(
             Vector2 current,
             Vector2 target,
-            float speed,
+            float maxSpeed,
+            float acceleration,
+            float arriveThreshold,
             float deltaTime,
             out bool arrived)
         {
-            var next = Vector2.MoveTowards(current, target, speed * deltaTime);
-            arrived = (target - next).sqrMagnitude < 0.0001f;
+            var offset = target - current;
+            var distSqr = offset.sqrMagnitude;
+            if (distSqr <= arriveThreshold * arriveThreshold)
+            {
+                arrived = true;
+                _runVelocity = Vector2.zero;
+                return target;
+            }
+
+            arrived = false;
+
+            var desiredVelocity = offset.normalized * maxSpeed;
+            _runVelocity = Vector2.MoveTowards(_runVelocity, desiredVelocity, acceleration * deltaTime);
+            var next = current + _runVelocity * deltaTime;
+
+            var remaining = target - next;
+            if (Vector2.Dot(offset, remaining) <= 0f)
+            {
+                _runVelocity = Vector2.zero;
+                arrived = true;
+                return target;
+            }
+
             return next;
         }
 

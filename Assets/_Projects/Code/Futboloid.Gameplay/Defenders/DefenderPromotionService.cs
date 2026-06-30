@@ -68,7 +68,11 @@ namespace Futboloid.Gameplay.Defenders
             }
 
             _activeCandidate = candidate;
-            candidate.BeginRunToGoal(anchor, _registry.RunToGoalSpeed, _registry.ArriveThreshold);
+            candidate.BeginRunToGoal(
+                anchor,
+                _registry.RunToGoalSpeed,
+                _registry.RunToGoalAcceleration,
+                _registry.ArriveThreshold);
             _bus.Publish(new DefenderPromotionStartedEvent(candidate.SlotId));
             Debug.Log($"[DefenderPromotionService] Slot {candidate.SlotId} running to goal.");
         }

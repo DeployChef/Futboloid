@@ -68,7 +68,7 @@ namespace Futboloid.Main
             _overlay = _appGameState.Overlay;
             TournamentBracket = _appGameState.LifetimeScope.Container.Resolve<ITournamentBracketReadModel>();
 
-            Debug.Log("[GameDirector] Infrastructure ready (Root → App → Game → MainMenu).");
+            Debug.Log("[GameDirector] Infrastructure ready (Root → App → Game → OnField).");
         }
     }
 }

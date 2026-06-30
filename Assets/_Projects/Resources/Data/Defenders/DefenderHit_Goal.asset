@@ -15,5 +15,4 @@ MonoBehaviour:
   hitType: 1
   fallbackWhenNoPass: 0
   launchSpeed: 12
-  openGoalWeight: 1
-  atKeeperWeight: 0.3
+  openGoalChancePercent: 100

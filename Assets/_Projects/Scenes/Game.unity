@@ -540,7 +540,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4969127172605605462, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: m_Name
-      value: Defender_Idle_Pass
+      value: Defender_Idle_
       objectReference: {fileID: 0}
     - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: ball
@@ -549,6 +549,10 @@ PrefabInstance:
     - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: maxHp
       value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: slotId
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: goalAnchor
@@ -563,16 +567,24 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 7643cafdcd13c7748bc2ac5a7a7a4b19, type: 2}
     - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: gizmoLabelPadding
+      value: 0.23
+      objectReference: {fileID: 0}
+    - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: gizmoGoalHalfWidth
+      value: 5.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: goalkeeperBehavior
       value: 
       objectReference: {fileID: 11400000, guid: c09cac6beeeaaac418d9c1d51ff32823, type: 2}
     - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.01
+      value: 0.58
       objectReference: {fileID: 0}
     - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.15
+      value: 1.38
       objectReference: {fileID: 0}
     - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1180,7 +1192,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.004453808, y: -0.022269249}
+  m_Offset: {x: -0.015293062, y: -0.022269249}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -1190,7 +1202,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.79512244, y: 0.81293774}
+  m_Size: {x: 1.4238023, y: 0.81293774}
   m_EdgeRadius: 0
 --- !u!114 &733644496
 MonoBehaviour:
@@ -1205,6 +1217,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Keeper.GoalkeeperView
   speed: 8
+  acceleration: 40
   returnToCenterSpeed: 8
   centerX: 0
   centerArriveThreshold: 0.02
@@ -3700,6 +3713,10 @@ PrefabInstance:
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: slotId
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: goalAnchor
       value: 
       objectReference: {fileID: 844577608}
@@ -3717,7 +3734,7 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: c09cac6beeeaaac418d9c1d51ff32823, type: 2}
     - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.01
+      value: 2.3
       objectReference: {fileID: 0}
     - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: m_LocalPosition.y
@@ -4176,6 +4193,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.DefenderGridRegistry
   goalAnchor: {fileID: 0}
   runToGoalSpeed: 4
+  runToGoalAcceleration: 18
   arriveThreshold: 0.08
 --- !u!1001 &1721164268429103024
 PrefabInstance:
@@ -4211,11 +4229,11 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: c09cac6beeeaaac418d9c1d51ff32823, type: 2}
     - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.01
+      value: -2.08
       objectReference: {fileID: 0}
     - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.15
+      value: 3.2
       objectReference: {fileID: 0}
     - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: m_LocalPosition.z

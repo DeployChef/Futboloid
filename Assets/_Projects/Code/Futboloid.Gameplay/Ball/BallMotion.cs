@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
@@ -12,7 +11,7 @@ namespace Futboloid.Gameplay.Ball
     {
         private readonly BallSettings _settings;
         private readonly IGameEventBus _bus;
-        private readonly LayerMask _contactMask;
+        private readonly DefenderGridRegistry _defenderRegistry;
         private readonly LayerMask _goalMask;
 
         public Vector2 Position { get; private set; }
@@ -23,13 +22,12 @@ namespace Futboloid.Gameplay.Ball
         public bool IsHeld => _holdAnchor != null;
 
         private IBallAnchor _holdAnchor;
-        private readonly HashSet<int> _defenderHitsThisFrame = new();
 
-        public BallMotion(BallSettings settings, IGameEventBus bus)
+        public BallMotion(BallSettings settings, IGameEventBus bus, DefenderGridRegistry defenderRegistry)
         {
             _settings = settings;
             _bus = bus;
-            _contactMask = PhysicsLayers.BallContactMask;
+            _defenderRegistry = defenderRegistry;
             _goalMask = PhysicsLayers.GoalMask;
         }
 
@@ -41,7 +39,6 @@ namespace Futboloid.Gameplay.Ball
             Speed = 0f;
         }
 
-        /// <summary>Ведение: мяч следует за якорем до ReleaseFromAnchor.</summary>
         public void AttachToAnchor(IBallAnchor anchor)
         {
             _holdAnchor = anchor;
@@ -67,8 +64,6 @@ namespace Futboloid.Gameplay.Ball
 
         public void Tick(float deltaTime)
         {
-            _defenderHitsThisFrame.Clear();
-
             if (_holdAnchor != null)
             {
                 Position = _holdAnchor.WorldPosition;
@@ -85,7 +80,7 @@ namespace Futboloid.Gameplay.Ball
                 _settings.Radius,
                 Direction,
                 castDistance,
-                _contactMask);
+                PhysicsLayers.BallContactMask);
 
             if (hit.collider != null)
                 ResolveHit(hit);
@@ -103,45 +98,61 @@ namespace Futboloid.Gameplay.Ball
             Direction = ClampMinAngle(Reflect(Direction, hit.normal));
         }
 
+        public void ApplyKeeperBoost()
+        {
+            Speed = Mathf.Min(Speed + _settings.KeeperBoost, _settings.MaxSpeed);
+        }
+
+        public void LaunchDirected(Vector2 direction, float speed)
+        {
+            if (direction.sqrMagnitude < 0.0001f)
+                return;
+
+            Direction = ClampMinAngle(direction.normalized);
+            Speed = speed;
+        }
+
         private void ResolveHit(RaycastHit2D hit)
         {
             Position = hit.point + hit.normal * (_settings.Radius + _settings.Skin);
 
-            if (hit.collider.gameObject.layer == PhysicsLayers.KeeperId)
+            var hitCollider = hit.collider;
+            if (hitCollider == null)
+                return;
+
+            var layer = hitCollider.gameObject.layer;
+            if (layer == PhysicsLayers.KeeperId)
             {
                 ReflectFromHit(hit);
-                Speed = Mathf.Min(Speed + _settings.KeeperBoost, _settings.MaxSpeed);
+                ApplyKeeperBoost();
                 _bus.Publish(new BallReturnedToKeeperEvent());
+                _bus.Publish(new BallContactEvent(BallContactKind.PlayerKeeper, hit.point, hit.normal, Speed));
                 return;
             }
 
-            if (hit.collider.gameObject.layer == PhysicsLayers.DefenderId)
+            if (layer == PhysicsLayers.DefenderId
+                && _defenderRegistry != null
+                && _defenderRegistry.TryGetDefender(hitCollider, out var defender))
             {
-                if (TryResolveDefenderHit(hit))
-                    return;
+                defender.HandleBallContact(this, hit);
+                _bus.Publish(new BallContactEvent(
+                    BallContactKind.Defender, hit.point, hit.normal, Speed, defender.SlotId));
+                return;
             }
 
             ReflectFromHit(hit);
-        }
-
-        private bool TryResolveDefenderHit(RaycastHit2D hit)
-        {
-            var contact = hit.collider.GetComponentInParent<IDefenderBallContact>();
-            if (contact == null || !contact.IsAlive)
-                return false;
-
-            return contact.TryHandleBallHit(this, hit, _defenderHitsThisFrame);
+            _bus.Publish(new BallContactEvent(BallContactKind.Wall, hit.point, hit.normal, Speed));
         }
 
         private bool TryScoreGoal()
         {
             var hits = Physics2D.OverlapCircleAll(Position, _settings.Radius, _goalMask);
-            foreach (var collider in hits)
+            foreach (var overlap in hits)
             {
-                if (collider == null)
+                if (overlap == null)
                     continue;
 
-                var layer = collider.gameObject.layer;
+                var layer = overlap.gameObject.layer;
                 if (layer == PhysicsLayers.GoalEnemyId)
                 {
                     Stop();

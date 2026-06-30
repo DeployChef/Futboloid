@@ -19,6 +19,7 @@ namespace Futboloid.Gameplay.Match
         private CancellationTokenSource _timerCts;
         private bool _onField;
         private bool _matchEnded;
+        private bool _timerStarted;
         private float _totalDurationSeconds;
 
         public int PlayerScore { get; private set; }
@@ -40,6 +41,7 @@ namespace Futboloid.Gameplay.Match
             _bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged);
             _bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged);
             _bus.Subscribe<MatchTimeAdjustedEvent>(OnTimeAdjusted);
+            _bus.Subscribe<BallServedEvent>(OnBallServed);
         }
 
         public void Reset()
@@ -51,6 +53,7 @@ namespace Futboloid.Gameplay.Match
             RemainingSeconds = _matchDurationSeconds;
             _totalDurationSeconds = _matchDurationSeconds;
             _matchEnded = false;
+            _timerStarted = false;
 
             PublishScore();
             PublishTimer();
@@ -159,10 +162,21 @@ namespace Futboloid.Gameplay.Match
             var wasOnField = _onField;
             _onField = e.Current == NavigationState.OnField;
 
-            if (_onField && !_matchEnded)
+            if (_onField && !_matchEnded && _timerStarted)
                 StartTimerLoop();
             else if (wasOnField)
                 StopTimerLoop();
+        }
+
+        private void OnBallServed(BallServedEvent _)
+        {
+            if (_matchEnded || _timerStarted)
+                return;
+
+            _timerStarted = true;
+
+            if (_onField)
+                StartTimerLoop();
         }
 
         private void OnPitchPhaseChanged(PitchPhaseChangedEvent e)

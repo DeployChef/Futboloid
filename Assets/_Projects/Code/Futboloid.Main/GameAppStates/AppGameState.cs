@@ -43,9 +43,9 @@ namespace Futboloid.Main.GameAppStates
             LifetimeScope.Container.Resolve<MatchEndHandler>();
 
             Overlay = LifetimeScope.Container.Resolve<OverlayStateController>();
-            await Overlay.SetState(NavigationState.MainMenu);
+            await Overlay.SetState(NavigationState.OnField);
 
-            Debug.Log($"[AppGameState] '{GameScenes.Game}' ready, navigation → MainMenu.");
+            Debug.Log($"[AppGameState] '{GameScenes.Game}' ready, navigation → OnField.");
         }
 
         public async UniTask Exit()

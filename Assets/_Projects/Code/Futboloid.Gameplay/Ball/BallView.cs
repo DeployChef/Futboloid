@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
+using Futboloid.Gameplay.Defenders;
+using Futboloid.Gameplay.Match;
 using UnityEngine;
 using VContainer;
 
@@ -24,10 +26,14 @@ namespace Futboloid.Gameplay.Ball
         public Vector2 Position => _motion != null ? _motion.Position : (Vector2)transform.position;
 
         [Inject]
-        public void Construct(IGameEventBus bus)
+        public void Construct(
+            IGameEventBus bus,
+            DefenderGridRegistry defenderRegistry,
+            PitchStateMachine pitch,
+            MatchFlow matchFlow)
         {
             _bus = bus;
-            _motion = new BallMotion(settings, bus);
+            _motion = new BallMotion(settings, bus, defenderRegistry);
 
             if (kickoffAnchor == null)
                 kickoffAnchor = FindAnyObjectByType<BallKickoffAnchor>();
@@ -35,6 +41,8 @@ namespace Futboloid.Gameplay.Ball
             _subscriptions.Add(bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged));
             _subscriptions.Add(bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged));
 
+            SyncPitchState(pitch.Current);
+            _onField = matchFlow.IsOnField;
             ResetAtKickoff();
         }
 
@@ -68,10 +76,15 @@ namespace Futboloid.Gameplay.Ball
 
         private void OnPitchPhaseChanged(PitchPhaseChangedEvent e)
         {
-            _phase = e.Phase;
-            _simulating = e.Phase == PitchPhase.Simulating;
+            SyncPitchState(e.Phase);
+        }
 
-            if (e.Phase == PitchPhase.KickoffWait)
+        private void SyncPitchState(PitchPhase phase)
+        {
+            _phase = phase;
+            _simulating = phase == PitchPhase.Simulating;
+
+            if (phase == PitchPhase.Reshuffle || phase == PitchPhase.KickoffWait)
                 ResetAtKickoff();
         }
 

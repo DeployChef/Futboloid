@@ -16,6 +16,7 @@ namespace Futboloid.Main.DI
             builder.Register<MatchFlow>(Lifetime.Singleton);
             builder.Register<PitchStateMachine>(Lifetime.Singleton);
             builder.Register<DefenderPromotionService>(Lifetime.Singleton);
+            builder.Register<DefenderReshuffleService>(Lifetime.Singleton);
 
             var inputHost = Object.FindAnyObjectByType<GameplayInputHost>();
             if (inputHost != null)
@@ -38,6 +39,7 @@ namespace Futboloid.Main.DI
         {
             resolver.Resolve<PitchStateMachine>();
             resolver.Resolve<DefenderPromotionService>();
+            resolver.Resolve<DefenderReshuffleService>();
 
             var scene = SceneManager.GetSceneByName(GameScenes.Game);
             if (!scene.IsValid() || !scene.isLoaded)
