@@ -102,10 +102,12 @@ namespace Futboloid.Gameplay.Ball
                 Direction = ClampMinAngle(Reflect(Direction, hit.normal));
                 Speed = Mathf.Min(Speed + _settings.KeeperBoost, _settings.MaxSpeed);
                 _bus.Publish(new BallReturnedToKeeperEvent());
+                _bus.Publish(new BallHitEvent());
                 return;
             }
 
             Direction = ClampMinAngle(Reflect(Direction, hit.normal));
+            _bus.Publish(new BallHitEvent());
         }
 
         private bool TryScoreGoal()
