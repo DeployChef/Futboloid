@@ -87,6 +87,7 @@ sequenceDiagram
 | Событие | Поведение |
 |---------|-----------|
 | `Navigation → OnField` | `StartTimerLoop()` (если матч не кончен) |
+| `PitchPhase → Reshuffle` | **Таймер идёт** — не останавливаем (гол ≠ пауза) |
 | Пауза (`Pause` во время **забега**, см. [[UI и оверлеи#Главное меню ≠ пауза]]) | `StopTimerLoop()` — секунды **сохраняются** |
 | Continue → `OnField` | снова `StartTimerLoop()` с тем же `RemainingSeconds` |
 | `PitchResetRequestedEvent` (новый Play) | стоп корутины, счёт и таймер → 90 с |
@@ -161,9 +162,15 @@ _bus.Publish(new MatchTimeAdjustedEvent(15f, "stoppage"));
 
 Отрицательный сдвиг — штраф / ускорение конца матча.
 
----
+### Reshuffle и таймер
 
-## HUD: слайдер на сцене Game
+После гола `PitchStateMachine` → `Reshuffle`: футболисты бегут, мяч летит на якорь. **`MatchFlow` корутину не останавливает** — `RemainingSeconds` уменьшается, пока `_onField` и не `MatchEnded`.
+
+> В футболе нет паузы после гола. Останавливать таймер только при `Navigation.Pause` (Escape) или конце матча.
+
+`MatchFlow` **не** подписан на `PitchPhaseChangedEvent` для паузы на `Reshuffle` / `KickoffWait` — только навигация и конец матча.
+
+---
 
 Match HUD **не на Root** — он живёт на **`Game.unity`** вместе с полем. Магазин и турнир на Root **не тащат** HUD матча.
 
