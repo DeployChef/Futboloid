@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae73ca73d1c5b844f9ecfdff0acb8de9, type: 3}
   m_Name: DefenderGoalkeeper_Default
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.DefenderGoalkeeperBehavior
-  paramSpeed: 0.45
+  trackSpeed: 1

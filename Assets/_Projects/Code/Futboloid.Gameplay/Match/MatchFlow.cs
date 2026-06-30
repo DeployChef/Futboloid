@@ -27,6 +27,8 @@ namespace Futboloid.Gameplay.Match
         public float NormalizedTime =>
             _totalDurationSeconds > 0f ? RemainingSeconds / _totalDurationSeconds : 0f;
 
+        public bool IsOnField => _onField;
+
         public MatchFlow(IGameEventBus bus, GameplaySettings settings)
         {
             _bus = bus;

@@ -2672,7 +2672,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: maxHp
-      value: 10
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: slotId
@@ -4000,6 +4000,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94874b7eab947db489edc83aac8bb066, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.DefenderGridRegistry
+  goalAnchor: {fileID: 0}
+  runToGoalSpeed: 4
+  arriveThreshold: 0.08
 --- !u!1001 &1721164268429103024
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4013,9 +4016,25 @@ PrefabInstance:
       value: Defender
       objectReference: {fileID: 0}
     - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: ball
+      value: 
+      objectReference: {fileID: 1203950916}
+    - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: maxHp
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: goalAnchor
+      value: 
+      objectReference: {fileID: 844577608}
+    - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: movementBehavior
       value: 
       objectReference: {fileID: 11400000, guid: 7643cafdcd13c7748bc2ac5a7a7a4b19, type: 2}
+    - target: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
+      propertyPath: goalkeeperBehavior
+      value: 
+      objectReference: {fileID: 11400000, guid: c09cac6beeeaaac418d9c1d51ff32823, type: 2}
     - target: {fileID: 9216872615087905485, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.01

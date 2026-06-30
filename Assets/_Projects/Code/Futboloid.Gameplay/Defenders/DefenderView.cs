@@ -4,6 +4,7 @@ using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
 using Futboloid.Gameplay.Ball;
+using Futboloid.Gameplay.Match;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -43,11 +44,16 @@ namespace Futboloid.Gameplay.Defenders
         private bool _onField;
         private bool _simulating;
         private bool _warnedMissingGoalAnchor;
+        private bool _runningToGoal;
+        private float _runSpeed = 4f;
+        private float _runArriveThreshold = 0.08f;
+        private Vector2 _runTarget;
         private Vector2 _homePosition;
 
         public int SlotId => slotId;
         public DefenderRole Role => role;
         public bool IsAlive => _isAlive;
+        public bool RunningToGoal => _runningToGoal;
         public Vector2 HomePosition => _homePosition;
 
         private void Awake()
@@ -61,19 +67,36 @@ namespace Futboloid.Gameplay.Defenders
         }
 
         [Inject]
-        public void Construct(IGameEventBus bus)
+        public void Construct(IGameEventBus bus, PitchStateMachine pitch, MatchFlow matchFlow)
         {
             _bus = bus;
             _subscriptions.Add(bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged));
             _subscriptions.Add(bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged));
 
+            SyncPitchState(pitch.Current);
+            _onField = matchFlow.IsOnField;
+
             if (ball == null)
                 ball = FindAnyObjectByType<BallView>();
         }
 
+        private void SyncPitchState(PitchPhase phase)
+        {
+            _simulating = phase == PitchPhase.Simulating;
+        }
+
         private void Update()
         {
-            if (!_onField || !_simulating || !_isAlive || role != DefenderRole.Goalkeeper)
+            if (!_isAlive)
+                return;
+
+            if (_runningToGoal)
+            {
+                TickRunningToGoal();
+                return;
+            }
+
+            if (!_onField || !_simulating || role != DefenderRole.Goalkeeper)
                 return;
 
             var zone = ResolveGoalAnchor();
@@ -84,6 +107,59 @@ namespace Futboloid.Gameplay.Defenders
             var ballX = ResolveBallWorldX();
             var position = _motor.TickGoalkeeperOnParabola(zone, ballX, trackSpeed, Time.deltaTime);
             transform.position = new Vector3(position.x, position.y, transform.position.z);
+        }
+
+        public void BeginRunToGoal(Transform anchor, float speed, float arriveThreshold)
+        {
+            if (!_isAlive || role != DefenderRole.Field)
+                return;
+
+            goalAnchor = anchor;
+            _runSpeed = speed;
+            _runArriveThreshold = arriveThreshold;
+            _runTarget = ResolveRunTarget(anchor);
+            _runningToGoal = true;
+        }
+
+        public void SetRole(DefenderRole newRole)
+        {
+            if (role == newRole)
+                return;
+
+            role = newRole;
+            _runningToGoal = false;
+            _bus?.Publish(new DefenderRoleChangedEvent(slotId, newRole == DefenderRole.Goalkeeper));
+
+            if (newRole == DefenderRole.Goalkeeper)
+                SnapGoalkeeperToBall();
+        }
+
+        private void TickRunningToGoal()
+        {
+            var current = (Vector2)transform.position;
+            var next = _motor.TickRunTowards(current, _runTarget, _runSpeed, Time.deltaTime, out var arrived);
+            transform.position = new Vector3(next.x, next.y, transform.position.z);
+
+            if (!arrived && (next - _runTarget).sqrMagnitude > _runArriveThreshold * _runArriveThreshold)
+                return;
+
+            CompleteRunToGoal();
+        }
+
+        private void CompleteRunToGoal()
+        {
+            _runningToGoal = false;
+            SetRole(DefenderRole.Goalkeeper);
+            _bus?.Publish(new DefenderPromotionCompletedEvent(slotId));
+        }
+
+        private static Vector2 ResolveRunTarget(Transform anchor)
+        {
+            if (anchor == null)
+                return Vector2.zero;
+
+            var zone = anchor.GetComponent<GoalAnchor>();
+            return zone != null ? zone.PositionOnParabola(0f) : anchor.position;
         }
 
         private void Start()
@@ -102,7 +178,7 @@ namespace Futboloid.Gameplay.Defenders
 
         private void OnPitchPhaseChanged(PitchPhaseChangedEvent e)
         {
-            _simulating = e.Phase == PitchPhase.Simulating;
+            SyncPitchState(e.Phase);
 
             if (role != DefenderRole.Goalkeeper)
                 return;
@@ -206,7 +282,9 @@ namespace Futboloid.Gameplay.Defenders
             if (!_isAlive)
                 return;
 
+            var wasGoalkeeper = role == DefenderRole.Goalkeeper;
             _isAlive = false;
+            _runningToGoal = false;
 
             if (bodyCollider != null)
                 bodyCollider.enabled = false;
@@ -214,8 +292,10 @@ namespace Futboloid.Gameplay.Defenders
             if (hpLabel != null)
                 hpLabel.gameObject.SetActive(false);
 
-            _bus?.Publish(new DefenderDestroyedEvent(slotId));
+            _bus?.Publish(new DefenderDestroyedEvent(slotId, wasGoalkeeper));
+            _registry?.Unregister(this);
             Debug.Log($"[DefenderView] Slot {slotId} destroyed.");
+            Destroy(gameObject);
         }
 
         private void RefreshHpLabel()
@@ -254,7 +334,9 @@ namespace Futboloid.Gameplay.Defenders
                 : DefenderMovementType.Idle;
 
             var label = $"#{slotId}  {role}\nHit: {hitType}";
-            if (role == DefenderRole.Field)
+            if (_runningToGoal)
+                label += "\n→ GK";
+            if (role == DefenderRole.Field && !_runningToGoal)
                 label += $"\nMove: {moveType}";
             if (Application.isPlaying)
                 label += $"\nHP: {_hp}/{maxHp}";

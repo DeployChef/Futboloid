@@ -8,6 +8,18 @@ namespace Futboloid.Gameplay.Defenders
 
         public float Param => _param;
 
+        public Vector2 TickRunTowards(
+            Vector2 current,
+            Vector2 target,
+            float speed,
+            float deltaTime,
+            out bool arrived)
+        {
+            var next = Vector2.MoveTowards(current, target, speed * deltaTime);
+            arrived = (target - next).sqrMagnitude < 0.0001f;
+            return next;
+        }
+
         /// <summary>Следует за ballWorldX: t → clamp((x−center)/halfWidth), движется по параболе.</summary>
         public Vector2 TickGoalkeeperOnParabola(
             GoalAnchor zone,
