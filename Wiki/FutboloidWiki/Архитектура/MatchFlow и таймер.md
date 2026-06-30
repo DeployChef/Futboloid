@@ -15,7 +15,7 @@ aliases:
 
 **Scope:** Game (`MatchFlow` в Game LifetimeScope).
 
-Отвечает за **счёт голов** и **обратный отсчёт 90 с**. `PitchStateMachine` не тикает таймер — только слушает **`MatchEndedEvent`** и переходит в `MatchEnded`.
+Отвечает за **счёт голов**, **обратный отсчёт 90 с** и **досрочный конец** (все враги выбиты). `PitchStateMachine` не тикает таймер — только слушает **`MatchEndedEvent`** и переходит в `MatchEnded`.
 
 Связано: [[UI и оверлеи#Match HUD]], [[../GDD/02 Игровой цикл#Окончание матча|GDD: окончание матча]], [[Прогрессия и эффекты#7. HUD — события + анимация кольца|HUD на событиях (аналогия с баффами)]].
 
@@ -28,7 +28,7 @@ aliases:
 
 | Класс | Что делает | Чего не делает |
 |-------|------------|----------------|
-| **`MatchFlow`** | Счёт, таймер, `MatchEndedEvent`, сдвиг времени | Не двигает мяч, не знает про UI |
+| **`MatchFlow`** | Счёт, таймер, `MatchEndedEvent`, сдвиг времени, **вайп врагов** | Не двигает мяч, не знает про UI |
 | **`PitchStateMachine`** | Фазы поля (`KickoffWait`, `Simulating`…) | Не считает секунды |
 | **`MatchHudController`** (Game) | Шина → виджет; видимость поля | Скрывает только при `Tournament` |
 | **`MatchHudWidget`** | Слайдер, тексты | Не знает про Navigation напрямую |
@@ -47,6 +47,7 @@ aliases:
 | Сколько секунд осталось | `MatchFlow` (корутина + `AdjustTime`) |
 | Как выглядит полоска | `MatchHudLayout` → `Slider` по **`MatchTimerChangedEvent`** |
 | Матч реально кончен | `MatchFlow` → **`MatchEndedEvent`** → `PitchStateMachine` |
+| Все враги мертвы | `DefenderDestroyedEvent` → registry → `MatchFlow.EndMatch(AllDefendersEliminated)` |
 
 ```mermaid
 sequenceDiagram
@@ -89,7 +90,8 @@ sequenceDiagram
 | Пауза (`Pause` во время **забега**, см. [[UI и оверлеи#Главное меню ≠ пауза]]) | `StopTimerLoop()` — секунды **сохраняются** |
 | Continue → `OnField` | снова `StartTimerLoop()` с тем же `RemainingSeconds` |
 | `PitchResetRequestedEvent` (новый Play) | стоп корутины, счёт и таймер → 90 с |
-| `RemainingSeconds ≤ 0` | `MatchEndedEvent`, стоп корутины |
+| `RemainingSeconds ≤ 0` | `MatchEndedEvent` (`TimeExpired`), стоп корутины |
+| Все `DefenderView` соперника мертвы | `MatchEndedEvent` (`AllDefendersEliminated`), стоп корутины |
 | `PitchPhase → MatchEnded` | стоп корутины, флаг конца матча |
 
 Корутина использует `Time.deltaTime` → при `timeScale = 0` отсчёт замирает даже если цикл формально жив (на паузе цикл **останавливаем** через `CancellationToken`).
@@ -130,6 +132,8 @@ public readonly struct MatchEndedEvent
 {
     public int PlayerScore { get; }
     public int OpponentScore { get; }
+    // public MatchEndReason Reason { get; }  // TimeExpired | AllDefendersEliminated — задел
+    // public int WipeBonusPoints { get; }    // TBD при ComboScoreService
 }
 
 /// <summary>+N доп. время, −N штраф. Публикует любой геймплейный код.</summary>
@@ -144,7 +148,7 @@ public readonly struct MatchTimeAdjustedEvent
 
 - **`MatchTimerChangedEvent`** — из корутины после каждого шага (для плавного слайдера) и после `AdjustTime` / `Reset`
 - **`MatchScoreChangedEvent`** — при голе (`GoalScoredEvent` → `RecordGoal`)
-- **`MatchEndedEvent`** — при `RemainingSeconds ≤ 0` (в т.ч. после отрицательного `AdjustTime`)
+- **`MatchEndedEvent`** — при `RemainingSeconds ≤ 0` (`TimeExpired`) **или** при вайпе всех врагов (`AllDefendersEliminated`)
 - слушает **`MatchTimeAdjustedEvent`** → `AdjustTime(delta, reason)`
 
 ### Доп. время
