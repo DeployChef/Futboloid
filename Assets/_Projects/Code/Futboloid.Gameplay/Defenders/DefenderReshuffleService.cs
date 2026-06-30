@@ -1,37 +1,38 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
+using Futboloid.Gameplay.Ball;
 using Futboloid.Gameplay.Match;
 using UnityEngine;
 
 namespace Futboloid.Gameplay.Defenders
 {
-    /// <summary>После гола: живые футболисты бегут на home, затем Pitch → KickoffWait.</summary>
+    /// <summary>После гола: твины футболистов + мяча, затем Pitch → KickoffWait.</summary>
     public sealed class DefenderReshuffleService : IDisposable
     {
-        private readonly IGameEventBus _bus;
         private readonly PitchStateMachine _pitch;
         private readonly DefenderGridRegistry _registry;
         private readonly List<IDisposable> _subscriptions = new();
-        private readonly HashSet<int> _pendingSlotIds = new();
+
+        private CancellationTokenSource _reshuffleCts;
 
         public DefenderReshuffleService(
             IGameEventBus bus,
             PitchStateMachine pitch,
             DefenderGridRegistry registry)
         {
-            _bus = bus;
             _pitch = pitch;
             _registry = registry;
             _subscriptions.Add(bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged));
-            _subscriptions.Add(bus.Subscribe<DefenderReturnedHomeEvent>(OnDefenderReturnedHome));
-            _subscriptions.Add(bus.Subscribe<DefenderDestroyedEvent>(OnDefenderDestroyed));
         }
 
         public void Dispose()
         {
+            CancelReshuffle();
             foreach (var subscription in _subscriptions)
                 subscription.Dispose();
         }
@@ -41,56 +42,53 @@ namespace Futboloid.Gameplay.Defenders
             if (e.Phase != PitchPhase.Reshuffle)
                 return;
 
-            BeginReshuffle();
+            RunReshuffleAsync().Forget();
         }
 
-        private void BeginReshuffle()
+        private async UniTaskVoid RunReshuffleAsync()
         {
-            _pendingSlotIds.Clear();
+            CancelReshuffle();
+            _reshuffleCts = new CancellationTokenSource();
+            var ct = _reshuffleCts.Token;
 
-            if (_registry == null)
+            try
             {
-                TryCompleteReshuffle();
-                return;
-            }
+                var tasks = new List<UniTask>(8);
+                var ballView = UnityEngine.Object.FindAnyObjectByType<BallView>();
+                if (ballView != null)
+                    tasks.Add(ballView.PlayReshuffleToKickoffAsync(ct));
 
-            _registry.ForEachLiving(defender =>
-            {
-                if (!defender.BeginReshuffleReturn(
-                        _registry.ReshuffleSpeed,
-                        _registry.ReshuffleAcceleration,
-                        _registry.ArriveThreshold))
+                if (_registry != null)
+                {
+                    _registry.ForEachLiving(defender =>
+                        tasks.Add(defender.PlayReshuffleTweenAsync(
+                            _registry.ReshuffleMoveDuration,
+                            _registry.ArriveThreshold,
+                            ct)));
+                }
+
+                if (tasks.Count > 0)
+                    await UniTask.WhenAll(tasks);
+
+                if (ct.IsCancellationRequested || _pitch.Current != PitchPhase.Reshuffle)
                     return;
 
-                _pendingSlotIds.Add(defender.SlotId);
-            });
-
-            TryCompleteReshuffle();
-        }
-
-        private void OnDefenderReturnedHome(DefenderReturnedHomeEvent e)
-        {
-            if (!_pendingSlotIds.Remove(e.SlotId))
-                return;
-
-            TryCompleteReshuffle();
-        }
-
-        private void OnDefenderDestroyed(DefenderDestroyedEvent e)
-        {
-            if (!_pendingSlotIds.Remove(e.SlotId))
-                return;
-
-            TryCompleteReshuffle();
-        }
-
-        private void TryCompleteReshuffle()
-        {
-            if (_pendingSlotIds.Count > 0)
-                return;
-
-            if (_pitch.Current == PitchPhase.Reshuffle)
                 _pitch.CompleteReshuffle();
+            }
+            catch (OperationCanceledException)
+            {
+                // Новый решафл или выгрузка сцены.
+            }
+        }
+
+        private void CancelReshuffle()
+        {
+            if (_reshuffleCts == null)
+                return;
+
+            _reshuffleCts.Cancel();
+            _reshuffleCts.Dispose();
+            _reshuffleCts = null;
         }
     }
 }

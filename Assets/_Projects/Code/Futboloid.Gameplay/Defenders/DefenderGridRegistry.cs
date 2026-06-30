@@ -18,8 +18,7 @@ namespace Futboloid.Gameplay.Defenders
         [SerializeField] private float arriveThreshold = 0.08f;
 
         [Header("Reshuffle after goal")]
-        [SerializeField] private float reshuffleSpeed = 3.5f;
-        [SerializeField] private float reshuffleAcceleration = 14f;
+        [SerializeField] private float reshuffleMoveDuration = 0.55f;
 
         private readonly Dictionary<EntityId, DefenderView> _byColliderId = new();
         private readonly List<DefenderView> _defenders = new();
@@ -29,8 +28,7 @@ namespace Futboloid.Gameplay.Defenders
 
         public float RunToGoalSpeed => runToGoalSpeed;
         public float RunToGoalAcceleration => runToGoalAcceleration;
-        public float ReshuffleSpeed => reshuffleSpeed;
-        public float ReshuffleAcceleration => reshuffleAcceleration;
+        public float ReshuffleMoveDuration => reshuffleMoveDuration;
         public float ArriveThreshold => arriveThreshold;
 
         [Inject]
