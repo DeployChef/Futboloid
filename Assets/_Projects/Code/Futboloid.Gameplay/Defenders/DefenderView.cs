@@ -39,6 +39,9 @@ namespace Futboloid.Gameplay.Defenders
         [SerializeField] private float wanderRadius = 1.5f;
         [SerializeField] private float chaseRadius = 3f;
         [SerializeField] private float separationRadius = 0.6f;
+        [SerializeField] private float fieldMoveSpeed = 1.6f;
+        [SerializeField] private float fieldAcceleration = 12f;
+        [SerializeField] private float fieldArriveThreshold = 0.12f;
 
         [Header("Goalkeeper")]
         [SerializeField] private Transform goalAnchor;
@@ -72,6 +75,7 @@ namespace Futboloid.Gameplay.Defenders
         private Vector2 _runTarget;
         private Vector2 _homePosition;
         private float _lastDamageTime = float.NegativeInfinity;
+        private readonly List<Vector2> _neighborPositions = new();
 
         public int SlotId => slotId;
         public Collider2D ContactCollider => bodyCollider != null ? bodyCollider : GetComponent<Collider2D>();
@@ -111,6 +115,7 @@ namespace Futboloid.Gameplay.Defenders
 
             SyncPitchState(pitch.Current);
             _onField = matchFlow.IsOnField;
+            _logic.InitializeFieldMovement(_homePosition, slotId, patrolPointCount, patrolRadius);
         }
 
         private void SyncPitchState(PitchPhase phase)
@@ -131,9 +136,21 @@ namespace Futboloid.Gameplay.Defenders
                 return;
             }
 
-            if (!_onField || !_simulating || role != DefenderRole.Goalkeeper)
+            if (!_onField || !_simulating)
                 return;
 
+            if (role == DefenderRole.Goalkeeper)
+            {
+                TickGoalkeeper();
+                return;
+            }
+
+            if (role == DefenderRole.Field)
+                TickFieldMovement();
+        }
+
+        private void TickGoalkeeper()
+        {
             var zone = ResolveGoalAnchor();
             if (zone == null)
                 return;
@@ -141,6 +158,44 @@ namespace Futboloid.Gameplay.Defenders
             var ballX = ResolveBallWorldX();
             var position = _logic.TickGoalkeeperOnParabola(zone, ballX, trackSpeed, Time.deltaTime);
             transform.position = new Vector3(position.x, position.y, transform.position.z);
+        }
+
+        private void TickFieldMovement()
+        {
+            CollectNeighborPositions();
+
+            Vector2? ballPosition = _ball != null ? _ball.Position : null;
+            var current = (Vector2)transform.position;
+            var next = _logic.TickFieldMovement(
+                current,
+                movementType,
+                _homePosition,
+                wanderRadius,
+                chaseRadius,
+                ballPosition,
+                fieldMoveSpeed,
+                fieldAcceleration,
+                fieldArriveThreshold,
+                separationRadius,
+                _neighborPositions,
+                Time.deltaTime);
+            transform.position = new Vector3(next.x, next.y, transform.position.z);
+        }
+
+        private void CollectNeighborPositions()
+        {
+            _neighborPositions.Clear();
+
+            if (_registry == null)
+                return;
+
+            _registry.ForEachLiving(defender =>
+            {
+                if (defender == null || defender == this)
+                    return;
+
+                _neighborPositions.Add(defender.transform.position);
+            });
         }
 
         public void BeginRunToGoal(Transform anchor, float maxSpeed, float acceleration, float arriveThreshold)
@@ -154,6 +209,7 @@ namespace Futboloid.Gameplay.Defenders
             _runArriveThreshold = arriveThreshold;
             _runTarget = ResolveRunTarget(anchor);
             _logic.ResetRunVelocity();
+            _logic.ResetFieldVelocity();
             _runningToGoal = true;
         }
 
