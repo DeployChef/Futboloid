@@ -15,7 +15,7 @@ aliases:
 
 **Scope:** Game (`MatchFlow` в Game LifetimeScope).
 
-Отвечает за **счёт голов** и **обратный отсчёт 90 с**. `PitchStateMachine` не тикает таймер — только слушает **`MatchEndedEvent`** и переходит в `MatchEnded`.
+Отвечает за **счёт голов**, **обратный отсчёт 90 с** и **досрочный конец** (все враги выбиты). `PitchStateMachine` не тикает таймер — только слушает **`MatchEndedEvent`** и переходит в `MatchEnded`.
 
 Связано: [[UI и оверлеи#Match HUD]], [[../GDD/02 Игровой цикл#Окончание матча|GDD: окончание матча]], [[Прогрессия и эффекты#7. HUD — события + анимация кольца|HUD на событиях (аналогия с баффами)]].
 
@@ -28,7 +28,7 @@ aliases:
 
 | Класс | Что делает | Чего не делает |
 |-------|------------|----------------|
-| **`MatchFlow`** | Счёт, таймер, `MatchEndedEvent`, сдвиг времени | Не двигает мяч, не знает про UI |
+| **`MatchFlow`** | Счёт, таймер, `MatchEndedEvent`, сдвиг времени, **вайп врагов** | Не двигает мяч, не знает про UI |
 | **`PitchStateMachine`** | Фазы поля (`KickoffWait`, `Simulating`…) | Не считает секунды |
 | **`MatchHudController`** (Game) | Шина → виджет; видимость поля | Скрывает только при `Tournament` |
 | **`MatchHudWidget`** | Слайдер, тексты | Не знает про Navigation напрямую |
@@ -47,16 +47,24 @@ aliases:
 | Сколько секунд осталось | `MatchFlow` (корутина + `AdjustTime`) |
 | Как выглядит полоска | `MatchHudLayout` → `Slider` по **`MatchTimerChangedEvent`** |
 | Матч реально кончен | `MatchFlow` → **`MatchEndedEvent`** → `PitchStateMachine` |
+| Все враги мертвы | `DefenderDestroyedEvent` → registry → `MatchFlow.EndMatch(AllDefendersEliminated)` |
 
 ```mermaid
 sequenceDiagram
+    participant App as AppGame.Enter
     participant Nav as Navigation OnField
     participant MF as MatchFlow
+    participant Ball as BallMotion.Serve
     participant Bus as IGameEventBus
     participant Ctrl as MatchHudController
     participant HUD as MatchHudWidget
 
-    Nav->>MF: NavigationChangedEvent
+    App->>Nav: SetState(OnField), isColdStart
+    Nav->>MF: NavigationChangedEvent (_onField=true)
+    Note over MF: таймер ещё не идёт (_timerStarted=false)
+
+    Ball->>Bus: BallServedEvent (первая подача)
+    Bus->>MF: OnBallServed
     MF->>MF: StartTimerLoop (UniTask)
 
     loop каждый кадр на поле
@@ -85,12 +93,18 @@ sequenceDiagram
 
 | Событие | Поведение |
 |---------|-----------|
-| `Navigation → OnField` | `StartTimerLoop()` (если матч не кончен) |
-| Пауза (`Pause` во время **забега**, см. [[UI и оверлеи#Главное меню ≠ пауза]]) | `StopTimerLoop()` — секунды **сохраняются** |
+| `Navigation → OnField` | `_onField = true`; корутина **не** стартует, пока не было первой подачи |
+| **`BallServedEvent`** (первая подача матча) | `_timerStarted = true` → `StartTimerLoop()` |
+| `PitchPhase → Reshuffle` | **Таймер идёт** (если уже стартовал) — не останавливаем |
+| `KickoffWait` после гола | Таймер **продолжает** идти; повторные подачи **не** перезапускают таймер |
+| Пауза (`Pause` во время **забега**) | `StopTimerLoop()` — секунды **сохраняются**, `_timerStarted` остаётся `true` |
 | Continue → `OnField` | снова `StartTimerLoop()` с тем же `RemainingSeconds` |
-| `PitchResetRequestedEvent` (новый Play) | стоп корутины, счёт и таймер → 90 с |
+| `PitchResetRequestedEvent` (новый Play / cold start) | стоп корутины, счёт и таймер → 90 с, `_timerStarted = false` |
 | `RemainingSeconds ≤ 0` | `MatchEndedEvent`, стоп корутины |
+| Все `DefenderView` соперника мертвы | `MatchEndedEvent` (`AllDefendersEliminated`), стоп корутины |
 | `PitchPhase → MatchEnded` | стоп корутины, флаг конца матча |
+
+Флаг **`_timerStarted`** в `MatchFlow`: сбрасывается в `Reset()`, выставляется один раз за матч на первом `BallServedEvent`. Связка с фазой: `PitchStateMachine` тоже слушает `BallServedEvent` → `Simulating`.
 
 Корутина использует `Time.deltaTime` → при `timeScale = 0` отсчёт замирает даже если цикл формально жив (на паузе цикл **останавливаем** через `CancellationToken`).
 
@@ -130,6 +144,8 @@ public readonly struct MatchEndedEvent
 {
     public int PlayerScore { get; }
     public int OpponentScore { get; }
+    // public MatchEndReason Reason { get; }  // TimeExpired | AllDefendersEliminated — задел
+    // public int WipeBonusPoints { get; }    // TBD при ComboScoreService
 }
 
 /// <summary>+N доп. время, −N штраф. Публикует любой геймплейный код.</summary>
@@ -144,8 +160,15 @@ public readonly struct MatchTimeAdjustedEvent
 
 - **`MatchTimerChangedEvent`** — из корутины после каждого шага (для плавного слайдера) и после `AdjustTime` / `Reset`
 - **`MatchScoreChangedEvent`** — при голе (`GoalScoredEvent` → `RecordGoal`)
-- **`MatchEndedEvent`** — при `RemainingSeconds ≤ 0` (в т.ч. после отрицательного `AdjustTime`)
-- слушает **`MatchTimeAdjustedEvent`** → `AdjustTime(delta, reason)`
+- **`MatchEndedEvent`** — при `RemainingSeconds ≤ 0` (`TimeExpired`) **или** при вайпе всех врагов (`AllDefendersEliminated`)
+
+Слушает:
+
+- **`GoalScoredEvent`** → `RecordGoal`
+- **`NavigationChangedEvent`** → `_onField`; возобновляет корутину только если `_timerStarted`
+- **`BallServedEvent`** → первая подача матча → `_timerStarted = true` → `StartTimerLoop()`
+- **`MatchTimeAdjustedEvent`** → `AdjustTime(delta, reason)`
+- **`PitchPhaseChangedEvent`** → `MatchEnded` → стоп корутины
 
 ### Доп. время
 
@@ -157,9 +180,15 @@ _bus.Publish(new MatchTimeAdjustedEvent(15f, "stoppage"));
 
 Отрицательный сдвиг — штраф / ускорение конца матча.
 
----
+### Reshuffle и таймер
 
-## HUD: слайдер на сцене Game
+После гола `PitchStateMachine` → `Reshuffle`: футболисты бегут, мяч летит на якорь. **`MatchFlow` корутину не останавливает** — `RemainingSeconds` уменьшается, пока `_onField` и не `MatchEnded`.
+
+> В футболе нет паузы после гола. Останавливать таймер только при `Navigation.Pause` (Escape) или конце матча.
+
+`MatchFlow` **не** подписан на `PitchPhaseChangedEvent` для паузы на `Reshuffle` / `KickoffWait` — только навигация и конец матча.
+
+---
 
 Match HUD **не на Root** — он живёт на **`Game.unity`** вместе с полем. Магазин и турнир на Root **не тащат** HUD матча.
 
@@ -221,8 +250,57 @@ flowchart LR
     GS --> PSM
 ```
 
-- Гол: `PitchStateMachine` → `Reshuffle` → `KickoffWait` (матч-таймер **не** сбрасывается).
+- Гол: `PitchStateMachine` → `Reshuffle` → `KickoffWait` (матч-таймер **не** сбрасывается и **не** останавливается).
 - Новый матч: `OverlayStateController` → `PitchResetRequestedEvent` → `PitchStateMachine.Reset()` + `MatchFlow.Reset()` + `KickoffWait`.
+
+---
+
+## Старт приложения и первый матч
+
+### Cold start → сразу на поле
+
+При первом `AppGameState.Enter()` навигация идёт **сразу в `OnField`**, без показа `MainMenu`:
+
+```csharp
+// AppGameState.Enter()
+await Overlay.SetState(NavigationState.OnField);
+```
+
+`OverlayStateController` помечает первый вызов флагом **`isColdStart`** (`!_initialized`) и передаёт его в `ApplyState`:
+
+| Условие | `ResetRun()` | `PitchResetRequestedEvent` |
+|---------|--------------|----------------------------|
+| Cold start (`isColdStart`) | **Да** | **Да** |
+| `MainMenu → OnField` (новая игра) | **Да** | **Да** |
+| `MainMenu → OnField` (продолжить с паузы) | Нет | Нет |
+| `Tournament → OnField` (след. матч) | Нет | **Да** (через тот же путь сброса pitch) |
+
+Итог при запуске: игрок **сразу на поле**, фаза **`KickoffWait`**, HUD виден, таймер на **90 с** (слайдер полный), но **отсчёт не идёт** до первой подачи.
+
+### Первая подача = старт таймера и симуляции
+
+```mermaid
+stateDiagram-v2
+    [*] --> OnField: AppGame.Enter (cold start)
+    OnField --> KickoffWait: PitchReset
+    KickoffWait --> Simulating: BallServedEvent
+    note right of KickoffWait
+        MatchFlow: таймер стоит
+        PitchStateMachine: ждёт Serve
+    end note
+    note right of Simulating
+        MatchFlow: StartTimerLoop
+        мяч и отскоки активны
+    end note
+```
+
+1. **Пробел** (или будущий автосерв) → `BallView.TryServe` → `BallMotion.Serve` → **`BallServedEvent`**
+2. `PitchStateMachine` → `Simulating`
+3. `MatchFlow` → `_timerStarted = true` → корутина таймера
+
+Повторные подачи после гола снова публикуют `BallServedEvent`, но таймер **уже** запущен — `OnBallServed` игнорирует повтор.
+
+Главное меню по-прежнему доступно через **выход из паузы** / конец матча → `ReturnToMainMenu`. Кнопка «Играть» в меню = `MainMenu → OnField` с `newRunFromMenu`.
 
 ---
 
@@ -233,12 +311,12 @@ flowchart LR
 
 | Таймер | Когда | Что делает |
 |--------|-------|------------|
-| **Матч** (`MatchFlow`) | `Simulating` | Обратный отсчёт 90 с, счёт голов |
-| **Окно ввода** (kickoff) | `KickoffWait` | Короткая задержка перед автосервом |
+| **Матч** (`MatchFlow`) | После **первого** `BallServedEvent` | Обратный отсчёт 90 с, счёт голов |
+| **Окно ввода** (kickoff) | `KickoffWait` | Короткая задержка перед автосервом (идея) |
 
 ### Поведение окна ввода
 
-1. Фаза `KickoffWait`: мяч на `BallKickoffAnchor`, матч-таймер **не тикает** (или ещё не запущен — только после первого `Simulating`).
+1. Фаза `KickoffWait`: мяч на `BallKickoffAnchor`. Матч-таймер **ещё не тикает** до первой подачи; после гола таймер **уже идёт** и на кик-оффе не останавливается.
 2. Стартует **отдельный** отсчёт (например 3–5 с) — «окно», пока игрок может **сам** пнуть (Пробел / тап).
 3. Если игрок пнул раньше — окно отменяется, переход в `Simulating`, матч-таймер идёт.
 4. Если окно **истекло** — **автоматический** удар по мячу (серв без игрока), затем `Simulating`.
@@ -257,7 +335,7 @@ stateDiagram-v2
 - Игрок не застревает, если забыл Пробел — автосерв после задержки.
 - Окно ввода — зона `PitchStateMachine` + `BallView` / anchor; в шину можно позже добавить `KickoffWindowChangedEvent` (не в MVP).
 
-**Сейчас в коде:** только ручной серв по Пробелу, без окна и без автосерва. Матч-таймер крутится всё время на `OnField` — это временно, до реализации идеи выше.
+**Сейчас в коде:** ручной серв по Пробелу; автосерв и окно ввода — нет. Таймер стартует на **первом** `BallServedEvent`, не при входе на поле. Cold start сразу открывает поле в `KickoffWait` (см. § «Старт приложения и первый матч»).
 
 ---
 

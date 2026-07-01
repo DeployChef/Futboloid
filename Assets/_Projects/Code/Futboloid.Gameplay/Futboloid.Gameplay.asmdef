@@ -4,6 +4,7 @@
     "references": [
         "Futboloid.Core",
         "Unity.InputSystem",
+        "Unity.TextMeshPro",
         "UniTask",
         "VContainer"
     ],
@@ -11,7 +12,9 @@
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
-    "precompiledReferences": [],
+    "precompiledReferences": [
+        "DOTween.dll"
+    ],
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],

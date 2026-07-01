@@ -86,6 +86,8 @@ public class Startup : MonoBehaviour
 ```csharp
 await SceneManager.LoadSceneAsync("Game", LoadSceneMode.Additive);
 SceneManager.SetActiveScene(gameScene);
+// …
+await Overlay.SetState(NavigationState.OnField);  // cold start — сразу матч, без MainMenu
 ```
 
 ### Что живёт в Game

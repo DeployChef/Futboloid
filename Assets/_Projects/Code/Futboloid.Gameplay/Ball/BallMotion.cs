@@ -1,6 +1,7 @@
 using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
+using Futboloid.Gameplay.Defenders;
 using Futboloid.Gameplay.Physics;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ namespace Futboloid.Gameplay.Ball
     {
         private readonly BallSettings _settings;
         private readonly IGameEventBus _bus;
-        private readonly LayerMask _contactMask;
+        private readonly DefenderGridRegistry _defenderRegistry;
         private readonly LayerMask _goalMask;
 
         public Vector2 Position { get; private set; }
@@ -22,11 +23,11 @@ namespace Futboloid.Gameplay.Ball
 
         private IBallAnchor _holdAnchor;
 
-        public BallMotion(BallSettings settings, IGameEventBus bus)
+        public BallMotion(BallSettings settings, IGameEventBus bus, DefenderGridRegistry defenderRegistry)
         {
             _settings = settings;
             _bus = bus;
-            _contactMask = PhysicsLayers.BallContactMask;
+            _defenderRegistry = defenderRegistry;
             _goalMask = PhysicsLayers.GoalMask;
         }
 
@@ -38,7 +39,6 @@ namespace Futboloid.Gameplay.Ball
             Speed = 0f;
         }
 
-        /// <summary>Ведение: мяч следует за якорем до ReleaseFromAnchor.</summary>
         public void AttachToAnchor(IBallAnchor anchor)
         {
             _holdAnchor = anchor;
@@ -80,7 +80,7 @@ namespace Futboloid.Gameplay.Ball
                 _settings.Radius,
                 Direction,
                 castDistance,
-                _contactMask);
+                PhysicsLayers.BallContactMask);
 
             if (hit.collider != null)
                 ResolveHit(hit);
@@ -93,30 +93,66 @@ namespace Futboloid.Gameplay.Ball
             Speed = Mathf.MoveTowards(Speed, _settings.BaseSpeed, _settings.Deceleration * deltaTime);
         }
 
+        public void ReflectFromHit(RaycastHit2D hit)
+        {
+            Direction = ClampMinAngle(Reflect(Direction, hit.normal));
+        }
+
+        public void ApplyKeeperBoost()
+        {
+            Speed = Mathf.Min(Speed + _settings.KeeperBoost, _settings.MaxSpeed);
+        }
+
+        public void LaunchDirected(Vector2 direction, float speed)
+        {
+            if (direction.sqrMagnitude < 0.0001f)
+                return;
+
+            Direction = ClampMinAngle(direction.normalized);
+            Speed = speed;
+        }
+
         private void ResolveHit(RaycastHit2D hit)
         {
             Position = hit.point + hit.normal * (_settings.Radius + _settings.Skin);
 
-            if (hit.collider.gameObject.layer == PhysicsLayers.KeeperId)
+            var hitCollider = hit.collider;
+            if (hitCollider == null)
+                return;
+
+            var layer = hitCollider.gameObject.layer;
+            if (layer == PhysicsLayers.KeeperId)
             {
-                Direction = ClampMinAngle(Reflect(Direction, hit.normal));
-                Speed = Mathf.Min(Speed + _settings.KeeperBoost, _settings.MaxSpeed);
+                ReflectFromHit(hit);
+                ApplyKeeperBoost();
                 _bus.Publish(new BallReturnedToKeeperEvent());
+                _bus.Publish(new BallContactEvent(BallContactKind.PlayerKeeper, hit.point, hit.normal, Speed));
                 return;
             }
 
-            Direction = ClampMinAngle(Reflect(Direction, hit.normal));
+            if (layer == PhysicsLayers.DefenderId
+                && _defenderRegistry != null
+                && _defenderRegistry.TryGetDefender(hitCollider, out var defender))
+            {
+                defender.HandleBallContact(this, hit);
+                _bus.Publish(new BallContactEvent(
+                    BallContactKind.Defender, hit.point, hit.normal, Speed, defender.SlotId));
+                return;
+            }
+
+            ReflectFromHit(hit);
+            _bus.Publish(new BallContactEvent(BallContactKind.Wall, hit.point, hit.normal, Speed));
         }
 
         private bool TryScoreGoal()
         {
             var hits = Physics2D.OverlapCircleAll(Position, _settings.Radius, _goalMask);
-            foreach (var collider in hits)
+            foreach (var overlap in hits)
             {
-                if (collider == null)
+                if (overlap == null)
                     continue;
 
-                var layer = collider.gameObject.layer;
+                var layer = overlap.gameObject.layer;
                 if (layer == PhysicsLayers.GoalEnemyId)
                 {
                     Stop();

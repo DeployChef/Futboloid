@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Futboloid.Core;
 using Futboloid.Gameplay.Ball;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
 using Futboloid.Gameplay.Input;
+using Futboloid.Gameplay.Match;
 using UnityEngine;
 using VContainer;
 
@@ -13,67 +17,118 @@ namespace Futboloid.Gameplay.Keeper
     public class GoalkeeperView : MonoBehaviour
     {
         [SerializeField] private float speed = 8f;
-        [SerializeField] private float returnToCenterSpeed = 8f;
+        [SerializeField] private float acceleration = 40f;
         [SerializeField] private float centerX = 0f;
         [SerializeField] private float centerArriveThreshold = 0.02f;
         [SerializeField] private float kickoffMinX = -1.5f;
         [SerializeField] private float kickoffMaxX = 1.5f;
         [SerializeField] private float playMinX = -4.2f;
         [SerializeField] private float playMaxX = 4.2f;
-        [SerializeField] private BallView ball;
         [SerializeField] private BallKickoffAnchor kickoffAnchor;
 
         private readonly List<IDisposable> _subscriptions = new();
 
         private PitchPhase _phase = PitchPhase.KickoffWait;
         private bool _onField;
-        private bool _returningToCenter;
+        private bool _reshuffleMoving;
+        private float _velocityX;
         private IGameplayInput _input;
+        private BallView _ball;
+        private Tween _moveTween;
 
         [Inject]
-        public void Construct(IGameEventBus bus, IGameplayInput input)
+        public void Construct(
+            IGameEventBus bus,
+            IGameplayInput input,
+            PitchStateMachine pitch,
+            MatchFlow matchFlow,
+            BallView ball)
         {
             _input = input;
-
-            if (ball == null)
-                ball = FindAnyObjectByType<BallView>();
+            _ball = ball;
 
             if (kickoffAnchor == null)
                 kickoffAnchor = FindAnyObjectByType<BallKickoffAnchor>();
 
             _subscriptions.Add(bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged));
             _subscriptions.Add(bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged));
+
+            _phase = pitch.Current;
+            _onField = matchFlow.IsOnField;
+        }
+
+        public async UniTask PlayReshuffleToCenterAsync(float moveDuration, CancellationToken ct)
+        {
+            KillMoveTween();
+            _velocityX = 0f;
+
+            var delta = centerX - transform.position.x;
+            if (Mathf.Abs(delta) <= centerArriveThreshold)
+            {
+                SnapToCenterX();
+                return;
+            }
+
+            _reshuffleMoving = true;
+
+            try
+            {
+                var distance = Mathf.Abs(delta);
+                var refDistance = 4f;
+                var duration = moveDuration * (distance / refDistance);
+                duration = Mathf.Clamp(duration, 0.12f, 1.4f);
+
+                _moveTween = transform
+                    .DOMoveX(centerX, duration)
+                    .SetEase(Ease.InOutQuad)
+                    .SetLink(gameObject);
+
+                await TweenAsync.Await(_moveTween, ct);
+
+                if (!ct.IsCancellationRequested)
+                    SnapToCenterX();
+            }
+            finally
+            {
+                _reshuffleMoving = false;
+                _moveTween = null;
+            }
+        }
+
+        public void KillMoveTween()
+        {
+            if (_moveTween != null && _moveTween.IsActive())
+                _moveTween.Kill();
+
+            _moveTween = null;
+            transform.DOKill();
+            _reshuffleMoving = false;
         }
 
         private void Update()
         {
-            if (_returningToCenter)
-                AdvanceReturnToCenter();
-
-            if (!_onField)
+            if (!_onField || _reshuffleMoving)
                 return;
 
             switch (_phase)
             {
+                case PitchPhase.Reshuffle:
                 case PitchPhase.KickoffWait:
-                    UpdateKickoffAim();
-
-                    if (WasServePressed())
+                    if (_phase == PitchPhase.KickoffWait)
                     {
-                        var direction = kickoffAnchor != null ? kickoffAnchor.ServeDirection : Vector2.up;
-                        ball?.TryServe(direction);
-                    }
+                        UpdateKickoffAim();
 
-                    if (_returningToCenter)
-                        return;
+                        if (WasServePressed())
+                        {
+                            var direction = kickoffAnchor != null ? kickoffAnchor.ServeDirection : Vector2.up;
+                            _ball?.TryServe(direction);
+                        }
+                    }
 
                     ApplyHorizontalMovement(kickoffMinX, kickoffMaxX);
                     break;
 
                 case PitchPhase.Simulating:
-                    if (_returningToCenter)
-                        return;
-
                     ApplyHorizontalMovement(playMinX, playMaxX);
                     break;
             }
@@ -88,37 +143,31 @@ namespace Futboloid.Gameplay.Keeper
             kickoffAnchor.UpdateAimFromKeeperX(transform.position.x, halfWidth);
         }
 
-        private void BeginReturnToCenter() => _returningToCenter = true;
-
-        private void AdvanceReturnToCenter()
+        private void SnapToCenterX()
         {
             var position = transform.position;
-            var delta = centerX - position.x;
-
-            if (Mathf.Abs(delta) <= centerArriveThreshold)
-            {
-                position.x = centerX;
-                transform.position = position;
-                _returningToCenter = false;
-                return;
-            }
-
-            var step = returnToCenterSpeed * Time.deltaTime;
-            position.x += Mathf.Sign(delta) * Mathf.Min(Mathf.Abs(delta), step);
+            position.x = centerX;
             transform.position = position;
+            _velocityX = 0f;
         }
 
         private void ApplyHorizontalMovement(float minX, float maxX)
         {
-            var moveX = ReadMoveX();
-            if (Mathf.Abs(moveX) < 0.001f)
-                return;
-
             var position = transform.position;
-            position.x = Mathf.Clamp(
-                position.x + moveX * speed * Time.deltaTime,
-                minX,
-                maxX);
+            position.x = Mathf.Clamp(position.x, minX, maxX);
+
+            var moveX = ReadMoveX();
+            var desiredVelocity = Mathf.Abs(moveX) < 0.001f ? 0f : moveX * speed;
+            _velocityX = Mathf.MoveTowards(_velocityX, desiredVelocity, acceleration * Time.deltaTime);
+
+            var previousX = position.x;
+            position.x = Mathf.Clamp(position.x + _velocityX * Time.deltaTime, minX, maxX);
+
+            if (position.x <= minX && _velocityX < 0f || position.x >= maxX && _velocityX > 0f)
+                _velocityX = 0f;
+            else if (Mathf.Abs(position.x - previousX) < 0.0001f && Mathf.Abs(desiredVelocity) > 0.001f)
+                _velocityX = 0f;
+
             transform.position = position;
         }
 
@@ -132,10 +181,12 @@ namespace Futboloid.Gameplay.Keeper
             var previous = _phase;
             _phase = e.Phase;
 
-            if (e.Phase == PitchPhase.KickoffWait && previous != PitchPhase.KickoffWait)
-                BeginReturnToCenter();
-            else if (previous == PitchPhase.Simulating && e.Phase != PitchPhase.Simulating && e.Phase != PitchPhase.KickoffWait)
-                BeginReturnToCenter();
+            if (e.Phase == PitchPhase.KickoffWait
+                && previous != PitchPhase.KickoffWait
+                && previous != PitchPhase.Reshuffle)
+            {
+                SnapToCenterX();
+            }
         }
 
         private void OnNavigationChanged(NavigationChangedEvent e)
@@ -144,22 +195,15 @@ namespace Futboloid.Gameplay.Keeper
 
             if (_onField)
             {
-                _returningToCenter = false;
-                return;
+                KillMoveTween();
+                _velocityX = 0f;
             }
-
-            if (e.IsMatchPausedInMenu)
-            {
-                _returningToCenter = false;
-                return;
-            }
-
-            if (e.Previous == NavigationState.OnField)
-                BeginReturnToCenter();
         }
 
         private void OnDestroy()
         {
+            KillMoveTween();
+
             foreach (var subscription in _subscriptions)
                 subscription.Dispose();
         }

@@ -43,7 +43,11 @@ Game
 │   └── Visual
 ├── Ball
 │   └── Visual
-└── Defenders                    ← пустой parent (сетка позже)
+└── Opponents                    ← команда соперника (GDD §7)
+    ├── GoalAnchor               ← зона ворот (не юнит)
+    └── Defenders                ← экземпляры одного prefab Defender
+        ├── Defender_GK          ← role Goalkeeper
+        └── Defender_0_0         ← role Field, слоты ...
 ```
 
 На **Game** нет: `EventSystem`, Canvas меню, `GameManager`, старый `Ball` с `Rigidbody2D`. UI — на **Root**.
@@ -56,7 +60,7 @@ Game
 |-------|-----|
 | `Wall` | борта, **рама ворот** (`Frame`) |
 | `Keeper` | коллайдер вратаря |
-| `Defender` | защитники (позже) |
+| `Defender` | футболисты соперника (поле и вратарь — один prefab, один collider) |
 | `GoalEnemy` | `ScoringZone` — гол **игрока** (верх) |
 | `GoalPlayer` | зона гола **соперника** (низ) |
 
@@ -214,6 +218,7 @@ Game
 - [ ] `BallKickoffAnchor` + стрелка
 - [ ] `BallView`, `GoalkeeperView`
 - [ ] Sorting: `Field` / `Gameplay`
+- [ ] `Opponents`: `GoalAnchor` + экземпляры prefab `Defender` (один GK, остальные Field) — см. [[Враги и защитники#Сборка сцены (чеклист)]]
 - [ ] Сохранена сцена
 
 ---

@@ -19,6 +19,7 @@ namespace Futboloid.Gameplay.Match
         private CancellationTokenSource _timerCts;
         private bool _onField;
         private bool _matchEnded;
+        private bool _timerStarted;
         private float _totalDurationSeconds;
 
         public int PlayerScore { get; private set; }
@@ -26,6 +27,8 @@ namespace Futboloid.Gameplay.Match
         public float RemainingSeconds { get; private set; }
         public float NormalizedTime =>
             _totalDurationSeconds > 0f ? RemainingSeconds / _totalDurationSeconds : 0f;
+
+        public bool IsOnField => _onField;
 
         public MatchFlow(IGameEventBus bus, GameplaySettings settings)
         {
@@ -38,6 +41,7 @@ namespace Futboloid.Gameplay.Match
             _bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged);
             _bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged);
             _bus.Subscribe<MatchTimeAdjustedEvent>(OnTimeAdjusted);
+            _bus.Subscribe<BallServedEvent>(OnBallServed);
         }
 
         public void Reset()
@@ -49,6 +53,7 @@ namespace Futboloid.Gameplay.Match
             RemainingSeconds = _matchDurationSeconds;
             _totalDurationSeconds = _matchDurationSeconds;
             _matchEnded = false;
+            _timerStarted = false;
 
             PublishScore();
             PublishTimer();
@@ -127,6 +132,15 @@ namespace Futboloid.Gameplay.Match
             }
         }
 
+        public void EndMatchFromWipe()
+        {
+            if (_matchEnded)
+                return;
+
+            Debug.Log("[MatchFlow] All defenders eliminated — early win.");
+            EndMatch();
+        }
+
         private void EndMatch()
         {
             if (_matchEnded)
@@ -148,10 +162,21 @@ namespace Futboloid.Gameplay.Match
             var wasOnField = _onField;
             _onField = e.Current == NavigationState.OnField;
 
-            if (_onField && !_matchEnded)
+            if (_onField && !_matchEnded && _timerStarted)
                 StartTimerLoop();
             else if (wasOnField)
                 StopTimerLoop();
+        }
+
+        private void OnBallServed(BallServedEvent _)
+        {
+            if (_matchEnded || _timerStarted)
+                return;
+
+            _timerStarted = true;
+
+            if (_onField)
+                StartTimerLoop();
         }
 
         private void OnPitchPhaseChanged(PitchPhaseChangedEvent e)
