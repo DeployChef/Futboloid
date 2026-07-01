@@ -273,9 +273,7 @@ GameObject:
   m_Component:
   - component: {fileID: 255520966}
   - component: {fileID: 255520968}
-  - component: {fileID: 255520967}
   - component: {fileID: 255520970}
-  - component: {fileID: 255520969}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -306,36 +304,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &255520967
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 255520965}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!222 &255520968
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -344,22 +312,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 255520965}
   m_CullTransparentMesh: 1
---- !u!114 &255520969
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 255520965}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e3dca52a2b70c1478244dcdea4615af, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Views.MatchHud.MatchHudLayout
-  timerSlider: {fileID: 1063182931}
-  remainingTimeText: {fileID: 2091377640}
-  playerScoreText: {fileID: 1888749745}
-  opponentScoreText: {fileID: 1927925481}
 --- !u!114 &255520970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -372,7 +324,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f11a0e534640e840911aa55d888ee9f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Views.MatchHud.MatchHudWidget
-  layout: {fileID: 255520969}
+  timerSlider: {fileID: 1063182931}
+  remainingTimeText: {fileID: 2091377640}
+  playerScoreText: {fileID: 1888749745}
+  opponentScoreText: {fileID: 1927925481}
 --- !u!1 &294407853
 GameObject:
   m_ObjectHideFlags: 0
@@ -646,7 +601,6 @@ GameObject:
   - component: {fileID: 566095556}
   - component: {fileID: 566095555}
   - component: {fileID: 566095554}
-  - component: {fileID: 566095553}
   m_Layer: 5
   m_Name: Tournament
   m_TagString: Untagged
@@ -674,19 +628,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &566095553
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 566095551}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 05326c35204a3a94dbbba4eb8760f876, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Futboloid.Main::Futboloid.Main.UI.TournamentController
-  widget: {fileID: 0}
 --- !u!114 &566095554
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2261,9 +2202,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1637710146}
   - component: {fileID: 1637710148}
-  - component: {fileID: 1637710147}
   - component: {fileID: 1637710150}
-  - component: {fileID: 1637710149}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -2295,36 +2234,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1637710147
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1637710145}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!222 &1637710148
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2333,23 +2242,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1637710145}
   m_CullTransparentMesh: 1
---- !u!114 &1637710149
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1637710145}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b85700e355b67e4c9d07643766efaec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Views.Tournament.TournamentLayout
-  roundLabel: {fileID: 659309847}
-  statusLabel: {fileID: 1941711789}
-  matchButton: {fileID: 570308141}
-  restartButton: {fileID: 701525217}
-  mainMenuButton: {fileID: 1933042305}
 --- !u!114 &1637710150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2362,7 +2254,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db847d7767e34f449970d71600565725, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Views.Tournament.TournamentWidget
-  layout: {fileID: 1637710149}
+  roundLabel: {fileID: 659309847}
+  statusLabel: {fileID: 1941711789}
+  matchButton: {fileID: 570308141}
+  restartButton: {fileID: 701525217}
+  mainMenuButton: {fileID: 1933042305}
 --- !u!1 &1655040488
 GameObject:
   m_ObjectHideFlags: 0
@@ -2759,7 +2655,6 @@ GameObject:
   - component: {fileID: 1817505868}
   - component: {fileID: 1817505867}
   - component: {fileID: 1817505866}
-  - component: {fileID: 1817505869}
   m_Layer: 5
   m_Name: MatchHud
   m_TagString: Untagged
@@ -2851,19 +2746,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 100
   m_TargetDisplay: 0
---- !u!114 &1817505869
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1817505863}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 430f291ddfdaa064aafb8d48b407bb5d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Futboloid.Main::Futboloid.Main.UI.MatchHudController
-  hud: {fileID: 255520970}
 --- !u!1001 &1830009753
 PrefabInstance:
   m_ObjectHideFlags: 0

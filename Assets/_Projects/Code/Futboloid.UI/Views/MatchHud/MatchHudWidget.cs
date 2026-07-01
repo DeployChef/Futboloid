@@ -1,36 +1,73 @@
-using Futboloid.UI;
+using System;
+using System.Collections.Generic;
+using Futboloid.Core;
+using Futboloid.Core.Bus;
+using Futboloid.Core.Bus.Events;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+using VContainer;
 
 namespace Futboloid.UI.Views.MatchHud
 {
+    /// <summary>
+    /// HUD матча на сцене Game — слайдер, счёт, видимость при уходе с поля.
+    /// </summary>
     public class MatchHudWidget : MonoBehaviour
     {
-        [SerializeField] private MatchHudLayout layout;
+        [SerializeField] private Slider timerSlider;
+        [SerializeField] private TextMeshProUGUI remainingTimeText;
+        [SerializeField] private TextMeshProUGUI playerScoreText;
+        [SerializeField] private TextMeshProUGUI opponentScoreText;
 
-        public void Open()
+        private readonly List<IDisposable> _subscriptions = new();
+
+        private void Awake()
         {
+            if (timerSlider != null)
+                timerSlider.interactable = false;
+        }
+
+        [Inject]
+        public void Construct(IGameEventBus bus)
+        {
+            foreach (var subscription in _subscriptions)
+                subscription.Dispose();
+
+            _subscriptions.Clear();
+
+            _subscriptions.Add(bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged));
+            _subscriptions.Add(bus.Subscribe<MatchTimerChangedEvent>(OnTimerChanged));
+            _subscriptions.Add(bus.Subscribe<MatchScoreChangedEvent>(OnScoreChanged));
+
             gameObject.SetActive(true);
-
-            if (layout == null)
-                layout = GetComponent<MatchHudLayout>();
         }
 
-        public void Close() => gameObject.SetActive(false);
-
-        public void SetTimer(float normalized, float remainingSeconds)
+        private void OnDestroy()
         {
-            if (layout == null)
-                layout = GetComponent<MatchHudLayout>();
-
-            layout?.SetTimer(normalized, remainingSeconds);
+            foreach (var subscription in _subscriptions)
+                subscription.Dispose();
         }
 
-        public void SetScore(int playerScore, int opponentScore)
-        {
-            if (layout == null)
-                layout = GetComponent<MatchHudLayout>();
+        private void OnNavigationChanged(NavigationChangedEvent e) =>
+            gameObject.SetActive(e.Current != NavigationState.Tournament);
 
-            layout?.SetScore(playerScore, opponentScore);
+        private void OnTimerChanged(MatchTimerChangedEvent e)
+        {
+            if (timerSlider != null)
+                timerSlider.value = e.Normalized;
+
+            if (remainingTimeText != null)
+                remainingTimeText.text = Mathf.CeilToInt(e.RemainingSeconds).ToString();
+        }
+
+        private void OnScoreChanged(MatchScoreChangedEvent e)
+        {
+            if (playerScoreText != null)
+                playerScoreText.text = e.PlayerScore.ToString();
+
+            if (opponentScoreText != null)
+                opponentScoreText.text = e.OpponentScore.ToString();
         }
     }
 }
