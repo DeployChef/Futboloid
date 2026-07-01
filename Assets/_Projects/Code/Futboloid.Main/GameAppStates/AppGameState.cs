@@ -38,7 +38,7 @@ namespace Futboloid.Main.GameAppStates
             SceneManager.SetActiveScene(gameScene);
 
             _gameState = new GameState(LifetimeScope);
-            await _gameState.Enter();
+            await _gameState.Enter(gameScene);
 
             LifetimeScope.Container.Resolve<MatchEndHandler>();
 

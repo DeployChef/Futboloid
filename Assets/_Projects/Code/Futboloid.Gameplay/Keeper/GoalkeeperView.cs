@@ -24,7 +24,6 @@ namespace Futboloid.Gameplay.Keeper
         [SerializeField] private float kickoffMaxX = 1.5f;
         [SerializeField] private float playMinX = -4.2f;
         [SerializeField] private float playMaxX = 4.2f;
-        [SerializeField] private BallView ball;
         [SerializeField] private BallKickoffAnchor kickoffAnchor;
 
         private readonly List<IDisposable> _subscriptions = new();
@@ -34,15 +33,19 @@ namespace Futboloid.Gameplay.Keeper
         private bool _reshuffleMoving;
         private float _velocityX;
         private IGameplayInput _input;
+        private BallView _ball;
         private Tween _moveTween;
 
         [Inject]
-        public void Construct(IGameEventBus bus, IGameplayInput input, PitchStateMachine pitch, MatchFlow matchFlow)
+        public void Construct(
+            IGameEventBus bus,
+            IGameplayInput input,
+            PitchStateMachine pitch,
+            MatchFlow matchFlow,
+            BallView ball)
         {
             _input = input;
-
-            if (ball == null)
-                ball = FindAnyObjectByType<BallView>();
+            _ball = ball;
 
             if (kickoffAnchor == null)
                 kickoffAnchor = FindAnyObjectByType<BallKickoffAnchor>();
@@ -118,7 +121,7 @@ namespace Futboloid.Gameplay.Keeper
                         if (WasServePressed())
                         {
                             var direction = kickoffAnchor != null ? kickoffAnchor.ServeDirection : Vector2.up;
-                            ball?.TryServe(direction);
+                            _ball?.TryServe(direction);
                         }
                     }
 

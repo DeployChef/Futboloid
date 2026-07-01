@@ -17,6 +17,8 @@ namespace Futboloid.Gameplay.Defenders
     {
         private readonly PitchStateMachine _pitch;
         private readonly DefenderGridRegistry _registry;
+        private readonly BallView _ball;
+        private readonly GoalkeeperView _keeper;
         private readonly List<IDisposable> _subscriptions = new();
 
         private CancellationTokenSource _reshuffleCts;
@@ -24,10 +26,14 @@ namespace Futboloid.Gameplay.Defenders
         public DefenderReshuffleService(
             IGameEventBus bus,
             PitchStateMachine pitch,
-            DefenderGridRegistry registry)
+            DefenderGridRegistry registry,
+            BallView ball,
+            GoalkeeperView keeper)
         {
             _pitch = pitch;
             _registry = registry;
+            _ball = ball;
+            _keeper = keeper;
             _subscriptions.Add(bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged));
         }
 
@@ -55,14 +61,12 @@ namespace Futboloid.Gameplay.Defenders
             try
             {
                 var tasks = new List<UniTask>(8);
-                var ballView = UnityEngine.Object.FindAnyObjectByType<BallView>();
-                if (ballView != null)
-                    tasks.Add(ballView.PlayReshuffleToKickoffAsync(ct));
+                if (_ball != null)
+                    tasks.Add(_ball.PlayReshuffleToKickoffAsync(ct));
 
-                var keeperView = UnityEngine.Object.FindAnyObjectByType<GoalkeeperView>();
                 var moveDuration = _registry != null ? _registry.ReshuffleMoveDuration : 0.55f;
-                if (keeperView != null)
-                    tasks.Add(keeperView.PlayReshuffleToCenterAsync(moveDuration, ct));
+                if (_keeper != null)
+                    tasks.Add(_keeper.PlayReshuffleToCenterAsync(moveDuration, ct));
 
                 if (_registry != null)
                 {

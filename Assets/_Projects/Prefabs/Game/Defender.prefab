@@ -96,7 +96,16 @@ MonoBehaviour:
   slotId: 0
   role: 0
   maxHp: 3
-  hitBehavior: {fileID: 11400000, guid: 8b2ca56e21635224b94b2bc18c82e874, type: 2}
+  hitType: 0
+  launchSpeed: 12
+  openGoalChancePercent: 70
+  movementType: 0
+  patrolPointCount: 4
+  patrolRadius: 1.5
+  wanderRadius: 1.5
+  chaseRadius: 3
+  separationRadius: 0.6
+  trackSpeed: 2.5
   bodyCollider: {fileID: 1864416684892860211}
   hpLabel: {fileID: 2968189813365401722}
 --- !u!1 &5333510178830016538
