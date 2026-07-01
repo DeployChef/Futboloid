@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Futboloid.Gameplay.Ball;
 using Futboloid.Gameplay.Keeper;
-using Futboloid.Gameplay.Physics;
 using UnityEngine;
 
 namespace Futboloid.Gameplay.Defenders
@@ -10,6 +10,12 @@ namespace Futboloid.Gameplay.Defenders
         private readonly GoalkeeperView _playerKeeper;
         private float _goalkeeperParam;
         private Vector2 _runVelocity;
+        private Vector2 _fieldVelocity;
+        private Vector2[] _patrolPath;
+        private int _patrolIndex;
+        private Vector2 _wanderTarget;
+        private bool _hasWanderTarget;
+        private System.Random _wanderRng;
 
         public DefenderLogic(GoalkeeperView playerKeeper)
         {
@@ -17,6 +23,50 @@ namespace Futboloid.Gameplay.Defenders
         }
 
         public void ResetRunVelocity() => _runVelocity = Vector2.zero;
+
+        public void ResetFieldVelocity() => _fieldVelocity = Vector2.zero;
+
+        public void InitializeFieldMovement(Vector2 home, int slotId, int patrolPointCount, float patrolRadius)
+        {
+            _fieldVelocity = Vector2.zero;
+            _hasWanderTarget = false;
+            _wanderRng = new System.Random(slotId * 7919 + 17);
+            _patrolPath = PatrolPathGenerator.Generate(home, patrolPointCount, patrolRadius, slotId * 7919 + 17);
+            _patrolIndex = 0;
+        }
+
+        public Vector2 TickFieldMovement(
+            Vector2 current,
+            DefenderMovementType movementType,
+            Vector2 home,
+            float wanderRadius,
+            float chaseRadius,
+            Vector2? ballPosition,
+            float moveSpeed,
+            float acceleration,
+            float arriveThreshold,
+            float separationRadius,
+            IReadOnlyList<Vector2> neighborPositions,
+            float deltaTime)
+        {
+            if (movementType == DefenderMovementType.Idle)
+            {
+                var idle = MoveTowards(current, home, moveSpeed, acceleration, arriveThreshold, deltaTime, ref _fieldVelocity);
+                return ApplySeparation(idle, neighborPositions, separationRadius, moveSpeed, deltaTime);
+            }
+
+            var target = ResolveFieldTarget(
+                movementType,
+                home,
+                wanderRadius,
+                chaseRadius,
+                ballPosition,
+                current,
+                arriveThreshold);
+
+            var next = MoveTowards(current, target, moveSpeed, acceleration, arriveThreshold, deltaTime, ref _fieldVelocity);
+            return ApplySeparation(next, neighborPositions, separationRadius, moveSpeed, deltaTime);
+        }
 
         public Vector2 TickRunTowards(
             Vector2 current,
@@ -111,45 +161,27 @@ namespace Futboloid.Gameplay.Defenders
 
         private Vector2 ResolvePlayerGoalTarget(DefenderView view)
         {
+            var goalBounds = GetPlayerGoalBounds();
+
             if (_playerKeeper == null)
-                return ResolvePlayerGoalFallback();
+                return goalBounds.center;
 
             var keeperPos = (Vector2)_playerKeeper.transform.position;
-            if (!TryGetPlayerGoalBounds(out var goalBounds))
-                goalBounds = BuildFallbackGoalBounds();
-
             var inset = 0.25f;
             var oppositeCornerX = keeperPos.x <= goalBounds.center.x
                 ? goalBounds.max.x - inset
                 : goalBounds.min.x + inset;
             var oppositeCorner = new Vector2(oppositeCornerX, goalBounds.center.y);
 
-            var aimFar = Random.Range(0, 100) < view.OpenGoalChancePercent;
+            var aimFar = UnityEngine.Random.Range(0, 100) < view.OpenGoalChancePercent;
             var distanceFromKeeper = aimFar
-                ? Random.Range(0.7f, 1f)
-                : Random.Range(0.08f, 0.35f);
+                ? UnityEngine.Random.Range(0.7f, 1f)
+                : UnityEngine.Random.Range(0.08f, 0.35f);
 
             return Vector2.Lerp(keeperPos, oppositeCorner, distanceFromKeeper);
         }
 
-        private static bool TryGetPlayerGoalBounds(out Bounds bounds)
-        {
-            var colliders = Object.FindObjectsByType<Collider2D>(FindObjectsSortMode.None);
-            for (var i = 0; i < colliders.Length; i++)
-            {
-                var collider = colliders[i];
-                if (collider != null && collider.gameObject.layer == PhysicsLayers.GoalPlayerId)
-                {
-                    bounds = collider.bounds;
-                    return true;
-                }
-            }
-
-            bounds = default;
-            return false;
-        }
-
-        private static Bounds BuildFallbackGoalBounds()
+        private static Bounds GetPlayerGoalBounds()
         {
             const float halfWidth = 4.46f;
             const float goalY = -8.3f;
@@ -158,20 +190,138 @@ namespace Futboloid.Gameplay.Defenders
             return new Bounds(center, size);
         }
 
-        private static Vector2 ResolvePlayerGoalFallback()
-        {
-            if (TryGetPlayerGoalBounds(out var goalBounds))
-                return goalBounds.center;
-
-            return new Vector2(0f, -8.3f);
-        }
-
         private static Vector2 HitOrigin(RaycastHit2D hit, DefenderView view)
         {
             if (hit.collider != null)
                 return hit.point;
 
             return view.transform.position;
+        }
+
+        private Vector2 ResolveFieldTarget(
+            DefenderMovementType movementType,
+            Vector2 home,
+            float wanderRadius,
+            float chaseRadius,
+            Vector2? ballPosition,
+            Vector2 current,
+            float arriveThreshold)
+        {
+            switch (movementType)
+            {
+                case DefenderMovementType.PatrolGenerated:
+                    return ResolvePatrolTarget(current, arriveThreshold);
+
+                case DefenderMovementType.WanderInRadius:
+                    return ResolveWanderTarget(home, wanderRadius, current, arriveThreshold);
+
+                case DefenderMovementType.ChaseBallInRadius:
+                    if (ballPosition.HasValue
+                        && (ballPosition.Value - home).sqrMagnitude <= chaseRadius * chaseRadius)
+                    {
+                        return ballPosition.Value;
+                    }
+
+                    return ResolveWanderTarget(home, wanderRadius, current, arriveThreshold);
+
+                default:
+                    return home;
+            }
+        }
+
+        private Vector2 ResolvePatrolTarget(Vector2 current, float arriveThreshold)
+        {
+            if (_patrolPath == null || _patrolPath.Length == 0)
+                return current;
+
+            var target = _patrolPath[_patrolIndex];
+            if ((target - current).sqrMagnitude <= arriveThreshold * arriveThreshold)
+            {
+                _patrolIndex = (_patrolIndex + 1) % _patrolPath.Length;
+                target = _patrolPath[_patrolIndex];
+            }
+
+            return target;
+        }
+
+        private Vector2 ResolveWanderTarget(Vector2 home, float radius, Vector2 current, float arriveThreshold)
+        {
+            if (!_hasWanderTarget
+                || (current - _wanderTarget).sqrMagnitude <= arriveThreshold * arriveThreshold)
+            {
+                _wanderTarget = PickRandomInRadius(home, radius);
+                _hasWanderTarget = true;
+            }
+
+            return _wanderTarget;
+        }
+
+        private Vector2 PickRandomInRadius(Vector2 center, float radius)
+        {
+            if (_wanderRng == null)
+                _wanderRng = new System.Random();
+
+            radius = Mathf.Max(0.1f, radius);
+            var angle = (float)_wanderRng.NextDouble() * Mathf.PI * 2f;
+            var distance = Mathf.Sqrt((float)_wanderRng.NextDouble()) * radius;
+            return center + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * distance;
+        }
+
+        private static Vector2 MoveTowards(
+            Vector2 current,
+            Vector2 target,
+            float maxSpeed,
+            float acceleration,
+            float arriveThreshold,
+            float deltaTime,
+            ref Vector2 velocity)
+        {
+            var offset = target - current;
+            if (offset.sqrMagnitude <= arriveThreshold * arriveThreshold)
+            {
+                velocity = Vector2.zero;
+                return target;
+            }
+
+            var desiredVelocity = offset.normalized * maxSpeed;
+            velocity = Vector2.MoveTowards(velocity, desiredVelocity, acceleration * deltaTime);
+            var next = current + velocity * deltaTime;
+
+            var remaining = target - next;
+            if (Vector2.Dot(offset, remaining) <= 0f)
+            {
+                velocity = Vector2.zero;
+                return target;
+            }
+
+            return next;
+        }
+
+        private static Vector2 ApplySeparation(
+            Vector2 position,
+            IReadOnlyList<Vector2> neighbors,
+            float radius,
+            float strength,
+            float deltaTime)
+        {
+            if (radius <= 0f || neighbors == null || neighbors.Count == 0)
+                return position;
+
+            var push = Vector2.zero;
+            for (var i = 0; i < neighbors.Count; i++)
+            {
+                var delta = position - neighbors[i];
+                var dist = delta.magnitude;
+                if (dist >= radius || dist < 0.0001f)
+                    continue;
+
+                push += delta.normalized * (1f - dist / radius);
+            }
+
+            if (push.sqrMagnitude < 0.0001f)
+                return position;
+
+            return position + push.normalized * (strength * 2f) * deltaTime;
         }
     }
 }
