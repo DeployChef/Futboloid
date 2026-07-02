@@ -488,6 +488,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Views.BonusPick.PerkCardView
   button: {fileID: 6718123041800381544}
   cardFrameImage: {fileID: 2158312189789371417}
+  iconImage: {fileID: 6995700709772326224}
   titleText: {fileID: 8605977335340787674}
   descriptionText: {fileID: 5513073275129381493}
 --- !u!114 &6718123041800381544

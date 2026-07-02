@@ -256,7 +256,7 @@ namespace Futboloid.Core.Run
                 _perkHudBuffer.Add(new RunPerkHudEntry(
                     perkId,
                     level,
-                    def.CardFrame,
+                    def.Icon,
                     def.DisplayName,
                     def.Description));
             }

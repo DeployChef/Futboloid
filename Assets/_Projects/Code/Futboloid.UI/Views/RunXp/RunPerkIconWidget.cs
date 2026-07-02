@@ -9,7 +9,7 @@ namespace Futboloid.UI.Views.RunXp
     /// <summary>Иконка взятого перка в Run HUD. Наведение — тултип.</summary>
     public class RunPerkIconWidget : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        [SerializeField] private Image cardFrameImage;
+        [SerializeField] private Image iconImage;
         [SerializeField] private TextMeshProUGUI levelText;
 
         private RunPerkHudEntry _entry;
@@ -20,12 +20,10 @@ namespace Futboloid.UI.Views.RunXp
             _entry = entry;
             _tooltip = tooltip;
 
-            if (cardFrameImage != null)
+            if (iconImage != null)
             {
-                if (entry.CardFrame != null)
-                    cardFrameImage.sprite = entry.CardFrame;
-
-                cardFrameImage.enabled = true;
+                iconImage.sprite = entry.Icon;
+                iconImage.enabled = entry.Icon != null;
             }
 
             if (levelText != null)

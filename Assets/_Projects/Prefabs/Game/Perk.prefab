@@ -58,7 +58,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03a519e11d581384e8d246144c0d64aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Views.RunXp.RunPerkIconWidget
-  cardFrameImage: {fileID: 3346917341205808730}
+  iconImage: {fileID: 3346917341205808730}
   levelText: {fileID: 0}
 --- !u!1 &6268360348471163431
 GameObject:

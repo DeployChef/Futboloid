@@ -10,6 +10,7 @@ namespace Futboloid.Core.Run
         [TextArea(2, 4)]
         [SerializeField] private string description;
         [SerializeField] private Sprite cardFrame;
+        [SerializeField] private Sprite icon;
         [SerializeField] private int maxLevel = 5;
         [SerializeField] private float valuePerLevel = 1f;
 
@@ -17,6 +18,7 @@ namespace Futboloid.Core.Run
         public string DisplayName => displayName;
         public string Description => description;
         public Sprite CardFrame => cardFrame;
+        public Sprite Icon => icon;
         public int MaxLevel => Mathf.Max(1, maxLevel);
         public float ValuePerLevel => valuePerLevel;
 

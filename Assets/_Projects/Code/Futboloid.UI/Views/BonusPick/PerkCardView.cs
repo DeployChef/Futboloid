@@ -6,11 +6,12 @@ using UnityEngine.UI;
 
 namespace Futboloid.UI.Views.BonusPick
 {
-    /// <summary>Одна карточка в BonusPick — card frame и тексты из PerkDefinition.</summary>
+    /// <summary>Карточка BonusPick: frame + icon + тексты из PerkDefinition.</summary>
     public class PerkCardView : MonoBehaviour
     {
         [SerializeField] private Button button;
         [SerializeField] private Image cardFrameImage;
+        [SerializeField] private Image iconImage;
         [SerializeField] private TextMeshProUGUI titleText;
         [SerializeField] private TextMeshProUGUI descriptionText;
 
@@ -29,11 +30,8 @@ namespace Futboloid.UI.Views.BonusPick
             PerkId = perk.Id;
             SetVisible(true);
 
-            if (cardFrameImage != null)
-            {
-                cardFrameImage.sprite = perk.CardFrame;
-                cardFrameImage.enabled = perk.CardFrame != null;
-            }
+            SetSprite(cardFrameImage, perk.CardFrame);
+            SetSprite(iconImage, perk.Icon);
 
             if (titleText != null)
                 titleText.text = perk.GetLevelLabel(levelAfterPick);
@@ -46,6 +44,15 @@ namespace Futboloid.UI.Views.BonusPick
         {
             PerkId = null;
             SetVisible(false);
+        }
+
+        private static void SetSprite(Image image, Sprite sprite)
+        {
+            if (image == null)
+                return;
+
+            image.sprite = sprite;
+            image.enabled = sprite != null;
         }
 
         private void SetVisible(bool visible) => gameObject.SetActive(visible);

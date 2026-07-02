@@ -15,6 +15,7 @@ namespace Futboloid.Gameplay.Match
         private readonly IGameEventBus _bus;
         private readonly PitchStateMachine _pitch;
         private readonly IRunProgressionService _run;
+        private readonly MatchFlow _matchFlow;
 
         private readonly IDisposable _offeredSubscription;
         private readonly IDisposable _pickedSubscription;
@@ -24,11 +25,13 @@ namespace Futboloid.Gameplay.Match
         public BonusPickCoordinator(
             IGameEventBus bus,
             PitchStateMachine pitch,
-            IRunProgressionService run)
+            IRunProgressionService run,
+            MatchFlow matchFlow)
         {
             _bus = bus;
             _pitch = pitch;
             _run = run;
+            _matchFlow = matchFlow;
 
             _offeredSubscription = bus.Subscribe<BonusPickOfferedEvent>(OnBonusPickOffered);
             _pickedSubscription = bus.Subscribe<PerkPickedEvent>(OnPerkPicked);
@@ -62,6 +65,9 @@ namespace Futboloid.Gameplay.Match
                 return;
 
             ResumeTimeScale();
+
+            if (_matchFlow.TryCompleteWipeVictory(_run))
+                return;
 
             if (_pitch.Current == PitchPhase.BonusPick)
                 _pitch.StartSimulation();

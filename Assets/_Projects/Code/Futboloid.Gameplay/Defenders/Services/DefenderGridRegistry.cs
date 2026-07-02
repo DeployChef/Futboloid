@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
+using Futboloid.Core.Run;
 using Futboloid.Gameplay.Match;
 using UnityEngine;
 using VContainer;
@@ -25,6 +28,8 @@ namespace Futboloid.Gameplay.Defenders
 
         private IGameEventBus _bus;
         private MatchFlow _matchFlow;
+        private IRunProgressionService _run;
+        private CancellationTokenSource _wipeCheckCts;
 
         public float RunToGoalSpeed => runToGoalSpeed;
         public float RunToGoalAcceleration => runToGoalAcceleration;
@@ -32,11 +37,18 @@ namespace Futboloid.Gameplay.Defenders
         public float ArriveThreshold => arriveThreshold;
 
         [Inject]
-        public void Construct(IGameEventBus bus, MatchFlow matchFlow)
+        public void Construct(IGameEventBus bus, MatchFlow matchFlow, IRunProgressionService run)
         {
             _bus = bus;
             _matchFlow = matchFlow;
+            _run = run;
             _bus.Subscribe<DefenderDestroyedEvent>(OnDefenderDestroyed);
+        }
+
+        private void OnDestroy()
+        {
+            _wipeCheckCts?.Cancel();
+            _wipeCheckCts?.Dispose();
         }
 
         public void Register(DefenderView defender)
@@ -161,7 +173,21 @@ namespace Futboloid.Gameplay.Defenders
             if (_matchFlow == null || AliveCount > 0)
                 return;
 
-            _matchFlow.EndMatchFromWipe();
+            _wipeCheckCts?.Cancel();
+            _wipeCheckCts?.Dispose();
+            _wipeCheckCts = new CancellationTokenSource();
+            ScheduleWipeVictoryCheckAsync(_wipeCheckCts.Token).Forget();
+        }
+
+        private async UniTaskVoid ScheduleWipeVictoryCheckAsync(CancellationToken ct)
+        {
+            await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate, ct);
+
+            if (ct.IsCancellationRequested || _matchFlow == null || AliveCount > 0)
+                return;
+
+            _matchFlow.MarkWipeVictoryPending();
+            _matchFlow.TryCompleteWipeVictory(_run);
         }
     }
 }
