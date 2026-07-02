@@ -110,7 +110,7 @@ MonoBehaviour:
     FieldArriveThreshold: 0.12
     LaunchSpeed: 12
     OpenGoalChancePercent: 70
-    DamageCooldown: 0.4
+    InteractionCooldown: 0.1
   - Id: Drifter
     MinTier: 0
     Weight: 3
@@ -127,7 +127,7 @@ MonoBehaviour:
     FieldArriveThreshold: 0.12
     LaunchSpeed: 12
     OpenGoalChancePercent: 70
-    DamageCooldown: 0.4
+    InteractionCooldown: 0.1
   - Id: Hunter
     MinTier: 1
     Weight: 2.5
@@ -144,7 +144,7 @@ MonoBehaviour:
     FieldArriveThreshold: 0.12
     LaunchSpeed: 12
     OpenGoalChancePercent: 70
-    DamageCooldown: 0.4
+    InteractionCooldown: 0.1
   - Id: Sniper
     MinTier: 1
     Weight: 1.5
@@ -161,7 +161,7 @@ MonoBehaviour:
     FieldArriveThreshold: 0.12
     LaunchSpeed: 13
     OpenGoalChancePercent: 85
-    DamageCooldown: 0.4
+    InteractionCooldown: 0.1
   - Id: Tank
     MinTier: 2
     Weight: 2
@@ -178,7 +178,7 @@ MonoBehaviour:
     FieldArriveThreshold: 0.14
     LaunchSpeed: 11
     OpenGoalChancePercent: 60
-    DamageCooldown: 0.45
+    InteractionCooldown: 0.15
   - Id: Presser
     MinTier: 3
     Weight: 1.5
@@ -195,7 +195,7 @@ MonoBehaviour:
     FieldArriveThreshold: 0.1
     LaunchSpeed: 13
     OpenGoalChancePercent: 75
-    DamageCooldown: 0.35
+    InteractionCooldown: 0.1
   tiers:
   - MinMatchNumber: 1
     Tier: 0

@@ -20,7 +20,7 @@ namespace Futboloid.Gameplay.Defenders
         public float FieldArriveThreshold;
         public float LaunchSpeed;
         public int OpenGoalChancePercent;
-        public float DamageCooldown;
+        public float InteractionCooldown;
         public float TrackSpeed;
     }
 }

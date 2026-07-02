@@ -29,7 +29,7 @@ namespace Futboloid.Gameplay.Defenders
                 TrackSpeed = settings.GkTrackSpeed,
                 LaunchSpeed = 12f,
                 OpenGoalChancePercent = 70,
-                DamageCooldown = 0.4f,
+                InteractionCooldown = 0.1f,
                 PatrolPointCount = 4,
                 PatrolRadius = 1.5f,
                 WanderRadius = 1.5f,

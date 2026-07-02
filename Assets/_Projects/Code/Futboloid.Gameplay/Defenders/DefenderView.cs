@@ -29,8 +29,9 @@ namespace Futboloid.Gameplay.Defenders
         [Tooltip("Шанс 0–100 пнуть дальше от вратаря (в противоположный угол). Иначе — ближе к вратарю.")]
         [FormerlySerializedAs("openGoalWeight")]
         [SerializeField] [Range(0, 100)] private int openGoalChancePercent = 70;
-        [Tooltip("Минимальный интервал между получением урона от мяча (сек).")]
-        [SerializeField] private float damageCooldown = 0.4f;
+        [Tooltip("Минимальный интервал между взаимодействиями с мячом: отскок и урон (сек).")]
+        [FormerlySerializedAs("damageCooldown")]
+        [SerializeField] private float interactionCooldown = 0.1f;
 
         [Header("Movement")]
         [SerializeField] private DefenderMovementType movementType = DefenderMovementType.Idle;
@@ -75,7 +76,7 @@ namespace Futboloid.Gameplay.Defenders
         private float _runArriveThreshold = 0.08f;
         private Vector2 _runTarget;
         private Vector2 _homePosition;
-        private float _lastDamageTime = float.NegativeInfinity;
+        private float _lastInteractionTime = float.NegativeInfinity;
         private readonly List<Vector2> _neighborPositions = new();
 
         public int SlotId => slotId;
@@ -105,7 +106,7 @@ namespace Futboloid.Gameplay.Defenders
             fieldArriveThreshold = build.FieldArriveThreshold;
             launchSpeed = build.LaunchSpeed;
             openGoalChancePercent = build.OpenGoalChancePercent;
-            damageCooldown = build.DamageCooldown;
+            interactionCooldown = build.InteractionCooldown;
 
             if (build.TrackSpeed > 0f)
                 trackSpeed = build.TrackSpeed;
@@ -481,18 +482,13 @@ namespace Futboloid.Gameplay.Defenders
 
         public void HandleBallContact(BallMotion motion, RaycastHit2D hit)
         {
-            _logic.ResolveBallHit(motion, hit, this);
-            TryApplyContactDamage();
-            _bus?.Publish(new DefenderHitEvent(slotId));
-        }
-
-        private void TryApplyContactDamage()
-        {
-            if (Time.time - _lastDamageTime < damageCooldown)
+            if (Time.time - _lastInteractionTime < interactionCooldown)
                 return;
 
-            _lastDamageTime = Time.time;
+            _lastInteractionTime = Time.time;
+            _logic.ResolveBallHit(motion, hit, this);
             ApplyDamage(1);
+            _bus?.Publish(new DefenderHitEvent(slotId));
         }
 
         private void ApplyDamage(int amount)

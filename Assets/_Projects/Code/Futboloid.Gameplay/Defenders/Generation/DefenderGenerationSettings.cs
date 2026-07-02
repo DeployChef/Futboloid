@@ -194,7 +194,7 @@ namespace Futboloid.Gameplay.Defenders
         public float FieldArriveThreshold;
         public float LaunchSpeed;
         public int OpenGoalChancePercent;
-        public float DamageCooldown;
+        public float InteractionCooldown;
 
         public DefenderBuild ToBuild(int slotId, int maxHp)
         {
@@ -215,7 +215,7 @@ namespace Futboloid.Gameplay.Defenders
                 FieldArriveThreshold = FieldArriveThreshold,
                 LaunchSpeed = LaunchSpeed,
                 OpenGoalChancePercent = OpenGoalChancePercent,
-                DamageCooldown = DamageCooldown,
+                InteractionCooldown = InteractionCooldown,
                 TrackSpeed = 0f
             };
         }
@@ -240,7 +240,7 @@ namespace Futboloid.Gameplay.Defenders
                 FieldArriveThreshold = 0.12f,
                 LaunchSpeed = 12f,
                 OpenGoalChancePercent = 70,
-                DamageCooldown = 0.4f
+                InteractionCooldown = 0.1f
             },
             new DefenderArchetypeDefinition
             {
@@ -260,7 +260,7 @@ namespace Futboloid.Gameplay.Defenders
                 FieldArriveThreshold = 0.12f,
                 LaunchSpeed = 12f,
                 OpenGoalChancePercent = 70,
-                DamageCooldown = 0.4f
+                InteractionCooldown = 0.1f
             },
             new DefenderArchetypeDefinition
             {
@@ -280,7 +280,7 @@ namespace Futboloid.Gameplay.Defenders
                 FieldArriveThreshold = 0.12f,
                 LaunchSpeed = 12f,
                 OpenGoalChancePercent = 70,
-                DamageCooldown = 0.4f
+                InteractionCooldown = 0.1f
             },
             new DefenderArchetypeDefinition
             {
@@ -300,7 +300,7 @@ namespace Futboloid.Gameplay.Defenders
                 FieldArriveThreshold = 0.12f,
                 LaunchSpeed = 13f,
                 OpenGoalChancePercent = 85,
-                DamageCooldown = 0.4f
+                InteractionCooldown = 0.1f
             },
             new DefenderArchetypeDefinition
             {
@@ -320,7 +320,7 @@ namespace Futboloid.Gameplay.Defenders
                 FieldArriveThreshold = 0.14f,
                 LaunchSpeed = 11f,
                 OpenGoalChancePercent = 60,
-                DamageCooldown = 0.45f
+                InteractionCooldown = 0.1f
             },
             new DefenderArchetypeDefinition
             {
@@ -340,7 +340,7 @@ namespace Futboloid.Gameplay.Defenders
                 FieldArriveThreshold = 0.1f,
                 LaunchSpeed = 13f,
                 OpenGoalChancePercent = 75,
-                DamageCooldown = 0.35f
+                InteractionCooldown = 0.1f
             }
         };
     }
