@@ -3,5 +3,6 @@
   <Project Path="Assembly-CSharp-firstpass.csproj" />
   <Project Path="Futboloid.Main.csproj" />
   <Project Path="Futboloid.Core.csproj" />
+  <Project Path="Futboloid.Editor.csproj" />
   <Project Path="Futboloid.UI.csproj" />
 </Solution>
