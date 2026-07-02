@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Match.GameplaySettings
   matchDurationSeconds: 60
   matchesToWin: 3
+  defenderGeneration: {fileID: 11400000, guid: 4c9a7e2f1b8d4a6e9f0c3d5e7a1b2c3d, type: 2}

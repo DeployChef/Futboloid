@@ -1,0 +1,211 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e4f1a2b3c5d6e7f8091a2b3c4d5e6f7, type: 3}
+  m_Name: DefenderGenerationSettings
+  m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.DefenderGenerationSettings
+  gridColumns: 5
+  gridRows: 7
+  generationSeedSalt: 7919
+  gkBaseHp: 10
+  gkHpPerMatch: 2
+  gkTrackSpeed: 1.25
+  fieldBaseHp: 3
+  pacingCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 1
+      value: 0.35
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 2.436556
+      value: 0.49152708
+      inSlope: -0.11107351
+      outSlope: -0.11107351
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.5906917
+      outWeight: 0.102804795
+    - serializedVersion: 3
+      time: 4.3947487
+      value: 0.57754767
+      inSlope: -0.12443716
+      outSlope: -0.12443716
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.5122348
+      outWeight: 0.07979012
+    - serializedVersion: 3
+      time: 7.361097
+      value: 0.71171486
+      inSlope: -0.14904046
+      outSlope: -0.14904046
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 1
+      outWeight: 0.07821133
+    - serializedVersion: 3
+      time: 10.112488
+      value: 0.982975
+      inSlope: 0.072222225
+      outSlope: 0.072222225
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  tutorialMatch:
+    SlotIds: 0c0000001000000012000000
+    ArchetypeIds:
+    - Shield
+    - Shield
+    - Drifter
+  formations:
+  - Id: Triangle3
+    SlotIds: 0c0000001000000012000000
+    MinTier: 0
+    Weight: 3
+  - Id: Line3
+    SlotIds: 0b0000000c0000000d000000
+    MinTier: 1
+    Weight: 2
+  - Id: V5
+    SlotIds: 0a0000000e000000110000001500000017000000
+    MinTier: 2
+    Weight: 2
+  - Id: Wall5
+    SlotIds: 0a0000000b0000000c0000000d0000000e000000
+    MinTier: 2
+    Weight: 2.5
+  archetypes:
+  - Id: Shield
+    MinTier: 0
+    Weight: 4
+    Hp: 3
+    HitType: 0
+    MovementType: 0
+    PatrolPointCount: 4
+    PatrolRadius: 1.2
+    WanderRadius: 1.2
+    ChaseRadius: 3
+    SeparationRadius: 0.6
+    FieldMoveSpeed: 1.4
+    FieldAcceleration: 12
+    FieldArriveThreshold: 0.12
+    LaunchSpeed: 12
+    OpenGoalChancePercent: 70
+    DamageCooldown: 0.4
+  - Id: Drifter
+    MinTier: 0
+    Weight: 3
+    Hp: 2
+    HitType: 0
+    MovementType: 2
+    PatrolPointCount: 4
+    PatrolRadius: 1.2
+    WanderRadius: 1.6
+    ChaseRadius: 3
+    SeparationRadius: 0.6
+    FieldMoveSpeed: 1.5
+    FieldAcceleration: 12
+    FieldArriveThreshold: 0.12
+    LaunchSpeed: 12
+    OpenGoalChancePercent: 70
+    DamageCooldown: 0.4
+  - Id: Hunter
+    MinTier: 1
+    Weight: 2.5
+    Hp: 3
+    HitType: 0
+    MovementType: 3
+    PatrolPointCount: 4
+    PatrolRadius: 1.2
+    WanderRadius: 1.2
+    ChaseRadius: 3.5
+    SeparationRadius: 0.6
+    FieldMoveSpeed: 1.7
+    FieldAcceleration: 14
+    FieldArriveThreshold: 0.12
+    LaunchSpeed: 12
+    OpenGoalChancePercent: 70
+    DamageCooldown: 0.4
+  - Id: Sniper
+    MinTier: 1
+    Weight: 1.5
+    Hp: 2
+    HitType: 1
+    MovementType: 0
+    PatrolPointCount: 4
+    PatrolRadius: 1
+    WanderRadius: 1
+    ChaseRadius: 2.5
+    SeparationRadius: 0.6
+    FieldMoveSpeed: 1.3
+    FieldAcceleration: 12
+    FieldArriveThreshold: 0.12
+    LaunchSpeed: 13
+    OpenGoalChancePercent: 85
+    DamageCooldown: 0.4
+  - Id: Tank
+    MinTier: 2
+    Weight: 2
+    Hp: 5
+    HitType: 0
+    MovementType: 0
+    PatrolPointCount: 4
+    PatrolRadius: 1
+    WanderRadius: 1
+    ChaseRadius: 2.5
+    SeparationRadius: 0.7
+    FieldMoveSpeed: 1.2
+    FieldAcceleration: 10
+    FieldArriveThreshold: 0.14
+    LaunchSpeed: 11
+    OpenGoalChancePercent: 60
+    DamageCooldown: 0.45
+  - Id: Presser
+    MinTier: 3
+    Weight: 1.5
+    Hp: 3
+    HitType: 1
+    MovementType: 3
+    PatrolPointCount: 4
+    PatrolRadius: 1
+    WanderRadius: 1.2
+    ChaseRadius: 4
+    SeparationRadius: 0.6
+    FieldMoveSpeed: 1.8
+    FieldAcceleration: 14
+    FieldArriveThreshold: 0.1
+    LaunchSpeed: 13
+    OpenGoalChancePercent: 75
+    DamageCooldown: 0.35
+  tiers:
+  - MinMatchNumber: 1
+    Tier: 0
+    MaxFieldCount: 3
+  - MinMatchNumber: 2
+    Tier: 1
+    MaxFieldCount: 4
+  - MinMatchNumber: 4
+    Tier: 2
+    MaxFieldCount: 5
+  - MinMatchNumber: 7
+    Tier: 3
+    MaxFieldCount: 7

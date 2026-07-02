@@ -16,22 +16,26 @@ namespace Futboloid.Gameplay.Defenders
         [SerializeField] private Transform spawnRoot;
         [SerializeField] private DefenderSlotLayout slotLayout;
         [SerializeField] private Transform goalAnchor;
-        [SerializeField] private int goalkeeperSlotId = DefenderFormationPatterns.GoalkeeperSlotId;
+        [SerializeField] private DefenderGenerationSettings generationSettingsOverride;
 
         private IObjectResolver _resolver;
         private ITournamentBracketReadModel _tournament;
+        private DefenderGenerationSettings _generationSettings;
         private readonly List<DefenderView> _spawned = new();
-        private readonly List<int> _fieldSlotBuffer = new();
         private readonly List<IDisposable> _subscriptions = new();
 
         [Inject]
         public void Construct(
             IGameEventBus bus,
             IObjectResolver resolver,
-            ITournamentBracketReadModel tournament)
+            ITournamentBracketReadModel tournament,
+            DefenderGenerationSettings generationSettings)
         {
             _resolver = resolver;
             _tournament = tournament;
+            _generationSettings = generationSettingsOverride != null
+                ? generationSettingsOverride
+                : generationSettings;
             _subscriptions.Add(bus.Subscribe<PitchResetRequestedEvent>(_ => SpawnForCurrentMatch()));
         }
 
@@ -49,16 +53,23 @@ namespace Futboloid.Gameplay.Defenders
                 return;
             }
 
+            if (_generationSettings == null)
+            {
+                Debug.LogWarning("[DefenderSpawner] DefenderGenerationSettings is not available.", this);
+                return;
+            }
+
             ClearSpawned();
 
             var matchNumber = _tournament?.CurrentMatchNumber ?? 1;
-            DefenderFormationPatterns.CollectFieldSlots(matchNumber, _fieldSlotBuffer);
+            var context = new DefenderGenerationContext(matchNumber);
+            var generation = DefenderMatchGenerator.Generate(_generationSettings, context);
 
-            SpawnGoalkeeper();
-            SpawnFieldDefenders(_fieldSlotBuffer);
+            SpawnGoalkeeper(generation.Goalkeeper);
+            SpawnFieldDefenders(generation.Field);
         }
 
-        private void SpawnGoalkeeper()
+        private void SpawnGoalkeeper(in DefenderBuild build)
         {
             if (goalAnchor == null)
             {
@@ -68,10 +79,10 @@ namespace Futboloid.Gameplay.Defenders
 
             var zone = goalAnchor.GetComponent<GoalAnchor>();
             var home = zone != null ? zone.PositionOnParabola(0f) : (Vector2)goalAnchor.position;
-            SpawnDefender(goalkeeperSlotId, DefenderRole.Goalkeeper, home, goalAnchor);
+            SpawnDefender(build, home, goalAnchor);
         }
 
-        private void SpawnFieldDefenders(IReadOnlyList<int> slotIds)
+        private void SpawnFieldDefenders(IReadOnlyList<DefenderBuild> builds)
         {
             if (slotLayout == null)
             {
@@ -79,20 +90,22 @@ namespace Futboloid.Gameplay.Defenders
                 return;
             }
 
-            for (var i = 0; i < slotIds.Count; i++)
+            for (var i = 0; i < builds.Count; i++)
             {
-                var slotId = slotIds[i];
-                if (!slotLayout.TryGetPosition(slotId, out var home))
+                var build = builds[i];
+                if (!slotLayout.TryGetPosition(build.SlotId, out var home))
                 {
-                    Debug.LogWarning($"[DefenderSpawner] Slot #{slotId} has no position in layout.", this);
+                    Debug.LogWarning(
+                        $"[DefenderSpawner] Slot #{build.SlotId} has no position in layout.",
+                        this);
                     continue;
                 }
 
-                SpawnDefender(slotId, DefenderRole.Field, home, goalAnchor);
+                SpawnDefender(build, home, goalAnchor);
             }
         }
 
-        private void SpawnDefender(int slotId, DefenderRole role, Vector2 home, Transform anchor)
+        private void SpawnDefender(in DefenderBuild build, Vector2 home, Transform anchor)
         {
             var parent = spawnRoot != null ? spawnRoot : transform;
             var instance = Instantiate(
@@ -101,7 +114,7 @@ namespace Futboloid.Gameplay.Defenders
                 Quaternion.identity,
                 parent);
 
-            instance.ApplySpawnSetup(slotId, role, home, anchor);
+            instance.ApplySpawnSetup(build, home, anchor);
             _resolver.InjectGameObject(instance.gameObject);
             _spawned.Add(instance);
         }

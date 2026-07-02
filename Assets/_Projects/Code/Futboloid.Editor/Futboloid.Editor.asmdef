@@ -2,7 +2,8 @@
     "name": "Futboloid.Editor",
     "rootNamespace": "Futboloid.Editor",
     "references": [
-        "Futboloid.Gameplay"
+        "Futboloid.Gameplay",
+        "Futboloid.Core"
     ],
     "includePlatforms": [
         "Editor"

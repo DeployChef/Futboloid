@@ -47,7 +47,7 @@ namespace Futboloid.Gameplay.Defenders
         [SerializeField] private Transform goalAnchor;
         [FormerlySerializedAs("paramSpeed")]
         [Tooltip("Скорость слежения по параметру t (−1…1) в секунду — насколько быстро GK едет по дуге к X мяча.")]
-        [SerializeField] private float trackSpeed = 2.5f;
+        [SerializeField] private float trackSpeed = 1.25f;
 
         [Header("Gizmos")]
         [SerializeField] private bool drawGizmos = true;
@@ -88,10 +88,28 @@ namespace Futboloid.Gameplay.Defenders
         public bool RunningToGoal => _runningToGoal;
         public Vector2 HomePosition => _homePosition;
 
-        public void ApplySpawnSetup(int id, DefenderRole spawnRole, Vector2 home, Transform anchor)
+        public void ApplySpawnSetup(in DefenderBuild build, Vector2 home, Transform anchor)
         {
-            slotId = id;
-            role = spawnRole;
+            slotId = build.SlotId;
+            role = build.Role;
+            maxHp = build.MaxHp;
+            hitType = build.HitType;
+            movementType = build.MovementType;
+            patrolPointCount = build.PatrolPointCount;
+            patrolRadius = build.PatrolRadius;
+            wanderRadius = build.WanderRadius;
+            chaseRadius = build.ChaseRadius;
+            separationRadius = build.SeparationRadius;
+            fieldMoveSpeed = build.FieldMoveSpeed;
+            fieldAcceleration = build.FieldAcceleration;
+            fieldArriveThreshold = build.FieldArriveThreshold;
+            launchSpeed = build.LaunchSpeed;
+            openGoalChancePercent = build.OpenGoalChancePercent;
+            damageCooldown = build.DamageCooldown;
+
+            if (build.TrackSpeed > 0f)
+                trackSpeed = build.TrackSpeed;
+
             goalAnchor = anchor;
             transform.position = new Vector3(home.x, home.y, transform.position.z);
             _homePosition = home;

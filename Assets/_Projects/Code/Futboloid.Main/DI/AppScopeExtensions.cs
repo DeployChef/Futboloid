@@ -10,7 +10,9 @@ namespace Futboloid.Main.DI
     {
         public static IContainerBuilder RegisterAppScope(this IContainerBuilder builder)
         {
-            builder.RegisterInstance(GameplaySettings.Load());
+            var gameplaySettings = GameplaySettings.Load();
+            builder.RegisterInstance(gameplaySettings);
+            builder.RegisterInstance(gameplaySettings.DefenderGeneration);
             builder.Register<IGameEventBus, GameEventBus>(Lifetime.Singleton);
             builder.Register<TournamentRunService>(Lifetime.Singleton)
                 .As<ITournamentRunService>()
