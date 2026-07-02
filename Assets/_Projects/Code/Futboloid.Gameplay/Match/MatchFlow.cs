@@ -50,6 +50,7 @@ namespace Futboloid.Gameplay.Match
         public void Reset()
         {
             StopTimerLoop();
+            AudioManager.Instance.StopEvent("MusicStart");
 
             PlayerScore = 0;
             OpponentScore = 0;
@@ -174,6 +175,8 @@ namespace Futboloid.Gameplay.Match
             _matchEnded = true;
             StopTimerLoop();
             _bus.Publish(new MatchEndedEvent(PlayerScore, OpponentScore, playerWon));
+            AudioManager.Instance.PlayEvent("MatchEnd");
+            AudioManager.Instance.StopEvent("MusicStart");
             Debug.Log($"[MatchFlow] Match ended {PlayerScore}:{OpponentScore}, playerWon={playerWon}");
         }
 
@@ -203,7 +206,10 @@ namespace Futboloid.Gameplay.Match
             _timerStarted = true;
 
             if (_onField)
+            {
                 StartTimerLoop();
+                AudioManager.Instance.PlayEvent("MusicStart");
+            }
         }
 
         private void OnPitchPhaseChanged(PitchPhaseChangedEvent e)

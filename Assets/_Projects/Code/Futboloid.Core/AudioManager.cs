@@ -1,115 +1,121 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Futboloid.Core.Bus;
-using Futboloid.Core.Bus.Events;
 
 namespace Futboloid.Core
 {
+    /// <summary>
+    /// Простой аудиоменеджер без DI и шины событий.
+    /// Вызывается напрямую из игровых скриптов: AudioManager.Instance.PlayEvent("BallHit");
+    /// </summary>
     public class AudioManager : MonoBehaviour
     {
+        public static AudioManager Instance { get; private set; }
+
         [Header("Глобальные настройки")]
         [Tooltip("Максимальное количество одновременных звуков (голосов).")]
         [SerializeField] private int maxVoices = 8;
 
-        // Список всех динамиков (детей)
-        private List<AudioClipSource> sources = new List<AudioClipSource>();
-        
-        // Карта для быстрого поиска: "BallHit" -> AudioClipSource
-        private Dictionary<string, AudioClipSource> eventMap = new Dictionary<string, AudioClipSource>();
+        [Header("Fade")]
+        [Tooltip("Глобальный тумблер для Fade In / Fade Out.")]
+        [SerializeField] private bool enableFade = true;
 
-        // Подписки
-        private readonly List<IDisposable> _subscriptions = new List<IDisposable>();
-        private readonly IGameEventBus _bus;
+        private List<AudioClipSource> _sources = new List<AudioClipSource>();
+        private Dictionary<string, AudioClipSource> _eventMap = new Dictionary<string, AudioClipSource>();
 
-        public AudioManager(IGameEventBus bus)
+        public bool EnableFade
         {
-            _bus = bus;
+            get => enableFade;
+            set => enableFade = value;
         }
 
         private void Awake()
         {
-            // Собираем все дочерние объекты с компонентом AudioClipSource
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+
             var allSources = GetComponentsInChildren<AudioClipSource>();
             foreach (var source in allSources)
             {
-                sources.Add(source);
+                _sources.Add(source);
                 if (!string.IsNullOrEmpty(source.eventName))
                 {
-                    eventMap[source.eventName] = source;
+                    _eventMap[source.eventName] = source;
                 }
             }
-            
-            DontDestroyOnLoad(gameObject);
-        }
-        
-        private void OnEnable()
-        {
-            if (_bus == null) return;
-            
-            // Подписываемся на события и мапим их на имена динамиков
-            _subscriptions.Add(_bus.Subscribe<GoalScoredEvent>(e => PlayEvent("GoalScored")));
-            _subscriptions.Add(_bus.Subscribe<BallReturnedToKeeperEvent>(e => PlayEvent("BallHit")));
-            _subscriptions.Add(_bus.Subscribe<BallHitEvent>(e => PlayEvent("BallHit")));
-            _subscriptions.Add(_bus.Subscribe<BallServedEvent>(e => PlayEvent("MatchStart")));
-            _subscriptions.Add(_bus.Subscribe<MatchEndedEvent>(e => PlayEvent("MatchEnd")));
-        }
-
-        private void OnDisable()
-        {
-            foreach (var sub in _subscriptions)
-            {
-                sub?.Dispose();
-            }
-            _subscriptions.Clear();
         }
 
         /// <summary>
-        /// Вызывается при наступлении события.
+        /// Воспроизводит звук по имени события.
+        /// Вызывать из игровых скриптов: AudioManager.Instance.PlayEvent("BallHit");
         /// </summary>
-        private void PlayEvent(string eventName)
+        public void PlayEvent(string eventName)
         {
-            if (!eventMap.TryGetValue(eventName, out var clipSource))
+            if (!_eventMap.TryGetValue(eventName, out var clipSource))
             {
                 Debug.LogWarning($"AudioManager: Нет динамика для события '{eventName}'");
                 return;
             }
 
-            // Если динамик играет и мы превысили лимит голосов — выкидываем самый старый
-            if (clipSource.source.isPlaying)
-            {
-                CheckVoiceLimit();
-            }
+            if (!clipSource.allowOverlap && clipSource.IsPlaying)
+                return;
 
-            // Играем случайный звук из массива этого динамика
+            if (!CanPlayWithPriority(clipSource))
+                return;
+
             clipSource.PlayRandom();
         }
-        
+
         /// <summary>
-        /// Если голосов больше, чем лимит, останавливаем самый старый.
+        /// Останавливает звук по имени события (для музыки при рестарте/конце матча).
         /// </summary>
-        private void CheckVoiceLimit()
+        public void StopEvent(string eventName)
         {
-            // Собираем все источники, которые сейчас играют (включая вложенные)
-            var playingSources = new List<AudioSource>();
-            foreach (var s in sources)
+            if (_eventMap.TryGetValue(eventName, out var clipSource))
+            {
+                clipSource.Stop();
+            }
+        }
+
+        private bool CanPlayWithPriority(AudioClipSource newSource)
+        {
+            var playingSources = new List<AudioClipSource>();
+            foreach (var s in _sources)
             {
                 if (s.source.isPlaying)
-                {
-                    playingSources.Add(s.source);
-                }
+                    playingSources.Add(s);
             }
 
-            // Если превысили лимит
-            if (playingSources.Count > maxVoices)
+            if (playingSources.Count >= maxVoices)
             {
-                // Находим самый старый (первый в списке)
-                if (playingSources.Count > 0)
+                AudioClipSource lowestPrioritySource = null;
+                int lowestPriority = -1;
+
+                foreach (var s in playingSources)
                 {
-                    var oldest = playingSources[0];
-                    oldest.Stop();
+                    if (lowestPrioritySource == null || s.priority > lowestPriority)
+                    {
+                        lowestPriority = s.priority;
+                        lowestPrioritySource = s;
+                    }
+                }
+
+                if (lowestPrioritySource != null && newSource.priority < lowestPrioritySource.priority)
+                {
+                    lowestPrioritySource.Stop();
+                }
+                else
+                {
+                    return false;
                 }
             }
+            
+            return true;
         }
     }
 }
