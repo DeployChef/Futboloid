@@ -20,6 +20,7 @@ namespace Futboloid.Gameplay.Match
         private bool _onField;
         private bool _matchEnded;
         private bool _timerStarted;
+        private bool _pauseTimer;
         private float _totalDurationSeconds;
 
         public int PlayerScore { get; private set; }
@@ -116,7 +117,7 @@ namespace Futboloid.Gameplay.Match
                 {
                     await UniTask.Yield(PlayerLoopTiming.Update, ct);
 
-                    if (!_onField)
+                    if (!_onField || _pauseTimer)
                         continue;
 
                     RemainingSeconds = Mathf.Max(0f, RemainingSeconds - Time.deltaTime);
@@ -183,6 +184,8 @@ namespace Futboloid.Gameplay.Match
 
         private void OnPitchPhaseChanged(PitchPhaseChangedEvent e)
         {
+            _pauseTimer = e.Phase == PitchPhase.BonusPick;
+
             if (e.Phase == PitchPhase.MatchEnded)
             {
                 _matchEnded = true;

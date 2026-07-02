@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 539b9b19bea0479691e2663d71c615f9, type: 3}
+  m_Name: Perk_enemy_hp
+  m_EditorClassIdentifier: Futboloid.Core::Futboloid.Core.Run.PerkDefinition
+  id: enemy_hp
+  displayName: "\u0421\u0442\u0435\u043D\u0430"
+  description: "+\u041D\u0420 \u0432\u0440\u0430\u0433\u043E\u0432"
+  icon: {fileID: 0}
+  cardColor: 1
+  maxLevel: 5
+  valuePerLevel: 0.1

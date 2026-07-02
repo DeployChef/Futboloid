@@ -15,7 +15,8 @@ tags:
 | Order | Слой | Сцена | Когда виден |
 |-------|------|-------|-------------|
 | 0 | Game world | Game | Пока загружена Game |
-| 100 | **Match HUD** | **Game** | Только во время **забега**: `OnField`, `Pause` |
+| 100 | **Match HUD** | **Game** | Таймер, счёт — `MatchHudWidget` |
+| 110 | **Run XP HUD** | **Game** | Шкала XP забега — `RunXpHudWidget` |
 | 130 | **BonusPick** | **Game** | `PitchPhase.BonusPick` — 3 карты перков |
 | 150 | **Tournament** | **Game** | `Navigation.Tournament` (после матча) |
 | 200 | Main Menu | Root | `Navigation.MainMenu` |

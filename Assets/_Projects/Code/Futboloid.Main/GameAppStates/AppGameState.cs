@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Futboloid.Core;
+using Futboloid.Core.Run;
 using Futboloid.Main.DI;
 using Futboloid.Main.Navigation;
 using Futboloid.Main.Session;
@@ -27,6 +28,7 @@ namespace Futboloid.Main.GameAppStates
         public async UniTask Enter()
         {
             LifetimeScope = _parentLifetimeScope.CreateChild(builder => builder.RegisterAppScope());
+            LifetimeScope.Container.Resolve<IRunProgressionService>();
 
             var gameScene = await EnsureGameSceneAsync();
             if (!gameScene.IsValid() || !gameScene.isLoaded)

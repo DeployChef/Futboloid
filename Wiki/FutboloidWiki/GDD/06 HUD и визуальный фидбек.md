@@ -22,9 +22,9 @@ tags:
 
 ### Шкала XP забега
 
-- Горизонтальная полоска на Match HUD (fill по `RunXpChangedEvent`)
-- XP **не сбрасывается** между матчами одного турнира
-- Level-up → overlay **BonusPick** (3 карты), матч на паузе
+- Отдельный виджет **`RunXpHudWidget`** на том же Canvas Game, рядом с Match HUD (не внутри него)
+- Fill по `RunXpChangedEvent`; опционально текст `12 / 30`
+- Скрывается при `Navigation.Tournament`, как Match HUD
 
 См. [[09 Карточки перков и XP]].
 
