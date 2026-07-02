@@ -141,7 +141,10 @@ namespace Futboloid.Gameplay.Defenders
                     break;
 
                 case DefenderHitType.ToPlayerGoal:
-                    LaunchToPlayerGoal(motion, hit, view);
+                    if (IsHitFromBehind(hit, view))
+                        motion.ReflectFromHit(hit);
+                    else
+                        LaunchToPlayerGoal(motion, hit, view);
                     break;
 
                 default:
@@ -163,6 +166,37 @@ namespace Futboloid.Gameplay.Defenders
             }
 
             motion.LaunchDirected(delta, view.LaunchSpeed);
+        }
+
+        /// <summary>
+        /// Удар в спину: точка контакта за спиной относительно направления к воротам игрока.
+        /// forward = к воротам; угол θ между forward и (центр→контакт):
+        /// θ ≤ 110° — бьёт в ворота, θ &gt; 110° — reflect (cos 110° ≈ −0.34).
+        /// </summary>
+        private const float BackHitDotThreshold = -0.34f;
+
+        private bool IsHitFromBehind(RaycastHit2D hit, DefenderView view)
+        {
+            var defenderPos = (Vector2)view.transform.position;
+            var forward = ResolveDefenderForward(defenderPos);
+            if (forward.sqrMagnitude < 0.0001f || hit.collider == null)
+                return false;
+
+            var toContact = hit.point - defenderPos;
+            if (toContact.sqrMagnitude < 0.0001f)
+                return false;
+
+            return Vector2.Dot(toContact.normalized, forward) < BackHitDotThreshold;
+        }
+
+        private Vector2 ResolveDefenderForward(Vector2 defenderPosition)
+        {
+            var goalCenter = (Vector2)GetPlayerGoalBounds().center;
+            var forward = goalCenter - defenderPosition;
+            if (forward.sqrMagnitude < 0.0001f)
+                forward = Vector2.down;
+
+            return forward.normalized;
         }
 
         private Vector2 ResolvePlayerGoalTarget(DefenderView view)
