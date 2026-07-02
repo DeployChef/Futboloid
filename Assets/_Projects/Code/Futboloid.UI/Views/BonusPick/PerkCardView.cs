@@ -14,7 +14,7 @@ namespace Futboloid.UI.Views.BonusPick
         [SerializeField] private Image iconImage;
         [SerializeField] private TextMeshProUGUI titleText;
         [SerializeField] private TextMeshProUGUI descriptionText;
-
+        [SerializeField] private TextMeshProUGUI PerkLevelText;
         public string PerkId { get; private set; }
 
         public event Action Clicked;
@@ -33,8 +33,13 @@ namespace Futboloid.UI.Views.BonusPick
             SetSprite(cardFrameImage, perk.CardFrame);
             SetSprite(iconImage, perk.Icon);
 
+            // Показываем только имя
             if (titleText != null)
-                titleText.text = perk.GetLevelLabel(levelAfterPick);
+                titleText.text = perk.DisplayName;
+            
+            // Показываем уровень отдельно
+            if (PerkLevelText != null)
+                PerkLevelText.text = $"Ур. {levelAfterPick}";
 
             if (descriptionText != null)
                 descriptionText.text = perk.Description;

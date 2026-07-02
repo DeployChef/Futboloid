@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecc99bf03bee5424ea126d5e35b2a13a, type: 3}
   m_Name: GameplaySettings
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Match.GameplaySettings
-  matchDurationSeconds: 5
+  matchDurationSeconds: 10
   matchesToWin: 3
   defenderGeneration: {fileID: 11400000, guid: 4c9a7e2f1b8d4a6e9f0c3d5e7a1b2c3d, type: 2}
