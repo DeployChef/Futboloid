@@ -188,7 +188,10 @@ namespace Futboloid.Gameplay.Keeper
             transform.position = position;
 
             if (animator != null)
+            {
+                var isMoving = Mathf.Abs(_velocityX) > 0.001f;
                 animator.SetBool("Run", isMoving);
+            }
         }
 
         private float ReadMoveX() => _input?.MoveX ?? 0f;

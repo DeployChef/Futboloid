@@ -1,5 +1,6 @@
-<Solution>
+﻿<Solution>
   <Project Path="Futboloid.UI.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="Futboloid.Core.csproj" />
   <Project Path="Futboloid.Gameplay.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
