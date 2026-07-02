@@ -1,3 +1,4 @@
+using Futboloid.Gameplay.Defenders;
 using UnityEngine;
 
 namespace Futboloid.Gameplay.Match
@@ -11,9 +12,14 @@ namespace Futboloid.Gameplay.Match
 
         [SerializeField] private float matchDurationSeconds = DefaultMatchDurationSeconds;
         [SerializeField] private int matchesToWin = DefaultMatchesToWin;
+        [SerializeField] private DefenderGenerationSettings defenderGeneration;
 
         public float MatchDurationSeconds => Mathf.Max(1f, matchDurationSeconds);
         public int MatchesToWin => Mathf.Max(1, matchesToWin);
+        public DefenderGenerationSettings DefenderGeneration =>
+            defenderGeneration != null
+                ? defenderGeneration
+                : DefenderGenerationSettings.Load();
 
         public static GameplaySettings Load()
         {

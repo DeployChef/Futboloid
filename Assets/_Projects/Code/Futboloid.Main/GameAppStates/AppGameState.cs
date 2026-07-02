@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Futboloid.Core;
+using Futboloid.Core.Run;
 using Futboloid.Main.DI;
 using Futboloid.Main.Navigation;
 using Futboloid.Main.Session;
@@ -27,6 +28,7 @@ namespace Futboloid.Main.GameAppStates
         public async UniTask Enter()
         {
             LifetimeScope = _parentLifetimeScope.CreateChild(builder => builder.RegisterAppScope());
+            LifetimeScope.Container.Resolve<IRunProgressionService>();
 
             var gameScene = await EnsureGameSceneAsync();
             if (!gameScene.IsValid() || !gameScene.isLoaded)
@@ -38,14 +40,14 @@ namespace Futboloid.Main.GameAppStates
             SceneManager.SetActiveScene(gameScene);
 
             _gameState = new GameState(LifetimeScope);
-            await _gameState.Enter();
+            await _gameState.Enter(gameScene);
 
             LifetimeScope.Container.Resolve<MatchEndHandler>();
 
             Overlay = LifetimeScope.Container.Resolve<OverlayStateController>();
-            await Overlay.SetState(NavigationState.MainMenu);
+            await Overlay.SetState(NavigationState.OnField);
 
-            Debug.Log($"[AppGameState] '{GameScenes.Game}' ready, navigation → MainMenu.");
+            Debug.Log($"[AppGameState] '{GameScenes.Game}' ready, navigation → OnField.");
         }
 
         public async UniTask Exit()

@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
+using Futboloid.Core.Run;
 using Futboloid.UI;
 using UnityEngine;
 
@@ -12,6 +13,7 @@ namespace Futboloid.Main.Navigation
         private readonly IGameEventBus _bus;
         private readonly UIService _uiService;
         private readonly ITournamentRunService _tournamentRun;
+        private readonly IRunProgressionService _runProgression;
 
         private bool _initialized;
 
@@ -21,11 +23,13 @@ namespace Futboloid.Main.Navigation
         public OverlayStateController(
             IGameEventBus bus,
             UIService uiService,
-            ITournamentRunService tournamentRun)
+            ITournamentRunService tournamentRun,
+            IRunProgressionService runProgression)
         {
             _bus = bus;
             _uiService = uiService;
             _tournamentRun = tournamentRun;
+            _runProgression = runProgression;
         }
 
         public UniTask SetState(NavigationState next)
@@ -33,6 +37,7 @@ namespace Futboloid.Main.Navigation
             if (_initialized && Current == next)
                 return UniTask.CompletedTask;
 
+            var isColdStart = !_initialized;
             var previous = _initialized ? Current : next;
             _initialized = true;
             Current = next;
@@ -40,7 +45,7 @@ namespace Futboloid.Main.Navigation
             if (next == NavigationState.MainMenu)
                 IsMatchPausedInMenu = previous == NavigationState.OnField;
 
-            ApplyState(next, previous);
+            ApplyState(next, previous, isColdStart);
             _uiService.ApplyNavigation(next, IsMatchPausedInMenu);
             _bus.Publish(new NavigationChangedEvent(previous, next, IsMatchPausedInMenu));
 
@@ -48,7 +53,7 @@ namespace Futboloid.Main.Navigation
             return UniTask.CompletedTask;
         }
 
-        private void ApplyState(NavigationState next, NavigationState previous)
+        private void ApplyState(NavigationState next, NavigationState previous, bool isColdStart)
         {
             switch (next)
             {
@@ -62,8 +67,11 @@ namespace Futboloid.Main.Navigation
                     var newRunFromMenu = previous == NavigationState.MainMenu && !IsMatchPausedInMenu;
                     if (!resumingFromPause)
                     {
-                        if (newRunFromMenu)
+                        if (newRunFromMenu || isColdStart)
+                        {
                             _tournamentRun.ResetRun();
+                            _runProgression.Reset();
+                        }
                         _bus.Publish(new PitchResetRequestedEvent());
                     }
                     else

@@ -6,6 +6,6 @@ namespace Futboloid.Core
     public interface ITournamentRunService : ITournamentBracketReadModel
     {
         void ResetRun();
-        void RecordMatchResult(int playerScore, int opponentScore);
+        void RecordMatchResult(int playerScore, int opponentScore, bool playerWon);
     }
 }

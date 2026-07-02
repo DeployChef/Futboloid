@@ -14,6 +14,7 @@ namespace Futboloid.Gameplay.Physics
         public static int KeeperId => LayerMask.NameToLayer(Keeper);
         public static int GoalEnemyId => LayerMask.NameToLayer(GoalEnemy);
         public static int GoalPlayerId => LayerMask.NameToLayer(GoalPlayer);
+        public static int DefenderId => LayerMask.NameToLayer(Defender);
 
         public static LayerMask BallContactMask => LayerMask.GetMask(Wall, Keeper, Defender);
 
