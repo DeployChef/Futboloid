@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Futboloid.Gameplay.Ball;
+using Futboloid.Gameplay.Defenders;
 using Futboloid.Gameplay.Keeper;
+using Futboloid.Gameplay.Match;
 using UnityEngine;
 
 namespace Futboloid.Gameplay.Defenders
@@ -8,6 +10,7 @@ namespace Futboloid.Gameplay.Defenders
     public sealed class DefenderLogic
     {
         private readonly GoalkeeperView _playerKeeper;
+        private readonly PitchBounds _pitchBounds;
         private float _goalkeeperParam;
         private Vector2 _runVelocity;
         private Vector2 _fieldVelocity;
@@ -17,9 +20,10 @@ namespace Futboloid.Gameplay.Defenders
         private bool _hasWanderTarget;
         private System.Random _wanderRng;
 
-        public DefenderLogic(GoalkeeperView playerKeeper)
+        public DefenderLogic(GoalkeeperView playerKeeper, PitchBounds pitchBounds)
         {
             _playerKeeper = playerKeeper;
+            _pitchBounds = pitchBounds;
         }
 
         public void ResetRunVelocity() => _runVelocity = Vector2.zero;
@@ -32,6 +36,8 @@ namespace Futboloid.Gameplay.Defenders
             _hasWanderTarget = false;
             _wanderRng = new System.Random(slotId * 7919 + 17);
             _patrolPath = PatrolPathGenerator.Generate(home, patrolPointCount, patrolRadius, slotId * 7919 + 17);
+            for (var i = 0; i < _patrolPath.Length; i++)
+                _patrolPath[i] = ClampToPitch(_patrolPath[i]);
             _patrolIndex = 0;
         }
 
@@ -51,8 +57,8 @@ namespace Futboloid.Gameplay.Defenders
         {
             if (movementType == DefenderMovementType.Idle)
             {
-                var idle = MoveTowards(current, home, moveSpeed, acceleration, arriveThreshold, deltaTime, ref _fieldVelocity);
-                return ApplySeparation(idle, neighborPositions, separationRadius, moveSpeed, deltaTime);
+                var idle = MoveTowards(current, ClampToPitch(home), moveSpeed, acceleration, arriveThreshold, deltaTime, ref _fieldVelocity);
+                return ClampToPitch(ApplySeparation(idle, neighborPositions, separationRadius, moveSpeed, deltaTime));
             }
 
             var target = ResolveFieldTarget(
@@ -65,7 +71,7 @@ namespace Futboloid.Gameplay.Defenders
                 arriveThreshold);
 
             var next = MoveTowards(current, target, moveSpeed, acceleration, arriveThreshold, deltaTime, ref _fieldVelocity);
-            return ApplySeparation(next, neighborPositions, separationRadius, moveSpeed, deltaTime);
+            return ClampToPitch(ApplySeparation(next, neighborPositions, separationRadius, moveSpeed, deltaTime));
         }
 
         public Vector2 TickRunTowards(
@@ -83,7 +89,7 @@ namespace Futboloid.Gameplay.Defenders
             {
                 arrived = true;
                 _runVelocity = Vector2.zero;
-                return target;
+                return ClampToPitch(target);
             }
 
             arrived = false;
@@ -97,10 +103,10 @@ namespace Futboloid.Gameplay.Defenders
             {
                 _runVelocity = Vector2.zero;
                 arrived = true;
-                return target;
+                return ClampToPitch(target);
             }
 
-            return next;
+            return ClampToPitch(next);
         }
 
         public Vector2 TickGoalkeeperOnParabola(
@@ -135,7 +141,10 @@ namespace Futboloid.Gameplay.Defenders
                     break;
 
                 case DefenderHitType.ToPlayerGoal:
-                    LaunchToPlayerGoal(motion, hit, view);
+                    if (IsHitFromBehind(hit, view))
+                        motion.ReflectFromHit(hit);
+                    else
+                        LaunchToPlayerGoal(motion, hit, view);
                     break;
 
                 default:
@@ -157,6 +166,37 @@ namespace Futboloid.Gameplay.Defenders
             }
 
             motion.LaunchDirected(delta, view.LaunchSpeed);
+        }
+
+        /// <summary>
+        /// Удар в спину: точка контакта за спиной относительно направления к воротам игрока.
+        /// forward = к воротам; угол θ между forward и (центр→контакт):
+        /// θ ≤ 110° — бьёт в ворота, θ &gt; 110° — reflect (cos 110° ≈ −0.34).
+        /// </summary>
+        private const float BackHitDotThreshold = -0.34f;
+
+        private bool IsHitFromBehind(RaycastHit2D hit, DefenderView view)
+        {
+            var defenderPos = (Vector2)view.transform.position;
+            var forward = ResolveDefenderForward(defenderPos);
+            if (forward.sqrMagnitude < 0.0001f || hit.collider == null)
+                return false;
+
+            var toContact = hit.point - defenderPos;
+            if (toContact.sqrMagnitude < 0.0001f)
+                return false;
+
+            return Vector2.Dot(toContact.normalized, forward) < BackHitDotThreshold;
+        }
+
+        private Vector2 ResolveDefenderForward(Vector2 defenderPosition)
+        {
+            var goalCenter = (Vector2)GetPlayerGoalBounds().center;
+            var forward = goalCenter - defenderPosition;
+            if (forward.sqrMagnitude < 0.0001f)
+                forward = Vector2.down;
+
+            return forward.normalized;
         }
 
         private Vector2 ResolvePlayerGoalTarget(DefenderView view)
@@ -219,7 +259,7 @@ namespace Futboloid.Gameplay.Defenders
                     if (ballPosition.HasValue
                         && (ballPosition.Value - home).sqrMagnitude <= chaseRadius * chaseRadius)
                     {
-                        return ballPosition.Value;
+                        return ClampToPitch(ballPosition.Value);
                     }
 
                     return ResolveWanderTarget(home, wanderRadius, current, arriveThreshold);
@@ -253,7 +293,7 @@ namespace Futboloid.Gameplay.Defenders
                 _hasWanderTarget = true;
             }
 
-            return _wanderTarget;
+            return ClampToPitch(_wanderTarget);
         }
 
         private Vector2 PickRandomInRadius(Vector2 center, float radius)
@@ -264,8 +304,11 @@ namespace Futboloid.Gameplay.Defenders
             radius = Mathf.Max(0.1f, radius);
             var angle = (float)_wanderRng.NextDouble() * Mathf.PI * 2f;
             var distance = Mathf.Sqrt((float)_wanderRng.NextDouble()) * radius;
-            return center + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * distance;
+            return ClampToPitch(center + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * distance);
         }
+
+        private Vector2 ClampToPitch(Vector2 position) =>
+            _pitchBounds != null ? _pitchBounds.Clamp(position) : position;
 
         private static Vector2 MoveTowards(
             Vector2 current,

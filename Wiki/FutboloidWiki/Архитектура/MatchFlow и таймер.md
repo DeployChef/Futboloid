@@ -47,7 +47,7 @@ aliases:
 | Сколько секунд осталось | `MatchFlow` (корутина + `AdjustTime`) |
 | Как выглядит полоска | `MatchHudLayout` → `Slider` по **`MatchTimerChangedEvent`** |
 | Матч реально кончен | `MatchFlow` → **`MatchEndedEvent`** → `PitchStateMachine` |
-| Все враги мертвы | `DefenderDestroyedEvent` → registry → `MatchFlow.EndMatch(AllDefendersEliminated)` |
+| Все враги мертвы | `DefenderDestroyedEvent` → registry → `MatchFlow.EndMatchFromWipe()` → `PlayerWon = true` |
 
 ```mermaid
 sequenceDiagram
@@ -101,7 +101,7 @@ sequenceDiagram
 | Continue → `OnField` | снова `StartTimerLoop()` с тем же `RemainingSeconds` |
 | `PitchResetRequestedEvent` (новый Play / cold start) | стоп корутины, счёт и таймер → 90 с, `_timerStarted = false` |
 | `RemainingSeconds ≤ 0` | `MatchEndedEvent`, стоп корутины |
-| Все `DefenderView` соперника мертвы | `MatchEndedEvent` (`AllDefendersEliminated`), стоп корутины |
+| Все `DefenderView` соперника мертвы | `MatchEndedEvent` (`PlayerWon = true`), стоп корутины |
 | `PitchPhase → MatchEnded` | стоп корутины, флаг конца матча |
 
 Флаг **`_timerStarted`** в `MatchFlow`: сбрасывается в `Reset()`, выставляется один раз за матч на первом `BallServedEvent`. Связка с фазой: `PitchStateMachine` тоже слушает `BallServedEvent` → `Simulating`.
@@ -144,8 +144,8 @@ public readonly struct MatchEndedEvent
 {
     public int PlayerScore { get; }
     public int OpponentScore { get; }
-    // public MatchEndReason Reason { get; }  // TimeExpired | AllDefendersEliminated — задел
-    // public int WipeBonusPoints { get; }    // TBD при ComboScoreService
+    public bool PlayerWon { get; }  // вайп → true; по таймеру → PlayerScore > OpponentScore
+    // public int WipeBonusPoints { get; }  // TBD при ComboScoreService
 }
 
 /// <summary>+N доп. время, −N штраф. Публикует любой геймплейный код.</summary>
@@ -160,7 +160,7 @@ public readonly struct MatchTimeAdjustedEvent
 
 - **`MatchTimerChangedEvent`** — из корутины после каждого шага (для плавного слайдера) и после `AdjustTime` / `Reset`
 - **`MatchScoreChangedEvent`** — при голе (`GoalScoredEvent` → `RecordGoal`)
-- **`MatchEndedEvent`** — при `RemainingSeconds ≤ 0` (`TimeExpired`) **или** при вайпе всех врагов (`AllDefendersEliminated`)
+- **`MatchEndedEvent`** — при `RemainingSeconds ≤ 0` (`PlayerWon` по счёту) **или** при вайпе (`PlayerWon = true` при любом счёте)
 
 Слушает:
 

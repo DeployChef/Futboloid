@@ -105,7 +105,7 @@ MonoBehaviour:
   wanderRadius: 1.5
   chaseRadius: 3
   separationRadius: 0.6
-  trackSpeed: 2.5
+  trackSpeed: 1.25
   bodyCollider: {fileID: 1864416684892860211}
   hpLabel: {fileID: 2968189813365401722}
 --- !u!1 &5333510178830016538

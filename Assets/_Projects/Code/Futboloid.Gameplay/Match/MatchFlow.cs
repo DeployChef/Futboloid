@@ -86,7 +86,7 @@ namespace Futboloid.Gameplay.Match
                 Debug.Log($"[MatchFlow] Time adjusted {deltaSeconds:+#;-#;0}s ({reason}), remaining {RemainingSeconds:F0}s");
 
             if (RemainingSeconds <= 0f)
-                EndMatch();
+                EndMatchByTime();
         }
 
         private void StartTimerLoop()
@@ -123,7 +123,7 @@ namespace Futboloid.Gameplay.Match
                     PublishTimer();
 
                     if (RemainingSeconds <= 0f)
-                        EndMatch();
+                        EndMatchByTime();
                 }
             }
             catch (System.OperationCanceledException)
@@ -137,20 +137,22 @@ namespace Futboloid.Gameplay.Match
             if (_matchEnded)
                 return;
 
-            Debug.Log("[MatchFlow] All defenders eliminated — early win.");
-            EndMatch();
+            Debug.Log("[MatchFlow] All defenders eliminated — player wins.");
+            EndMatch(playerWon: true);
         }
 
-        private void EndMatch()
+        private void EndMatch(bool playerWon)
         {
             if (_matchEnded)
                 return;
 
             _matchEnded = true;
             StopTimerLoop();
-            _bus.Publish(new MatchEndedEvent(PlayerScore, OpponentScore));
-            Debug.Log($"[MatchFlow] Match ended {PlayerScore}:{OpponentScore}");
+            _bus.Publish(new MatchEndedEvent(PlayerScore, OpponentScore, playerWon));
+            Debug.Log($"[MatchFlow] Match ended {PlayerScore}:{OpponentScore}, playerWon={playerWon}");
         }
+
+        private void EndMatchByTime() => EndMatch(playerWon: PlayerScore > OpponentScore);
 
         private void OnGoalScored(GoalScoredEvent e) => RecordGoal(e.IsPlayerGoal);
 

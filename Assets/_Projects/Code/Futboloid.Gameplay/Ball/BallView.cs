@@ -41,10 +41,11 @@ namespace Futboloid.Gameplay.Ball
             IGameEventBus bus,
             DefenderGridRegistry defenderRegistry,
             PitchStateMachine pitch,
-            MatchFlow matchFlow)
+            MatchFlow matchFlow,
+            PitchBounds pitchBounds)
         {
             _bus = bus;
-            _motion = new BallMotion(settings, bus, defenderRegistry);
+            _motion = new BallMotion(settings, bus, defenderRegistry, pitchBounds);
 
             if (kickoffAnchor == null)
                 kickoffAnchor = FindAnyObjectByType<BallKickoffAnchor>();

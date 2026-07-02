@@ -16,6 +16,8 @@ namespace Futboloid.Main.Session
 
         public TournamentRunState RunState { get; private set; } = TournamentRunState.InProgress;
 
+        public int CurrentMatchNumber => _matchesCompleted + 1;
+
         public string RoundLabel => GetRoundLabel();
         public string StatusLine => GetStatusLine();
 
@@ -32,14 +34,13 @@ namespace Futboloid.Main.Session
             RunState = TournamentRunState.InProgress;
         }
 
-        public void RecordMatchResult(int playerScore, int opponentScore)
+        public void RecordMatchResult(int playerScore, int opponentScore, bool playerWon)
         {
             _lastPlayerScore = playerScore;
             _lastOpponentScore = opponentScore;
-            var wonMatch = playerScore > opponentScore;
             _matchesCompleted++;
 
-            if (!wonMatch)
+            if (!playerWon)
                 RunState = TournamentRunState.Eliminated;
             else if (_matchesCompleted >= _matchesToWin)
                 RunState = TournamentRunState.Completed;

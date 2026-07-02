@@ -43,12 +43,19 @@ Game
 │   └── Visual
 ├── Ball
 │   └── Visual
-└── Opponents                    ← команда соперника (GDD §7)
-    ├── GoalAnchor               ← зона ворот (не юнит)
-    └── Defenders                ← экземпляры одного prefab Defender
-        ├── Defender_GK          ← role Goalkeeper
-        └── Defender_0_0         ← role Field, слоты ...
+├── Defenders                    ← команда соперника (GDD §7)
+│   ├── DefenderGridRegistry
+│   ├── GoalAnchor               ← зона ворот (не юнит)
+│   ├── DefenderSlots            ← DefenderSlotLayout, Slot_0…Slot_34 (5×7)
+│   ├── Spawned                  ← Spawn Root: инстансы от DefenderSpawner
+│   └── DefenderSpawner
+└── UI / GameplayInputHost …     ← см. Root для Canvas
 ```
+
+> [!important] Не вешать врагов руками
+> Полевые и GK **спавнятся** при `PitchResetRequestedEvent`. На сцене только слоты и `GoalAnchor`. См. [[Генерация врагов]].
+
+Старое имя `Opponents` **не** используем — корень `Defenders`.
 
 На **Game** нет: `EventSystem`, Canvas меню, `GameManager`, старый `Ball` с `Rigidbody2D`. UI — на **Root**.
 
@@ -218,7 +225,8 @@ Game
 - [ ] `BallKickoffAnchor` + стрелка
 - [ ] `BallView`, `GoalkeeperView`
 - [ ] Sorting: `Field` / `Gameplay`
-- [ ] `Opponents`: `GoalAnchor` + экземпляры prefab `Defender` (один GK, остальные Field) — см. [[Враги и защитники#Сборка сцены (чеклист)]]
+- [ ] `Defenders`: `GoalAnchor`, `DefenderSlots` (сетка), `Spawned`, `DefenderSpawner` — см. [[Генерация врагов]], [[Враги и защитники#Сборка сцены (чеклист)]]
+- [ ] Временные ручные `Defender_*` на сцене **удалены**
 - [ ] Сохранена сцена
 
 ---

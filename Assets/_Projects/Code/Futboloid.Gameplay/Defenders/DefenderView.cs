@@ -29,8 +29,9 @@ namespace Futboloid.Gameplay.Defenders
         [Tooltip("Шанс 0–100 пнуть дальше от вратаря (в противоположный угол). Иначе — ближе к вратарю.")]
         [FormerlySerializedAs("openGoalWeight")]
         [SerializeField] [Range(0, 100)] private int openGoalChancePercent = 70;
-        [Tooltip("Минимальный интервал между получением урона от мяча (сек).")]
-        [SerializeField] private float damageCooldown = 0.4f;
+        [Tooltip("Минимальный интервал между взаимодействиями с мячом: отскок и урон (сек).")]
+        [FormerlySerializedAs("damageCooldown")]
+        [SerializeField] private float interactionCooldown = 0.1f;
 
         [Header("Movement")]
         [SerializeField] private DefenderMovementType movementType = DefenderMovementType.Idle;
@@ -47,7 +48,7 @@ namespace Futboloid.Gameplay.Defenders
         [SerializeField] private Transform goalAnchor;
         [FormerlySerializedAs("paramSpeed")]
         [Tooltip("Скорость слежения по параметру t (−1…1) в секунду — насколько быстро GK едет по дуге к X мяча.")]
-        [SerializeField] private float trackSpeed = 2.5f;
+        [SerializeField] private float trackSpeed = 1.25f;
 
         [Header("Gizmos")]
         [SerializeField] private bool drawGizmos = true;
@@ -61,6 +62,7 @@ namespace Futboloid.Gameplay.Defenders
         private DefenderGridRegistry _registry;
         private DefenderLogic _logic;
         private BallView _ball;
+        private PitchBounds _pitchBounds;
         private readonly List<IDisposable> _subscriptions = new();
         private int _hp;
         private bool _isAlive = true;
@@ -74,7 +76,7 @@ namespace Futboloid.Gameplay.Defenders
         private float _runArriveThreshold = 0.08f;
         private Vector2 _runTarget;
         private Vector2 _homePosition;
-        private float _lastDamageTime = float.NegativeInfinity;
+        private float _lastInteractionTime = float.NegativeInfinity;
         private readonly List<Vector2> _neighborPositions = new();
 
         public int SlotId => slotId;
@@ -86,6 +88,37 @@ namespace Futboloid.Gameplay.Defenders
         public bool IsAlive => _isAlive;
         public bool RunningToGoal => _runningToGoal;
         public Vector2 HomePosition => _homePosition;
+
+        public void ApplySpawnSetup(in DefenderBuild build, Vector2 home, Transform anchor)
+        {
+            slotId = build.SlotId;
+            role = build.Role;
+            maxHp = build.MaxHp;
+            hitType = build.HitType;
+            movementType = build.MovementType;
+            patrolPointCount = build.PatrolPointCount;
+            patrolRadius = build.PatrolRadius;
+            wanderRadius = build.WanderRadius;
+            chaseRadius = build.ChaseRadius;
+            separationRadius = build.SeparationRadius;
+            fieldMoveSpeed = build.FieldMoveSpeed;
+            fieldAcceleration = build.FieldAcceleration;
+            fieldArriveThreshold = build.FieldArriveThreshold;
+            launchSpeed = build.LaunchSpeed;
+            openGoalChancePercent = build.OpenGoalChancePercent;
+            interactionCooldown = build.InteractionCooldown;
+
+            if (build.TrackSpeed > 0f)
+                trackSpeed = build.TrackSpeed;
+
+            goalAnchor = anchor;
+            transform.position = new Vector3(home.x, home.y, transform.position.z);
+            _homePosition = home;
+            _hp = maxHp;
+            _isAlive = true;
+            _runningToGoal = false;
+            RefreshHpLabel();
+        }
 
         private void Awake()
         {
@@ -104,12 +137,14 @@ namespace Futboloid.Gameplay.Defenders
             MatchFlow matchFlow,
             DefenderGridRegistry registry,
             DefenderLogic logic,
-            BallView ball)
+            BallView ball,
+            PitchBounds pitchBounds)
         {
             _bus = bus;
             _registry = registry;
             _logic = logic;
             _ball = ball;
+            _pitchBounds = pitchBounds;
             _subscriptions.Add(bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged));
             _subscriptions.Add(bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged));
 
@@ -157,6 +192,8 @@ namespace Futboloid.Gameplay.Defenders
 
             var ballX = ResolveBallWorldX();
             var position = _logic.TickGoalkeeperOnParabola(zone, ballX, trackSpeed, Time.deltaTime);
+            if (_pitchBounds != null)
+                position = _pitchBounds.Clamp(position);
             transform.position = new Vector3(position.x, position.y, transform.position.z);
         }
 
@@ -445,18 +482,13 @@ namespace Futboloid.Gameplay.Defenders
 
         public void HandleBallContact(BallMotion motion, RaycastHit2D hit)
         {
-            _logic.ResolveBallHit(motion, hit, this);
-            TryApplyContactDamage();
-            _bus?.Publish(new DefenderHitEvent(slotId));
-        }
-
-        private void TryApplyContactDamage()
-        {
-            if (Time.time - _lastDamageTime < damageCooldown)
+            if (Time.time - _lastInteractionTime < interactionCooldown)
                 return;
 
-            _lastDamageTime = Time.time;
+            _lastInteractionTime = Time.time;
+            _logic.ResolveBallHit(motion, hit, this);
             ApplyDamage(1);
+            _bus?.Publish(new DefenderHitEvent(slotId));
         }
 
         private void ApplyDamage(int amount)
