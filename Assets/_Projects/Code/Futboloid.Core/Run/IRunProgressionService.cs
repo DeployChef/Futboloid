@@ -16,5 +16,8 @@ namespace Futboloid.Core.Run
         void Reset();
 
         void ApplyPerkPick(string perkId);
+
+        /// <summary>Повторно отправить состояние на HUD (после инжекта виджета).</summary>
+        void NotifyHud();
     }
 }

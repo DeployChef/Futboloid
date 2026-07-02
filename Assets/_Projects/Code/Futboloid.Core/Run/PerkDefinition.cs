@@ -9,16 +9,14 @@ namespace Futboloid.Core.Run
         [SerializeField] private string displayName;
         [TextArea(2, 4)]
         [SerializeField] private string description;
-        [SerializeField] private Sprite icon;
-        [SerializeField] private PerkCardColor cardColor = PerkCardColor.Green;
+        [SerializeField] private Sprite cardFrame;
         [SerializeField] private int maxLevel = 5;
         [SerializeField] private float valuePerLevel = 1f;
 
         public string Id => id;
         public string DisplayName => displayName;
         public string Description => description;
-        public Sprite Icon => icon;
-        public PerkCardColor CardColor => cardColor;
+        public Sprite CardFrame => cardFrame;
         public int MaxLevel => Mathf.Max(1, maxLevel);
         public float ValuePerLevel => valuePerLevel;
 

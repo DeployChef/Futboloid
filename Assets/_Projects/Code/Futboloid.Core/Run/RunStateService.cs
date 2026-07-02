@@ -14,14 +14,15 @@ namespace Futboloid.Core.Run
         private readonly RunProgressionSettings _settings;
         private readonly PerkCatalog _catalog;
         private readonly Dictionary<string, int> _perkLevels = new();
+        private readonly List<string> _perkPickOrder = new();
         private readonly List<PerkDefinition> _rollBuffer = new();
+        private readonly List<RunPerkHudEntry> _perkHudBuffer = new();
         private readonly System.Random _random = new();
 
         private readonly IDisposable _hitSubscription;
         private readonly IDisposable _killSubscription;
         private readonly IDisposable _ballServedSubscription;
         private readonly IDisposable _matchEndedSubscription;
-        private readonly IDisposable _pitchResetSubscription;
 
         private bool _collectingXp;
         private int _pendingPerkPicks;
@@ -50,9 +51,8 @@ namespace Futboloid.Core.Run
             _killSubscription = bus.Subscribe<DefenderDestroyedEvent>(_ => TryAddXp(_settings.XpPerKill));
             _ballServedSubscription = bus.Subscribe<BallServedEvent>(_ => _collectingXp = true);
             _matchEndedSubscription = bus.Subscribe<MatchEndedEvent>(_ => _collectingXp = false);
-            _pitchResetSubscription = bus.Subscribe<PitchResetRequestedEvent>(_ => Reset());
 
-            PublishXpChanged();
+            PublishProgressionUpdated();
         }
 
         public int GetPerkLevel(string perkId) =>
@@ -74,13 +74,16 @@ namespace Futboloid.Core.Run
             CurrentXp = 0;
             RunLevel = 1;
             _perkLevels.Clear();
+            _perkPickOrder.Clear();
             _pendingPerkPicks = 0;
             _bonusPickActive = false;
             _collectingXp = false;
             _currentOffers = new PerkDefinition[3];
             RecalculateXpThreshold();
-            PublishXpChanged();
+            PublishProgressionUpdated();
         }
+
+        public void NotifyHud() => PublishProgressionUpdated();
 
         public void ApplyPerkPick(string perkId)
         {
@@ -98,14 +101,17 @@ namespace Futboloid.Core.Run
                 return;
 
             var newLevel = GetPerkLevel(perkId) + 1;
+            if (!_perkLevels.ContainsKey(perkId))
+                _perkPickOrder.Add(perkId);
             _perkLevels[perkId] = newLevel;
 
             _pendingPerkPicks = Mathf.Max(0, _pendingPerkPicks - 1);
             _bonusPickActive = false;
             _currentOffers = new PerkDefinition[3];
 
-            _bus.Publish(new PerkPickedEvent(perkId, newLevel, def.CardColor));
-            Debug.Log($"[RunStateService] Picked {perkId} → level {newLevel} ({def.CardColor}).");
+            _bus.Publish(new PerkPickedEvent(perkId, newLevel));
+            Debug.Log($"[RunStateService] Picked {perkId} → level {newLevel}.");
+            PublishProgressionUpdated();
 
             if (_pendingPerkPicks > 0)
                 BeginBonusPick();
@@ -117,7 +123,6 @@ namespace Futboloid.Core.Run
             _killSubscription?.Dispose();
             _ballServedSubscription?.Dispose();
             _matchEndedSubscription?.Dispose();
-            _pitchResetSubscription?.Dispose();
         }
 
         private void TryAddXp(int amount)
@@ -127,7 +132,7 @@ namespace Futboloid.Core.Run
 
             CurrentXp += amount;
             ProcessLevelUps();
-            PublishXpChanged();
+            PublishProgressionUpdated();
         }
 
         private void ProcessLevelUps()
@@ -234,10 +239,34 @@ namespace Futboloid.Core.Run
             XpFill01 = XpToNextLevel > 0 ? (float)CurrentXp / XpToNextLevel : 0f;
         }
 
-        private void PublishXpChanged()
+        private void PublishProgressionUpdated()
         {
             XpFill01 = XpToNextLevel > 0 ? (float)CurrentXp / XpToNextLevel : 0f;
-            _bus.Publish(new RunXpChangedEvent(CurrentXp, XpToNextLevel, XpFill01));
+
+            _perkHudBuffer.Clear();
+            foreach (var perkId in _perkPickOrder)
+            {
+                if (!_perkLevels.TryGetValue(perkId, out var level) || level <= 0)
+                    continue;
+
+                var def = FindPerk(perkId);
+                if (def == null)
+                    continue;
+
+                _perkHudBuffer.Add(new RunPerkHudEntry(
+                    perkId,
+                    level,
+                    def.CardFrame,
+                    def.DisplayName,
+                    def.Description));
+            }
+
+            _bus.Publish(new RunProgressionUpdatedEvent(
+                RunLevel,
+                CurrentXp,
+                XpToNextLevel,
+                XpFill01,
+                _perkHudBuffer.ToArray()));
         }
     }
 }

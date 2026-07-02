@@ -15,9 +15,6 @@ namespace Futboloid.UI.Views.BonusPick
     public class BonusPickWidget : MonoBehaviour
     {
         [SerializeField] private PerkCardView[] cards = new PerkCardView[3];
-        [SerializeField] private Sprite greenFrame;
-        [SerializeField] private Sprite yellowFrame;
-        [SerializeField] private Sprite redFrame;
 
         private readonly List<IDisposable> _subscriptions = new();
 
@@ -78,22 +75,8 @@ namespace Futboloid.UI.Views.BonusPick
                 return;
             }
 
-            card.Show(
-                perk,
-                levelAfterPick,
-                ResolveFrame(perk.CardColor),
-                perk.Icon,
-                perk.GetLevelLabel(levelAfterPick),
-                perk.Description);
+            card.Show(perk, levelAfterPick);
         }
-
-        private Sprite ResolveFrame(PerkCardColor color) =>
-            color switch
-            {
-                PerkCardColor.Yellow => yellowFrame != null ? yellowFrame : greenFrame,
-                PerkCardColor.Red => redFrame != null ? redFrame : greenFrame,
-                _ => greenFrame,
-            };
 
         private void OnCardClicked(int index)
         {
