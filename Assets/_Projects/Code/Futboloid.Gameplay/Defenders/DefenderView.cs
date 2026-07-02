@@ -61,6 +61,7 @@ namespace Futboloid.Gameplay.Defenders
         private DefenderGridRegistry _registry;
         private DefenderLogic _logic;
         private BallView _ball;
+        private PitchBounds _pitchBounds;
         private readonly List<IDisposable> _subscriptions = new();
         private int _hp;
         private bool _isAlive = true;
@@ -104,12 +105,14 @@ namespace Futboloid.Gameplay.Defenders
             MatchFlow matchFlow,
             DefenderGridRegistry registry,
             DefenderLogic logic,
-            BallView ball)
+            BallView ball,
+            PitchBounds pitchBounds)
         {
             _bus = bus;
             _registry = registry;
             _logic = logic;
             _ball = ball;
+            _pitchBounds = pitchBounds;
             _subscriptions.Add(bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged));
             _subscriptions.Add(bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged));
 
@@ -157,6 +160,8 @@ namespace Futboloid.Gameplay.Defenders
 
             var ballX = ResolveBallWorldX();
             var position = _logic.TickGoalkeeperOnParabola(zone, ballX, trackSpeed, Time.deltaTime);
+            if (_pitchBounds != null)
+                position = _pitchBounds.Clamp(position);
             transform.position = new Vector3(position.x, position.y, transform.position.z);
         }
 

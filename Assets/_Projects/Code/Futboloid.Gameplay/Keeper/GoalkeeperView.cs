@@ -20,10 +20,6 @@ namespace Futboloid.Gameplay.Keeper
         [SerializeField] private float acceleration = 40f;
         [SerializeField] private float centerX = 0f;
         [SerializeField] private float centerArriveThreshold = 0.02f;
-        [SerializeField] private float kickoffMinX = -1.5f;
-        [SerializeField] private float kickoffMaxX = 1.5f;
-        [SerializeField] private float playMinX = -4.2f;
-        [SerializeField] private float playMaxX = 4.2f;
         [SerializeField] private BallKickoffAnchor kickoffAnchor;
 
         private readonly List<IDisposable> _subscriptions = new();
@@ -34,6 +30,7 @@ namespace Futboloid.Gameplay.Keeper
         private float _velocityX;
         private IGameplayInput _input;
         private BallView _ball;
+        private PitchBounds _pitchBounds;
         private Tween _moveTween;
 
         [Inject]
@@ -42,10 +39,12 @@ namespace Futboloid.Gameplay.Keeper
             IGameplayInput input,
             PitchStateMachine pitch,
             MatchFlow matchFlow,
-            BallView ball)
+            BallView ball,
+            PitchBounds pitchBounds)
         {
             _input = input;
             _ball = ball;
+            _pitchBounds = pitchBounds;
 
             if (kickoffAnchor == null)
                 kickoffAnchor = FindAnyObjectByType<BallKickoffAnchor>();
@@ -107,7 +106,7 @@ namespace Futboloid.Gameplay.Keeper
 
         private void Update()
         {
-            if (!_onField || _reshuffleMoving)
+            if (!_onField || _reshuffleMoving || _pitchBounds == null)
                 return;
 
             switch (_phase)
@@ -125,11 +124,11 @@ namespace Futboloid.Gameplay.Keeper
                         }
                     }
 
-                    ApplyHorizontalMovement(kickoffMinX, kickoffMaxX);
+                    ApplyHorizontalMovement(_pitchBounds.KickoffMinX, _pitchBounds.KickoffMaxX);
                     break;
 
                 case PitchPhase.Simulating:
-                    ApplyHorizontalMovement(playMinX, playMaxX);
+                    ApplyHorizontalMovement(_pitchBounds.MinX, _pitchBounds.MaxX);
                     break;
             }
         }
@@ -139,7 +138,7 @@ namespace Futboloid.Gameplay.Keeper
             if (kickoffAnchor == null)
                 return;
 
-            var halfWidth = (kickoffMaxX - kickoffMinX) * 0.5f;
+            var halfWidth = _pitchBounds != null ? _pitchBounds.KickoffHalfWidth : 1.5f;
             kickoffAnchor.UpdateAimFromKeeperX(transform.position.x, halfWidth);
         }
 
@@ -153,8 +152,12 @@ namespace Futboloid.Gameplay.Keeper
 
         private void ApplyHorizontalMovement(float minX, float maxX)
         {
+            if (_pitchBounds == null)
+                return;
+
             var position = transform.position;
             position.x = Mathf.Clamp(position.x, minX, maxX);
+            position.y = Mathf.Clamp(position.y, _pitchBounds.MinY, _pitchBounds.MaxY);
 
             var moveX = ReadMoveX();
             var desiredVelocity = Mathf.Abs(moveX) < 0.001f ? 0f : moveX * speed;
@@ -162,6 +165,7 @@ namespace Futboloid.Gameplay.Keeper
 
             var previousX = position.x;
             position.x = Mathf.Clamp(position.x + _velocityX * Time.deltaTime, minX, maxX);
+            position.y = Mathf.Clamp(position.y, _pitchBounds.MinY, _pitchBounds.MaxY);
 
             if (position.x <= minX && _velocityX < 0f || position.x >= maxX && _velocityX > 0f)
                 _velocityX = 0f;

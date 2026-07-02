@@ -23,6 +23,7 @@ namespace Futboloid.Main.DI
 
             builder.RegisterComponentInScene<GameplayInputHost>(gameScene).As<IGameplayInput>();
             builder.RegisterComponentInScene<DefenderGridRegistry>(gameScene);
+            builder.RegisterComponentInScene<PitchBounds>(gameScene);
             builder.RegisterComponentInScene<BallView>(gameScene);
             builder.RegisterComponentInScene<GoalkeeperView>(gameScene);
 

@@ -2,6 +2,7 @@ using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
 using Futboloid.Gameplay.Defenders;
+using Futboloid.Gameplay.Match;
 using Futboloid.Gameplay.Physics;
 using UnityEngine;
 
@@ -12,6 +13,7 @@ namespace Futboloid.Gameplay.Ball
         private readonly BallSettings _settings;
         private readonly IGameEventBus _bus;
         private readonly DefenderGridRegistry _defenderRegistry;
+        private readonly PitchBounds _pitchBounds;
         private readonly LayerMask _goalMask;
 
         public Vector2 Position { get; private set; }
@@ -23,11 +25,16 @@ namespace Futboloid.Gameplay.Ball
 
         private IBallAnchor _holdAnchor;
 
-        public BallMotion(BallSettings settings, IGameEventBus bus, DefenderGridRegistry defenderRegistry)
+        public BallMotion(
+            BallSettings settings,
+            IGameEventBus bus,
+            DefenderGridRegistry defenderRegistry,
+            PitchBounds pitchBounds)
         {
             _settings = settings;
             _bus = bus;
             _defenderRegistry = defenderRegistry;
+            _pitchBounds = pitchBounds;
             _goalMask = PhysicsLayers.GoalMask;
         }
 
@@ -91,6 +98,20 @@ namespace Futboloid.Gameplay.Ball
                 return;
 
             Speed = Mathf.MoveTowards(Speed, _settings.BaseSpeed, _settings.Deceleration * deltaTime);
+            RecoverIfFarOutsideBounds();
+        }
+
+        private void RecoverIfFarOutsideBounds()
+        {
+            if (_pitchBounds == null)
+                return;
+
+            if (_pitchBounds.DistanceOutside(Position) < _pitchBounds.BallRecoveryOverflow)
+                return;
+
+            Position = _pitchBounds.Center;
+            Direction = ClampMinAngle(Vector2.up);
+            Speed = _settings.BaseSpeed;
         }
 
         public void ReflectFromHit(RaycastHit2D hit)
