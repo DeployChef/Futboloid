@@ -16,6 +16,8 @@ namespace Futboloid.Main.Session
 
         public TournamentRunState RunState { get; private set; } = TournamentRunState.InProgress;
 
+        public int CurrentMatchNumber => _matchesCompleted + 1;
+
         public string RoundLabel => GetRoundLabel();
         public string StatusLine => GetStatusLine();
 

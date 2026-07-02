@@ -88,6 +88,19 @@ namespace Futboloid.Gameplay.Defenders
         public bool RunningToGoal => _runningToGoal;
         public Vector2 HomePosition => _homePosition;
 
+        public void ApplySpawnSetup(int id, DefenderRole spawnRole, Vector2 home, Transform anchor)
+        {
+            slotId = id;
+            role = spawnRole;
+            goalAnchor = anchor;
+            transform.position = new Vector3(home.x, home.y, transform.position.z);
+            _homePosition = home;
+            _hp = maxHp;
+            _isAlive = true;
+            _runningToGoal = false;
+            RefreshHpLabel();
+        }
+
         private void Awake()
         {
             if (bodyCollider == null)
