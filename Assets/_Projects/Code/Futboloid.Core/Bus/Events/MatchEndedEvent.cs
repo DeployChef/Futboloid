@@ -4,11 +4,13 @@ namespace Futboloid.Core.Bus.Events
     {
         public int PlayerScore { get; }
         public int OpponentScore { get; }
+        public bool PlayerWon { get; }
 
-        public MatchEndedEvent(int playerScore, int opponentScore)
+        public MatchEndedEvent(int playerScore, int opponentScore, bool playerWon)
         {
             PlayerScore = playerScore;
             OpponentScore = opponentScore;
+            PlayerWon = playerWon;
         }
     }
 }

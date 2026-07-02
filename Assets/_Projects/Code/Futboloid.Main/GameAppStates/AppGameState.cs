@@ -38,14 +38,14 @@ namespace Futboloid.Main.GameAppStates
             SceneManager.SetActiveScene(gameScene);
 
             _gameState = new GameState(LifetimeScope);
-            await _gameState.Enter();
+            await _gameState.Enter(gameScene);
 
             LifetimeScope.Container.Resolve<MatchEndHandler>();
 
             Overlay = LifetimeScope.Container.Resolve<OverlayStateController>();
-            await Overlay.SetState(NavigationState.MainMenu);
+            await Overlay.SetState(NavigationState.OnField);
 
-            Debug.Log($"[AppGameState] '{GameScenes.Game}' ready, navigation → MainMenu.");
+            Debug.Log($"[AppGameState] '{GameScenes.Game}' ready, navigation → OnField.");
         }
 
         public async UniTask Exit()

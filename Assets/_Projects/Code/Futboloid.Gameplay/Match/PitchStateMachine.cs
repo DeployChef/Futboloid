@@ -58,7 +58,6 @@ namespace Futboloid.Gameplay.Match
         private void OnGoalScored()
         {
             EnterReshuffle();
-            CompleteReshuffle();
         }
 
         private void TransitionTo(PitchPhase phase)

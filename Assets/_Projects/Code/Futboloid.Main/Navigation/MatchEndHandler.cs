@@ -27,7 +27,7 @@ namespace Futboloid.Main.Navigation
 
         private void OnMatchEnded(MatchEndedEvent e)
         {
-            _tournamentRun.RecordMatchResult(e.PlayerScore, e.OpponentScore);
+            _tournamentRun.RecordMatchResult(e.PlayerScore, e.OpponentScore, e.PlayerWon);
             _overlay.SetState(NavigationState.Tournament).Forget();
         }
     }

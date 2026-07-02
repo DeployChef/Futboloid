@@ -19,6 +19,7 @@ namespace Futboloid.Gameplay.Match
         private CancellationTokenSource _timerCts;
         private bool _onField;
         private bool _matchEnded;
+        private bool _timerStarted;
         private float _totalDurationSeconds;
 
         public int PlayerScore { get; private set; }
@@ -26,6 +27,8 @@ namespace Futboloid.Gameplay.Match
         public float RemainingSeconds { get; private set; }
         public float NormalizedTime =>
             _totalDurationSeconds > 0f ? RemainingSeconds / _totalDurationSeconds : 0f;
+
+        public bool IsOnField => _onField;
 
         public MatchFlow(IGameEventBus bus, GameplaySettings settings)
         {
@@ -38,6 +41,7 @@ namespace Futboloid.Gameplay.Match
             _bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged);
             _bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged);
             _bus.Subscribe<MatchTimeAdjustedEvent>(OnTimeAdjusted);
+            _bus.Subscribe<BallServedEvent>(OnBallServed);
         }
 
         public void Reset()
@@ -49,6 +53,7 @@ namespace Futboloid.Gameplay.Match
             RemainingSeconds = _matchDurationSeconds;
             _totalDurationSeconds = _matchDurationSeconds;
             _matchEnded = false;
+            _timerStarted = false;
 
             PublishScore();
             PublishTimer();
@@ -81,7 +86,7 @@ namespace Futboloid.Gameplay.Match
                 Debug.Log($"[MatchFlow] Time adjusted {deltaSeconds:+#;-#;0}s ({reason}), remaining {RemainingSeconds:F0}s");
 
             if (RemainingSeconds <= 0f)
-                EndMatch();
+                EndMatchByTime();
         }
 
         private void StartTimerLoop()
@@ -118,7 +123,7 @@ namespace Futboloid.Gameplay.Match
                     PublishTimer();
 
                     if (RemainingSeconds <= 0f)
-                        EndMatch();
+                        EndMatchByTime();
                 }
             }
             catch (System.OperationCanceledException)
@@ -127,16 +132,27 @@ namespace Futboloid.Gameplay.Match
             }
         }
 
-        private void EndMatch()
+        public void EndMatchFromWipe()
+        {
+            if (_matchEnded)
+                return;
+
+            Debug.Log("[MatchFlow] All defenders eliminated — player wins.");
+            EndMatch(playerWon: true);
+        }
+
+        private void EndMatch(bool playerWon)
         {
             if (_matchEnded)
                 return;
 
             _matchEnded = true;
             StopTimerLoop();
-            _bus.Publish(new MatchEndedEvent(PlayerScore, OpponentScore));
-            Debug.Log($"[MatchFlow] Match ended {PlayerScore}:{OpponentScore}");
+            _bus.Publish(new MatchEndedEvent(PlayerScore, OpponentScore, playerWon));
+            Debug.Log($"[MatchFlow] Match ended {PlayerScore}:{OpponentScore}, playerWon={playerWon}");
         }
+
+        private void EndMatchByTime() => EndMatch(playerWon: PlayerScore > OpponentScore);
 
         private void OnGoalScored(GoalScoredEvent e) => RecordGoal(e.IsPlayerGoal);
 
@@ -148,10 +164,21 @@ namespace Futboloid.Gameplay.Match
             var wasOnField = _onField;
             _onField = e.Current == NavigationState.OnField;
 
-            if (_onField && !_matchEnded)
+            if (_onField && !_matchEnded && _timerStarted)
                 StartTimerLoop();
             else if (wasOnField)
                 StopTimerLoop();
+        }
+
+        private void OnBallServed(BallServedEvent _)
+        {
+            if (_matchEnded || _timerStarted)
+                return;
+
+            _timerStarted = true;
+
+            if (_onField)
+                StartTimerLoop();
         }
 
         private void OnPitchPhaseChanged(PitchPhaseChangedEvent e)

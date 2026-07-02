@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Futboloid.Main.DI;
-using UnityEngine;
+using UnityEngine.SceneManagement;
 using VContainer.Unity;
 
 namespace Futboloid.Main.GameAppStates
@@ -16,11 +16,12 @@ namespace Futboloid.Main.GameAppStates
             _parentLifetimeScope = parentLifetimeScope;
         }
 
-        public UniTask Enter()
+        public UniTask Enter(Scene gameScene)
         {
-            LifetimeScope = _parentLifetimeScope.CreateChild(builder => builder.RegisterGameScope());
+            LifetimeScope = _parentLifetimeScope.CreateChild(
+                builder => builder.RegisterGameScope(gameScene));
 
-            Debug.Log("[GameState] Game scope ready, scene views injected.");
+            UnityEngine.Debug.Log("[GameState] Game scope ready, scene views injected.");
             return UniTask.CompletedTask;
         }
 
@@ -32,7 +33,7 @@ namespace Futboloid.Main.GameAppStates
                 LifetimeScope = null;
             }
 
-            Debug.Log("[GameState] Game scope disposed.");
+            UnityEngine.Debug.Log("[GameState] Game scope released.");
             return UniTask.CompletedTask;
         }
     }
