@@ -15,7 +15,9 @@ tags:
 | Order | Слой | Сцена | Когда виден |
 |-------|------|-------|-------------|
 | 0 | Game world | Game | Пока загружена Game |
-| 100 | **Match HUD** | **Game** | Только во время **забега**: `OnField`, `Pause` |
+| 100 | **Match HUD** | **Game** | Таймер, счёт — `MatchHudWidget` |
+| 110 | **Run XP HUD** | **Game** | Шкала XP забега — `RunXpHudWidget` |
+| 130 | **BonusPick** | **Game** | `PitchPhase.BonusPick` — 3 карты перков |
 | 150 | **Tournament** | **Game** | `Navigation.Tournament` (после матча) |
 | 200 | Main Menu | Root | `Navigation.MainMenu` |
 | 210 | Pause | Root | `Navigation.Pause` — **только во время забега** |
@@ -81,11 +83,22 @@ uiService.Close<MainMenuWidget>();
 
 `MatchHudController` обновляет слайдер/счёт с шины; скрывает HUD только при `Tournament` (сетка перекрывает). Детали: [[MatchFlow и таймер#HUD: слайдер на сцене Game]].
 
+## BonusPick overlay (level-up в матче)
+
+На **`Game.unity`**, sorting order **130** — между Match HUD (100) и Tournament (150).
+
+| PitchPhase | BonusPick overlay |
+|------------|-------------------|
+| `BonusPick` | **Виден** — затемнение + 3 карточки |
+| Остальные | Скрыт |
+
+Показывается при `RunLevelUpEvent` / входе в `PitchPhase.BonusPick`. Матч на паузе (`timeScale = 0`). Карточки — один prefab, данные из `PerkDefinition` SO. GDD: [[../GDD/09 Карточки перков и XP#UI / сцена (делает игрок в Unity)|§9 UI]].
+
+Tween карточек при появлении — **`SetUpdate(true)`** (unscaled), т.к. игра на паузе.
+
 ## Tournament overlay (после матча)
 
 Тоже на **`Game.unity`**, не Root — часть игрового поля, как HUD.
-
-| Navigation | Tournament overlay |
 |------------|-------------------|
 | `Tournament` | **Виден** — сетка, счёт матча, кнопка **МАТЧ!** |
 | Остальное | Скрыт (`TournamentController` по `NavigationChangedEvent`) |

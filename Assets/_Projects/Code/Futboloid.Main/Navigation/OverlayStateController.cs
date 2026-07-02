@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
+using Futboloid.Core.Run;
 using Futboloid.UI;
 using UnityEngine;
 
@@ -12,6 +13,7 @@ namespace Futboloid.Main.Navigation
         private readonly IGameEventBus _bus;
         private readonly UIService _uiService;
         private readonly ITournamentRunService _tournamentRun;
+        private readonly IRunProgressionService _runProgression;
 
         private bool _initialized;
 
@@ -21,11 +23,13 @@ namespace Futboloid.Main.Navigation
         public OverlayStateController(
             IGameEventBus bus,
             UIService uiService,
-            ITournamentRunService tournamentRun)
+            ITournamentRunService tournamentRun,
+            IRunProgressionService runProgression)
         {
             _bus = bus;
             _uiService = uiService;
             _tournamentRun = tournamentRun;
+            _runProgression = runProgression;
         }
 
         public UniTask SetState(NavigationState next)
@@ -64,7 +68,10 @@ namespace Futboloid.Main.Navigation
                     if (!resumingFromPause)
                     {
                         if (newRunFromMenu || isColdStart)
+                        {
                             _tournamentRun.ResetRun();
+                            _runProgression.Reset();
+                        }
                         _bus.Publish(new PitchResetRequestedEvent());
                     }
                     else

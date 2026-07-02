@@ -1,5 +1,6 @@
 using Futboloid.Core;
 using Futboloid.Core.Bus;
+using Futboloid.Core.Run;
 using Futboloid.Gameplay.Match;
 using Futboloid.Main.Navigation;
 using Futboloid.Main.Session;
@@ -19,6 +20,13 @@ namespace Futboloid.Main.DI
                 .As<ITournamentBracketReadModel>();
             builder.Register<OverlayStateController>(Lifetime.Singleton);
             builder.Register<MatchEndHandler>(Lifetime.Singleton);
+
+            var runProgressionSettings = RunProgressionSettings.Load();
+            var perkCatalog = PerkCatalog.Load();
+            builder.RegisterInstance(runProgressionSettings);
+            builder.RegisterInstance(perkCatalog);
+            builder.Register<RunStateService>(Lifetime.Singleton)
+                .As<IRunProgressionService>();
 
             return builder;
         }

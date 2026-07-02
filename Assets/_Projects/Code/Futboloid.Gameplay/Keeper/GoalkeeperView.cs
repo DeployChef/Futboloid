@@ -4,6 +4,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Futboloid.Core;
+using Futboloid.Core.Run;
 using Futboloid.Gameplay.Ball;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
@@ -32,6 +33,7 @@ namespace Futboloid.Gameplay.Keeper
         private IGameplayInput _input;
         private BallView _ball;
         private PitchBounds _pitchBounds;
+        private IRunProgressionService _runProgression;
         private Tween _moveTween;
 
         [Inject]
@@ -41,11 +43,13 @@ namespace Futboloid.Gameplay.Keeper
             PitchStateMachine pitch,
             MatchFlow matchFlow,
             BallView ball,
-            PitchBounds pitchBounds)
+            PitchBounds pitchBounds,
+            IRunProgressionService runProgression)
         {
             _input = input;
             _ball = ball;
             _pitchBounds = pitchBounds;
+            _runProgression = runProgression;
 
             if (kickoffAnchor == null)
                 kickoffAnchor = FindAnyObjectByType<BallKickoffAnchor>();
@@ -167,8 +171,9 @@ namespace Futboloid.Gameplay.Keeper
             position.y = Mathf.Clamp(position.y, _pitchBounds.MinY, _pitchBounds.MaxY);
 
             var moveX = ReadMoveX();
-            var isMoving = Mathf.Abs(moveX) > 0.001f;
-            var desiredVelocity = isMoving ? moveX * speed : 0f;
+            var speedMultiplier = _runProgression?.GetGoalkeeperMoveSpeedMultiplier() ?? 1f;
+            var effectiveSpeed = speed * speedMultiplier;
+            var desiredVelocity = Mathf.Abs(moveX) < 0.001f ? 0f : moveX * effectiveSpeed;
             _velocityX = Mathf.MoveTowards(_velocityX, desiredVelocity, acceleration * Time.deltaTime);
 
             var previousX = position.x;

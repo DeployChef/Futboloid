@@ -17,6 +17,7 @@ namespace Futboloid.Main.DI
         {
             builder.Register<MatchFlow>(Lifetime.Singleton);
             builder.Register<PitchStateMachine>(Lifetime.Singleton);
+            builder.Register<BonusPickCoordinator>(Lifetime.Singleton);
             builder.Register<DefenderPromotionService>(Lifetime.Singleton);
             builder.Register<DefenderReshuffleService>(Lifetime.Singleton);
             builder.Register<DefenderLogic>(Lifetime.Transient);
@@ -63,6 +64,7 @@ namespace Futboloid.Main.DI
         private static void OnGameScopeBuilt(IObjectResolver resolver, Scene gameScene)
         {
             resolver.Resolve<PitchStateMachine>();
+            resolver.Resolve<BonusPickCoordinator>();
             resolver.Resolve<DefenderPromotionService>();
             resolver.Resolve<DefenderReshuffleService>();
 
