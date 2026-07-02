@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d53d49c3853547169ad3b548112e94bd, type: 3}
+  m_Name: PerkCatalog
+  m_EditorClassIdentifier: Futboloid.Core::Futboloid.Core.Run.PerkCatalog
+  perks:
+  - {fileID: 11400000, guid: 3126cfa17a1348619a09e98cf046e19a, type: 2}
+  - {fileID: 11400000, guid: 6a7b8c9d0e1f4234c5d6e7f8091a2b3c, type: 2}
+  - {fileID: 11400000, guid: 7b8c9d0e1f204345d6e7f8091a2b3c4d, type: 2}

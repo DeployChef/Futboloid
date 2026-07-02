@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Futboloid.Core;
+using Futboloid.Core.Run;
 using Futboloid.Main.DI;
 using Futboloid.Main.GameAppStates;
 using Futboloid.Main.Navigation;
@@ -43,7 +44,9 @@ namespace Futboloid.Main
                 return;
 
             var run = _appGameState.LifetimeScope.Container.Resolve<ITournamentRunService>();
+            var progression = _appGameState.LifetimeScope.Container.Resolve<IRunProgressionService>();
             run.ResetRun();
+            progression.Reset();
             _overlay.SetState(NavigationState.OnField).Forget();
         }
 
