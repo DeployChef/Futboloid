@@ -67,6 +67,7 @@ namespace Futboloid.Gameplay.Ball
             Speed = _settings.ServeSpeed;
             Direction = ClampMinAngle(Direction);
             _bus.Publish(new BallServedEvent());
+            AudioManager.Instance.PlayEvent("MatchStart");
         }
 
         public void Tick(float deltaTime)

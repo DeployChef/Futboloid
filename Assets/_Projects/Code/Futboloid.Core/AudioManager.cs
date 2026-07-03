@@ -19,8 +19,14 @@ namespace Futboloid.Core
         [Tooltip("Глобальный тумблер для Fade In / Fade Out.")]
         [SerializeField] private bool enableFade = true;
 
+        [Header("Music Pause")]
+        [Tooltip("Музыка ставится на паузу при выходе в главное меню.")]
+        [SerializeField] private bool pauseMusicOnMainMenu = true;
+
         private List<AudioClipSource> _sources = new List<AudioClipSource>();
         private Dictionary<string, AudioClipSource> _eventMap = new Dictionary<string, AudioClipSource>();
+        private AudioClipSource _musicSource;
+        private bool _musicWasPlaying;
 
         public bool EnableFade
         {
@@ -46,6 +52,11 @@ namespace Futboloid.Core
                 if (!string.IsNullOrEmpty(source.eventName))
                 {
                     _eventMap[source.eventName] = source;
+                }
+
+                if (source.eventName == "MusicStart")
+                {
+                    _musicSource = source;
                 }
             }
         }
@@ -80,6 +91,30 @@ namespace Futboloid.Core
             {
                 clipSource.Stop();
             }
+        }
+
+        /// <summary>
+        /// Ставит музыку на паузу (при выходе в главное меню).
+        /// </summary>
+        public void PauseMusic()
+        {
+            if (_musicSource == null || !_musicSource.source.isPlaying)
+                return;
+
+            _musicWasPlaying = true;
+            _musicSource.source.Pause();
+        }
+
+        /// <summary>
+        /// Возобновляет музыку (при возврате в игру).
+        /// </summary>
+        public void ResumeMusic()
+        {
+            if (_musicSource == null || !_musicWasPlaying)
+                return;
+
+            _musicWasPlaying = false;
+            _musicSource.source.Play();
         }
 
         private bool CanPlayWithPriority(AudioClipSource newSource)

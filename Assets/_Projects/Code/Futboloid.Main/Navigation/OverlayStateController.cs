@@ -40,6 +40,10 @@ namespace Futboloid.Main.Navigation
             var isColdStart = !_initialized;
             var previous = _initialized ? Current : next;
             _initialized = true;
+
+            // Сохраняем флаг ДО ApplyState, который его сбрасывает
+            var wasPausedInMenu = IsMatchPausedInMenu;
+
             Current = next;
 
             if (next == NavigationState.MainMenu)
@@ -48,6 +52,16 @@ namespace Futboloid.Main.Navigation
             ApplyState(next, previous, isColdStart);
             _uiService.ApplyNavigation(next, IsMatchPausedInMenu);
             _bus.Publish(new NavigationChangedEvent(previous, next, IsMatchPausedInMenu));
+
+            // Пауза/возобновление музыки при выходе в меню и возврате в игру
+            if (next == NavigationState.MainMenu && previous == NavigationState.OnField)
+            {
+                AudioManager.Instance?.PauseMusic();
+            }
+            else if (next == NavigationState.OnField && previous == NavigationState.MainMenu && wasPausedInMenu)
+            {
+                AudioManager.Instance?.ResumeMusic();
+            }
 
             Debug.Log($"[OverlayStateController] {previous} → {next}");
             return UniTask.CompletedTask;
