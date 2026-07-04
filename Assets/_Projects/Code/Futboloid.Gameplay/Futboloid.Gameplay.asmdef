@@ -1,0 +1,22 @@
+{
+    "name": "Futboloid.Gameplay",
+    "rootNamespace": "Futboloid.Gameplay",
+    "references": [
+        "Futboloid.Core",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro",
+        "UniTask",
+        "VContainer"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [
+        "DOTween.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

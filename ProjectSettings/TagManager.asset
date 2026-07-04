@@ -2,20 +2,24 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
-  tags: []
+  serializedVersion: 3
+  tags:
+  - GameOver
+  - Ball
+  - GoalMe
+  - GoalEnemy
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - ' '
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Wall
+  - GoalEnemy
+  - GoalPlayer
+  - Keeper
+  - Defender
   - 
   - 
   - 
@@ -41,3 +45,15 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Field
+    uniqueID: 2381144709
+    locked: 0
+  - name: Gameplay
+    uniqueID: 3117749993
+    locked: 0
+  - name: FX
+    uniqueID: 1230648873
+    locked: 0
+  m_RenderingLayers:
+  - Default
+  m_MigratedRenderPipelines: []

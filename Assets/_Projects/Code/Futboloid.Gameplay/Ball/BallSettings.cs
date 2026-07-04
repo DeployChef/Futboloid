@@ -1,0 +1,27 @@
+using System;
+using UnityEngine;
+
+namespace Futboloid.Gameplay.Ball
+{
+    [Serializable]
+    public class BallSettings
+    {
+        [SerializeField] private float radius = 0.25f;
+        [SerializeField] private float baseSpeed = 8f;
+        [SerializeField] private float serveSpeed = 10f;
+        [SerializeField] private float maxSpeed = 20f;
+        [SerializeField] private float deceleration = 3f;
+        [SerializeField] private float keeperBoost = 2f;
+        [SerializeField] private float skin = 0.02f;
+        [SerializeField] private float minVerticalComponent = 0.15f;
+
+        public float Radius => radius;
+        public float BaseSpeed => baseSpeed;
+        public float ServeSpeed => serveSpeed;
+        public float MaxSpeed => maxSpeed;
+        public float Deceleration => deceleration;
+        public float KeeperBoost => keeperBoost;
+        public float Skin => skin;
+        public float MinVerticalComponent => minVerticalComponent;
+    }
+}
