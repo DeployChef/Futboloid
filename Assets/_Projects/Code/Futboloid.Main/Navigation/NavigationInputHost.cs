@@ -57,7 +57,13 @@ namespace Futboloid.Main.Navigation
 
             if (_director.CurrentNavigation == NavigationState.OnField)
             {
-                _director.ReturnToMainMenu();
+                _director.ReturnToPause();
+                return;
+            }
+
+            if (_director.CurrentNavigation == NavigationState.Pause)
+            {
+                _director.GoOnField();
                 return;
             }
 
