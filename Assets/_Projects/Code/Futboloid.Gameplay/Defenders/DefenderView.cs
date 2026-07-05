@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
@@ -70,7 +69,6 @@ namespace Futboloid.Gameplay.Defenders
         private bool _simulating;
         private bool _warnedMissingGoalAnchor;
         private bool _runningToGoal;
-        private bool _reshuffleMoving;
         private float _runSpeed = 4f;
         private float _runAcceleration = 18f;
         private float _runArriveThreshold = 0.08f;
@@ -78,6 +76,7 @@ namespace Futboloid.Gameplay.Defenders
         private Vector2 _homePosition;
         private float _lastInteractionTime = float.NegativeInfinity;
         private readonly List<Vector2> _neighborPositions = new();
+        private readonly DefenderReshuffleMotion _reshuffle = new();
 
         public int SlotId => slotId;
         public Collider2D ContactCollider => bodyCollider != null ? bodyCollider : GetComponent<Collider2D>();
@@ -158,11 +157,9 @@ namespace Futboloid.Gameplay.Defenders
             _simulating = phase == PitchPhase.Simulating;
         }
 
-        private Tween _reshuffleTween;
-
         private void Update()
         {
-            if (!_isAlive || _reshuffleMoving)
+            if (!_isAlive || _reshuffle.IsActive)
                 return;
 
             if (_runningToGoal)
@@ -295,49 +292,15 @@ namespace Futboloid.Gameplay.Defenders
 
             var completePromotion = _runningToGoal;
             var target = completePromotion ? _runTarget : ResolveReshuffleTarget();
-            var current = (Vector2)transform.position;
-            var offset = target - current;
 
-            if (offset.sqrMagnitude <= arriveThreshold * arriveThreshold)
-            {
-                SnapTo(target);
-                if (completePromotion)
-                    CompleteRunToGoal();
-                else
-                    _bus?.Publish(new DefenderReturnedHomeEvent(slotId));
+            var arrived = await _reshuffle.PlayToAsync(
+                transform,
+                target,
+                arriveThreshold,
+                moveDuration,
+                ct);
 
-                return;
-            }
-
-            _reshuffleMoving = true;
-
-            try
-            {
-                var distance = offset.magnitude;
-                var refDistance = 4f;
-                var duration = moveDuration * (distance / refDistance);
-                duration = Mathf.Clamp(duration, 0.12f, 1.4f);
-
-                var end = new Vector3(target.x, target.y, transform.position.z);
-                _reshuffleTween = transform
-                    .DOMove(end, duration)
-                    .SetEase(Ease.InOutQuad)
-                    .SetLink(gameObject);
-
-                await TweenAsync.Await(_reshuffleTween, ct);
-
-                if (!_isAlive || ct.IsCancellationRequested)
-                    return;
-
-                SnapTo(target);
-            }
-            finally
-            {
-                _reshuffleMoving = false;
-                _reshuffleTween = null;
-            }
-
-            if (!_isAlive)
+            if (!_isAlive || !arrived)
                 return;
 
             if (completePromotion)
@@ -346,20 +309,7 @@ namespace Futboloid.Gameplay.Defenders
                 _bus?.Publish(new DefenderReturnedHomeEvent(slotId));
         }
 
-        public void KillReshuffleTween()
-        {
-            if (_reshuffleTween != null && _reshuffleTween.IsActive())
-                _reshuffleTween.Kill();
-
-            _reshuffleTween = null;
-            transform.DOKill();
-            _reshuffleMoving = false;
-        }
-
-        private void SnapTo(Vector2 target)
-        {
-            transform.position = new Vector3(target.x, target.y, transform.position.z);
-        }
+        public void KillReshuffleTween() => _reshuffle.Kill(transform);
 
         private Vector2 ResolveReshuffleTarget()
         {
