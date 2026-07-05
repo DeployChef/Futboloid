@@ -1,5 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Futboloid.Core;
+using Futboloid.Core.Bus;
+using Futboloid.Core.Bus.Events;
 using Futboloid.Core.Run;
 using Futboloid.Main.DI;
 using Futboloid.Main.GameAppStates;
@@ -38,15 +40,27 @@ namespace Futboloid.Main
         public void GoOnField() =>
             _overlay.SetState(NavigationState.OnField).Forget();
 
+        public void ReturnToPause() =>
+            _overlay.SetState(NavigationState.Pause).Forget();
+
         public void RestartTournament()
         {
             if (_appGameState?.LifetimeScope == null)
                 return;
 
-            var run = _appGameState.LifetimeScope.Container.Resolve<ITournamentRunService>();
-            var progression = _appGameState.LifetimeScope.Container.Resolve<IRunProgressionService>();
+            var container = _appGameState.LifetimeScope.Container;
+            
+            // Сбрасываем прогресс забега
+            var run = container.Resolve<ITournamentRunService>();
+            var progression = container.Resolve<IRunProgressionService>();
             run.ResetRun();
             progression.Reset();
+
+            // Явно сбрасываем поле и таймер
+            var bus = container.Resolve<IGameEventBus>();
+            bus.Publish(new PitchResetRequestedEvent());
+
+            // Переходим на поле
             _overlay.SetState(NavigationState.OnField).Forget();
         }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Futboloid.Core;
 using Futboloid.UI.Views.MainMenu;
+using Futboloid.UI.Views.PauseMenu;
 using UnityEngine;
 
 namespace Futboloid.UI
@@ -42,21 +43,22 @@ namespace Futboloid.UI
             switch (state)
             {
                 case NavigationState.MainMenu:
+                    Close<PauseMenuView>();
                     ShowMainMenu(isMatchPausedInMenu);
                     break;
 
                 case NavigationState.OnField:
                     Close<MainMenuWidget>();
-                    Close<PauseWidget>();
+                    Close<PauseMenuView>();
                     break;
 
                 case NavigationState.Tournament:
                     Close<MainMenuWidget>();
-                    Close<PauseWidget>();
+                    Close<PauseMenuView>();
                     break;
 
                 case NavigationState.Pause:
-                    Show<PauseWidget>();
+                    Show<PauseMenuView>();
                     break;
             }
         }

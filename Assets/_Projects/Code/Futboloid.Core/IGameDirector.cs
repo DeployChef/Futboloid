@@ -8,6 +8,7 @@ namespace Futboloid.Core
 
         void InitializeGame();
         void GoOnField();
+        void ReturnToPause();
         void RestartTournament();
         void ReturnToMainMenu();
         void SaveGame();
