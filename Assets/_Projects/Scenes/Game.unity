@@ -1148,6 +1148,7 @@ GameObject:
   - component: {fileID: 350005273}
   - component: {fileID: 350005275}
   - component: {fileID: 350005274}
+  - component: {fileID: 350005276}
   m_Layer: 5
   m_Name: ComboScoreText
   m_TagString: Untagged
@@ -1171,7 +1172,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 60}
+  m_AnchoredPosition: {x: -274, y: 129}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &350005274
@@ -1196,8 +1197,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: SCORE
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8c6e7cd572b211c41ad072b3666442f9, type: 2}
+  m_sharedMaterial: {fileID: -347929224489766659, guid: 8c6e7cd572b211c41ad072b3666442f9, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1221,8 +1222,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1274,6 +1275,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 350005272}
   m_CullTransparentMesh: 1
+--- !u!114 &350005276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 350005272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bbb085e3766d674191dea6fec34ad94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Effects.TmpWaveMotion
+  text: {fileID: 350005274}
+  waveAmplitude: 6
+  waveSpeed: 3
+  waveSpacing: 0.45
+  useUnscaledTime: 0
 --- !u!1 &361219380
 GameObject:
   m_ObjectHideFlags: 0
@@ -3242,6 +3260,7 @@ GameObject:
   - component: {fileID: 749094568}
   - component: {fileID: 749094570}
   - component: {fileID: 749094569}
+  - component: {fileID: 749094571}
   m_Layer: 5
   m_Name: ComboMultiplierText
   m_TagString: Untagged
@@ -3265,7 +3284,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -26}
+  m_AnchoredPosition: {x: 224, y: 125}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &749094569
@@ -3290,8 +3309,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: MULT
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8c6e7cd572b211c41ad072b3666442f9, type: 2}
+  m_sharedMaterial: {fileID: -347929224489766659, guid: 8c6e7cd572b211c41ad072b3666442f9, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3322,7 +3341,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 4
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -3368,6 +3387,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 749094567}
   m_CullTransparentMesh: 1
+--- !u!114 &749094571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 749094567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bbb085e3766d674191dea6fec34ad94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Effects.TmpWaveMotion
+  text: {fileID: 749094569}
+  waveAmplitude: 6
+  waveSpeed: 3
+  waveSpacing: 0.45
+  useUnscaledTime: 0
 --- !u!1 &751021348
 GameObject:
   m_ObjectHideFlags: 0
@@ -4482,19 +4518,19 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1362810476}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.3386558, y: 0, z: 0, w: 0.94091034}
+  m_LocalPosition: {x: 0, y: 0, z: 23}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 350005273}
   - {fileID: 749094568}
   m_Father: {fileID: 1817505864}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 39.59, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 379, y: 837}
-  m_SizeDelta: {x: -533.6147, y: -1364.1602}
+  m_AnchoredPosition: {x: 38.904, y: 662}
+  m_SizeDelta: {x: -77.807, y: -1493.2605}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1362810478
 CanvasRenderer:

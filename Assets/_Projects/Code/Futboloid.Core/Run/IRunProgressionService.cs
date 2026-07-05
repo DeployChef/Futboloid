@@ -11,6 +11,10 @@ namespace Futboloid.Core.Run
 
         float GetGoalkeeperMoveSpeedMultiplier();
 
+        int GetComboMinMultiplier();
+
+        float GetComboDecayIntervalMultiplier();
+
         int GetPerkLevel(string perkId);
 
         void Reset();

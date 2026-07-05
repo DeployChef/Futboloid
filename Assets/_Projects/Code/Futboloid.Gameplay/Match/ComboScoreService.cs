@@ -4,18 +4,20 @@ using Cysharp.Threading.Tasks;
 using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
+using Futboloid.Core.Run;
 using UnityEngine;
 
 namespace Futboloid.Gameplay.Match
 {
     /// <summary>
     /// Аркадные очки и комбо-множитель внутри сессии мяча.
-    /// Множитель растёт от ударов, со временем падает, касание вратаря снимает до −3 (мин. x1).
+    /// Множитель растёт от ударов, со временем падает, касание вратаря снимает до −3 (мин. от перков).
     /// </summary>
     public sealed class ComboScoreService : IDisposable
     {
         private readonly IGameEventBus _bus;
         private readonly ComboScoreSettings _settings;
+        private readonly IRunProgressionService _progression;
 
         private readonly IDisposable _hitSubscription;
         private readonly IDisposable _goalSubscription;
@@ -23,6 +25,7 @@ namespace Futboloid.Gameplay.Match
         private readonly IDisposable _resetSubscription;
         private readonly IDisposable _phaseSubscription;
         private readonly IDisposable _matchEndedSubscription;
+        private readonly IDisposable _perkPickedSubscription;
 
         private CancellationTokenSource _decayCts;
         private PitchPhase _phase = PitchPhase.KickoffWait;
@@ -31,11 +34,15 @@ namespace Futboloid.Gameplay.Match
         public int TotalScore { get; private set; }
         public int Multiplier { get; private set; } = 1;
 
-        public ComboScoreService(IGameEventBus bus, GameplaySettings gameplaySettings)
+        public ComboScoreService(
+            IGameEventBus bus,
+            GameplaySettings gameplaySettings,
+            IRunProgressionService progression)
         {
             _bus = bus;
             _settings = gameplaySettings.ComboScore;
-            Multiplier = _settings.MinMultiplier;
+            _progression = progression;
+            Multiplier = ResolveMinMultiplier();
 
             _hitSubscription = bus.Subscribe<DefenderHitEvent>(OnDefenderHit);
             _goalSubscription = bus.Subscribe<GoalScoredEvent>(OnGoalScored);
@@ -43,6 +50,7 @@ namespace Futboloid.Gameplay.Match
             _resetSubscription = bus.Subscribe<PitchResetRequestedEvent>(_ => Reset());
             _phaseSubscription = bus.Subscribe<PitchPhaseChangedEvent>(e => _phase = e.Phase);
             _matchEndedSubscription = bus.Subscribe<MatchEndedEvent>(_ => _matchEnded = true);
+            _perkPickedSubscription = bus.Subscribe<PerkPickedEvent>(OnPerkPicked);
 
             _decayCts = new CancellationTokenSource();
             RunDecayLoopAsync(_decayCts.Token).Forget();
@@ -52,7 +60,7 @@ namespace Futboloid.Gameplay.Match
         {
             TotalScore = 0;
             _matchEnded = false;
-            Multiplier = _settings.MinMultiplier;
+            Multiplier = ResolveMinMultiplier();
             PublishChanged(0, Multiplier);
         }
 
@@ -64,9 +72,16 @@ namespace Futboloid.Gameplay.Match
             _resetSubscription?.Dispose();
             _phaseSubscription?.Dispose();
             _matchEndedSubscription?.Dispose();
+            _perkPickedSubscription?.Dispose();
 
             _decayCts?.Cancel();
             _decayCts?.Dispose();
+        }
+
+        private void OnPerkPicked(PerkPickedEvent e)
+        {
+            if (e.PerkId == PerkIds.ComboFloor)
+                ApplyMinFloor();
         }
 
         private void OnDefenderHit(DefenderHitEvent e)
@@ -94,21 +109,37 @@ namespace Futboloid.Gameplay.Match
 
         private async UniTaskVoid RunDecayLoopAsync(CancellationToken token)
         {
-            var interval = _settings.DecayIntervalSeconds;
-
             while (!token.IsCancellationRequested)
             {
+                var interval = ResolveDecayIntervalSeconds();
                 await UniTask.Delay(TimeSpan.FromSeconds(interval), cancellationToken: token);
 
                 if (_matchEnded || _phase != PitchPhase.Simulating)
                     continue;
 
-                if (Multiplier <= _settings.MinMultiplier)
+                if (Multiplier <= ResolveMinMultiplier())
                     continue;
 
                 DecreaseMultiplier(_settings.DecayStep);
             }
         }
+
+        private void ApplyMinFloor()
+        {
+            var min = ResolveMinMultiplier();
+            if (Multiplier >= min)
+                return;
+
+            var previous = Multiplier;
+            Multiplier = min;
+            PublishChanged(0, previous);
+        }
+
+        private int ResolveMinMultiplier() =>
+            Mathf.Max(_settings.MinMultiplier, _progression.GetComboMinMultiplier());
+
+        private float ResolveDecayIntervalSeconds() =>
+            _settings.DecayIntervalSeconds * _progression.GetComboDecayIntervalMultiplier();
 
         private void AddPoints(int delta)
         {
@@ -136,11 +167,12 @@ namespace Futboloid.Gameplay.Match
 
         private void DecreaseMultiplier(int amount)
         {
-            if (amount <= 0 || Multiplier <= _settings.MinMultiplier)
+            var min = ResolveMinMultiplier();
+            if (amount <= 0 || Multiplier <= min)
                 return;
 
             var previous = Multiplier;
-            Multiplier = Mathf.Max(_settings.MinMultiplier, Multiplier - amount);
+            Multiplier = Mathf.Max(min, Multiplier - amount);
 
             if (Multiplier != previous)
                 PublishChanged(0, previous);

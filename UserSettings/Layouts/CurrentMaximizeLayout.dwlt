@@ -24,7 +24,7 @@ MonoBehaviour:
   m_MinSize: {x: 500, y: 112}
   m_MaxSize: {x: 40480, y: 16192}
   vertical: 0
-  controlID: 11844
+  controlID: 17914
   draggingID: 0
 --- !u!114 &2
 MonoBehaviour:
@@ -153,7 +153,7 @@ MonoBehaviour:
   m_MinSize: {x: 400, y: 112}
   m_MaxSize: {x: 32384, y: 16192}
   vertical: 1
-  controlID: 11845
+  controlID: 17915
   draggingID: 0
 --- !u!114 &4
 MonoBehaviour:
@@ -181,7 +181,7 @@ MonoBehaviour:
   m_MinSize: {x: 400, y: 56}
   m_MaxSize: {x: 32384, y: 8096}
   vertical: 0
-  controlID: 11846
+  controlID: 17916
   draggingID: 0
 --- !u!114 &5
 MonoBehaviour:
@@ -251,9 +251,9 @@ MonoBehaviour:
     m_TreeViewState:
       scrollPos: {x: 0, y: 28}
       m_SelectedIDs:
-      - m_Data: -71372
+      - m_Data: -71534
       m_LastClickedID:
-        m_Data: -71372
+        m_Data: -71534
       m_ExpandedIDs:
       - m_Data: -71534
       - m_Data: -71372
@@ -916,9 +916,9 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
-    m_Target: {x: 619.7436, y: 1159.2919, z: -5.965507}
+    m_Target: {x: 520.9718, y: 1386.059, z: -3.2041736}
     speed: 2
-    m_Value: {x: 619.7436, y: 1159.2919, z: -5.965507}
+    m_Value: {x: 520.9718, y: 1386.059, z: -3.2041736}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 2
@@ -969,9 +969,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 688.5351
+    m_Target: 412.40338
     speed: 2
-    m_Value: 688.5351
+    m_Value: 412.40338
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -1179,7 +1179,7 @@ MonoBehaviour:
     m_IsLocked: 0
   m_LastLocalAssetsSearchArea: 1
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 300}
+    scrollPos: {x: 0, y: 315}
     m_SelectedIDs:
     - m_Data: 95372
     m_LastClickedID:
@@ -1284,9 +1284,9 @@ MonoBehaviour:
       m_ResourceFile: 
   m_ListAreaState:
     m_SelectedInstanceIDs:
-    - m_Data: -71372
+    - m_Data: -71534
     m_LastClickedEntityId:
-      m_Data: -71372
+      m_Data: -71534
     m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs:
     - m_Data: -99400
@@ -1551,8 +1551,8 @@ MonoBehaviour:
     y: 515
     width: 1433
     height: 418
-  m_MinSize: {x: 101, y: 126}
-  m_MaxSize: {x: 4001, y: 4026}
+  m_MinSize: {x: 100, y: 100}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 18}
   m_Panes:
   - {fileID: 15}
