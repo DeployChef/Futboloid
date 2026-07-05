@@ -77,9 +77,10 @@ namespace Futboloid.Main.Navigation
 
                 case NavigationState.OnField:
                     Time.timeScale = 1f;
-                    var resumingFromPause = previous == NavigationState.MainMenu && IsMatchPausedInMenu;
+                    var resumingFromPause = previous == NavigationState.Pause;
+                    var resumingFromMenu = previous == NavigationState.MainMenu && IsMatchPausedInMenu;
                     var newRunFromMenu = previous == NavigationState.MainMenu && !IsMatchPausedInMenu;
-                    if (!resumingFromPause)
+                    if (!resumingFromPause && !resumingFromMenu)
                     {
                         if (newRunFromMenu || isColdStart)
                         {
@@ -88,7 +89,7 @@ namespace Futboloid.Main.Navigation
                         }
                         _bus.Publish(new PitchResetRequestedEvent());
                     }
-                    else
+                    else if (resumingFromMenu)
                         IsMatchPausedInMenu = false;
                     break;
 

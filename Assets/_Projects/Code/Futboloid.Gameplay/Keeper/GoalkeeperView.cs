@@ -22,6 +22,7 @@ namespace Futboloid.Gameplay.Keeper
         [SerializeField] private float centerX = 0f;
         [SerializeField] private float centerArriveThreshold = 0.02f;
         [SerializeField] private BallKickoffAnchor kickoffAnchor;
+        [SerializeField] private Animator animator;
 
         private readonly List<IDisposable> _subscriptions = new();
 
@@ -108,6 +109,12 @@ namespace Futboloid.Gameplay.Keeper
             _reshuffleMoving = false;
         }
 
+        private void Start()
+        {
+            if (animator == null)
+                animator = GetComponent<Animator>();
+        }
+
         private void Update()
         {
             if (!_onField || _reshuffleMoving || _pitchBounds == null)
@@ -179,6 +186,12 @@ namespace Futboloid.Gameplay.Keeper
                 _velocityX = 0f;
 
             transform.position = position;
+
+            if (animator != null)
+            {
+                var isMoving = Mathf.Abs(_velocityX) > 0.001f;
+                animator.SetBool("Run", isMoving);
+            }
         }
 
         private float ReadMoveX() => _input?.MoveX ?? 0f;
