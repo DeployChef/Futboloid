@@ -37,7 +37,8 @@ namespace Futboloid.Gameplay.Defenders
                 SeparationRadius = 0.6f,
                 FieldMoveSpeed = 1.6f,
                 FieldAcceleration = 12f,
-                FieldArriveThreshold = 0.12f
+                FieldArriveThreshold = 0.12f,
+                PointValue = settings.GkPointValue
             };
 
             if (matchNumber <= 1)

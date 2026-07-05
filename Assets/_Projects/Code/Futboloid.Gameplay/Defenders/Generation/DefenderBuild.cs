@@ -22,5 +22,6 @@ namespace Futboloid.Gameplay.Defenders
         public int OpenGoalChancePercent;
         public float InteractionCooldown;
         public float TrackSpeed;
+        public int PointValue;
     }
 }
