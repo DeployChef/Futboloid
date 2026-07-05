@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Futboloid.Core;
@@ -10,22 +11,15 @@ using UnityEngine;
 namespace Futboloid.Gameplay.Match
 {
     /// <summary>
-    /// Аркадные очки и комбо-множитель внутри сессии мяча.
-    /// Множитель растёт от ударов, со временем падает, касание вратаря снимает до −3 (мин. от перков).
+    /// Аркадные очки (на весь забег) и комбо-множитель (на матч).
     /// </summary>
     public sealed class ComboScoreService : IDisposable
     {
         private readonly IGameEventBus _bus;
         private readonly ComboScoreSettings _settings;
         private readonly IRunProgressionService _progression;
-
-        private readonly IDisposable _hitSubscription;
-        private readonly IDisposable _goalSubscription;
-        private readonly IDisposable _keeperSubscription;
-        private readonly IDisposable _resetSubscription;
-        private readonly IDisposable _phaseSubscription;
-        private readonly IDisposable _matchEndedSubscription;
-        private readonly IDisposable _perkPickedSubscription;
+        private readonly ITournamentBracketReadModel _tournament;
+        private readonly List<IDisposable> _subscriptions = new();
 
         private CancellationTokenSource _decayCts;
         private PitchPhase _phase = PitchPhase.KickoffWait;
@@ -37,45 +31,47 @@ namespace Futboloid.Gameplay.Match
         public ComboScoreService(
             IGameEventBus bus,
             GameplaySettings gameplaySettings,
-            IRunProgressionService progression)
+            IRunProgressionService progression,
+            ITournamentBracketReadModel tournament)
         {
             _bus = bus;
             _settings = gameplaySettings.ComboScore;
             _progression = progression;
+            _tournament = tournament;
             Multiplier = ResolveMinMultiplier();
 
-            _hitSubscription = bus.Subscribe<DefenderHitEvent>(OnDefenderHit);
-            _goalSubscription = bus.Subscribe<GoalScoredEvent>(OnGoalScored);
-            _keeperSubscription = bus.Subscribe<BallReturnedToKeeperEvent>(OnBallReturnedToKeeper);
-            _resetSubscription = bus.Subscribe<PitchResetRequestedEvent>(_ => Reset());
-            _phaseSubscription = bus.Subscribe<PitchPhaseChangedEvent>(e => _phase = e.Phase);
-            _matchEndedSubscription = bus.Subscribe<MatchEndedEvent>(_ => _matchEnded = true);
-            _perkPickedSubscription = bus.Subscribe<PerkPickedEvent>(OnPerkPicked);
+            _subscriptions.Add(bus.Subscribe<DefenderHitEvent>(OnDefenderHit));
+            _subscriptions.Add(bus.Subscribe<GoalScoredEvent>(OnGoalScored));
+            _subscriptions.Add(bus.Subscribe<BallReturnedToKeeperEvent>(OnBallReturnedToKeeper));
+            _subscriptions.Add(bus.Subscribe<PitchResetRequestedEvent>(OnPitchReset));
+            _subscriptions.Add(bus.Subscribe<PitchPhaseChangedEvent>(e => _phase = e.Phase));
+            _subscriptions.Add(bus.Subscribe<MatchEndedEvent>(_ => _matchEnded = true));
+            _subscriptions.Add(bus.Subscribe<PerkPickedEvent>(OnPerkPicked));
 
             _decayCts = new CancellationTokenSource();
             RunDecayLoopAsync(_decayCts.Token).Forget();
         }
 
-        public void Reset()
-        {
-            TotalScore = 0;
-            _matchEnded = false;
-            Multiplier = ResolveMinMultiplier();
-            PublishChanged(0, Multiplier);
-        }
-
         public void Dispose()
         {
-            _hitSubscription?.Dispose();
-            _goalSubscription?.Dispose();
-            _keeperSubscription?.Dispose();
-            _resetSubscription?.Dispose();
-            _phaseSubscription?.Dispose();
-            _matchEndedSubscription?.Dispose();
-            _perkPickedSubscription?.Dispose();
+            foreach (var subscription in _subscriptions)
+                subscription.Dispose();
+
+            _subscriptions.Clear();
 
             _decayCts?.Cancel();
             _decayCts?.Dispose();
+        }
+
+        private void OnPitchReset(PitchResetRequestedEvent _)
+        {
+            if (_tournament.CurrentMatchNumber == 1)
+                TotalScore = 0;
+
+            _matchEnded = false;
+            var previous = Multiplier;
+            Multiplier = ResolveMinMultiplier();
+            PublishChanged(0, previous);
         }
 
         private void OnPerkPicked(PerkPickedEvent e)
