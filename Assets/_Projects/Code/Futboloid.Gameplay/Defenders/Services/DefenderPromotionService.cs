@@ -13,15 +13,21 @@ namespace Futboloid.Gameplay.Defenders
         private readonly IGameEventBus _bus;
         private readonly DefenderGridRegistry _registry;
         private readonly GoalAnchor _goalAnchor;
+        private readonly DefenderMatchSettings _matchSettings;
         private readonly List<IDisposable> _subscriptions = new();
 
         private DefenderView _activeCandidate;
 
-        public DefenderPromotionService(IGameEventBus bus, DefenderGridRegistry registry, GoalAnchor goalAnchor)
+        public DefenderPromotionService(
+            IGameEventBus bus,
+            DefenderGridRegistry registry,
+            GoalAnchor goalAnchor,
+            DefenderMatchSettings matchSettings)
         {
             _bus = bus;
             _registry = registry;
             _goalAnchor = goalAnchor;
+            _matchSettings = matchSettings;
             _subscriptions.Add(bus.Subscribe<DefenderDestroyedEvent>(OnDefenderDestroyed));
             _subscriptions.Add(bus.Subscribe<DefenderPromotionCompletedEvent>(OnPromotionCompleted));
         }
@@ -64,9 +70,9 @@ namespace Futboloid.Gameplay.Defenders
 
             _activeCandidate = candidate;
             candidate.BeginRunToGoal(
-                _registry.RunToGoalSpeed,
-                _registry.RunToGoalAcceleration,
-                _registry.ArriveThreshold);
+                _matchSettings.RunToGoalSpeed,
+                _matchSettings.RunToGoalAcceleration,
+                _matchSettings.ArriveThreshold);
             _bus.Publish(new DefenderPromotionStartedEvent(candidate.SlotId));
             Debug.Log($"[DefenderPromotionService] Slot {candidate.SlotId} running to goal.");
         }

@@ -86,7 +86,10 @@ public static class AppScopeExtensions
 {
     public static IContainerBuilder RegisterAppScope(this IContainerBuilder builder)
     {
-        builder.RegisterInstance(GameplaySettings.Load());
+        var gameplaySettings = GameplaySettings.Load();
+        builder.RegisterInstance(gameplaySettings);
+        builder.RegisterInstance(gameplaySettings.DefenderGeneration);
+        builder.RegisterInstance(gameplaySettings.DefenderMatch);
         builder.Register<PauseCoordinator>(Lifetime.Singleton);
         builder.Register<IGameEventBus, GameEventBus>(Lifetime.Singleton);
         builder.Register<TournamentRunService>(Lifetime.Singleton)
@@ -114,7 +117,10 @@ public static class GameScopeExtensions
         builder.Register<MatchFlow>(Lifetime.Singleton);
         builder.Register<PitchStateMachine>(Lifetime.Singleton);
         builder.Register<BonusPickCoordinator>(Lifetime.Singleton);
+        builder.RegisterComponentInScene<GoalAnchor>(gameScene);
         builder.RegisterComponentInScene<BallView>(gameScene);
+        builder.RegisterComponentInScene<GoalkeeperView>(gameScene);
+        builder.RegisterComponentInScene<DefenderGridRegistry>(gameScene);
         // … RegisterBuildCallback → InjectGameObject на всех root GO сцены
         return builder;
     }
