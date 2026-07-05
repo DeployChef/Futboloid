@@ -2,8 +2,8 @@ using System;
 using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
+using Futboloid.Core.Pause;
 using Futboloid.Core.Run;
-using UnityEngine;
 
 namespace Futboloid.Gameplay.Match
 {
@@ -16,6 +16,7 @@ namespace Futboloid.Gameplay.Match
         private readonly PitchStateMachine _pitch;
         private readonly IRunProgressionService _run;
         private readonly MatchFlow _matchFlow;
+        private readonly PauseCoordinator _pause;
 
         private readonly IDisposable _offeredSubscription;
         private readonly IDisposable _pickedSubscription;
@@ -26,12 +27,14 @@ namespace Futboloid.Gameplay.Match
             IGameEventBus bus,
             PitchStateMachine pitch,
             IRunProgressionService run,
-            MatchFlow matchFlow)
+            MatchFlow matchFlow,
+            PauseCoordinator pause)
         {
             _bus = bus;
             _pitch = pitch;
             _run = run;
             _matchFlow = matchFlow;
+            _pause = pause;
 
             _offeredSubscription = bus.Subscribe<BonusPickOfferedEvent>(OnBonusPickOffered);
             _pickedSubscription = bus.Subscribe<PerkPickedEvent>(OnPerkPicked);
@@ -43,7 +46,7 @@ namespace Futboloid.Gameplay.Match
             _pickedSubscription?.Dispose();
 
             if (_pausedForBonusPick)
-                ResumeTimeScale();
+                ReleaseBonusPickPause();
         }
 
         private void OnBonusPickOffered(BonusPickOfferedEvent e)
@@ -64,7 +67,7 @@ namespace Futboloid.Gameplay.Match
             if (_run.PendingPerkPicks > 0 || _run.IsBonusPickActive)
                 return;
 
-            ResumeTimeScale();
+            ReleaseBonusPickPause();
 
             if (_matchFlow.TryCompleteWipeVictory(_run))
                 return;
@@ -79,16 +82,16 @@ namespace Futboloid.Gameplay.Match
                 return;
 
             _pausedForBonusPick = true;
-            Time.timeScale = 0f;
+            _pause.Request(PauseReasons.BonusPick);
         }
 
-        private void ResumeTimeScale()
+        private void ReleaseBonusPickPause()
         {
             if (!_pausedForBonusPick)
                 return;
 
             _pausedForBonusPick = false;
-            Time.timeScale = 1f;
+            _pause.Release(PauseReasons.BonusPick);
         }
     }
 }

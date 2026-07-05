@@ -1,6 +1,7 @@
 using Futboloid.Core;
 using Futboloid.Core.Audio;
 using Futboloid.Core.Bus;
+using Futboloid.Core.Pause;
 using Futboloid.Core.Run;
 using Futboloid.Gameplay.Match;
 using Futboloid.Main.Navigation;
@@ -15,6 +16,7 @@ namespace Futboloid.Main.DI
             var gameplaySettings = GameplaySettings.Load();
             builder.RegisterInstance(gameplaySettings);
             builder.RegisterInstance(gameplaySettings.DefenderGeneration);
+            builder.Register<PauseCoordinator>(Lifetime.Singleton);
             builder.Register<IGameEventBus, GameEventBus>(Lifetime.Singleton);
             builder.Register<TournamentRunService>(Lifetime.Singleton)
                 .As<ITournamentRunService>()
