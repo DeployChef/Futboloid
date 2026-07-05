@@ -247,3 +247,4 @@ builder
 | `AppGameState.Exit` | Dispose, unload scene |
 | Restart турнира | `AppGameState.Exit` → `Enter` |
 | Restart матча | `PitchResetRequestedEvent` / `PitchStateMachine.Reset()` |
+

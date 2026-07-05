@@ -1,0 +1,248 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c4a8b9e1d2f3045a6b7c8d9e0f1a2b3, type: 3}
+  m_Name: AudioCatalog
+  m_EditorClassIdentifier: Futboloid.Core::Futboloid.Core.Audio.AudioCatalog
+  sounds:
+  - id: BallHit
+    channel: 1
+    clips:
+    - {fileID: 8300000, guid: d7c20de5c165df94e8be8f7094335dfc, type: 3}
+    - {fileID: 8300000, guid: 215ed26d072f07f4cb223ae9e74c5a62, type: 3}
+    - {fileID: 8300000, guid: ab4d77af66171f44aab033f938cc8d15, type: 3}
+    - {fileID: 8300000, guid: 9e51209e1986b094ba726a74a4a2b8c9, type: 3}
+    - {fileID: 8300000, guid: 167df36e6db7c714491566e35c7b77cd, type: 3}
+    - {fileID: 8300000, guid: 87d22419712f2b84f8746b2a94209cbe, type: 3}
+    - {fileID: 8300000, guid: 6b6a61313cd6dbf42849866d4245fef4, type: 3}
+    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 80
+    allowOverlap: 1
+    cooldown: 0.2
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: GoalScored
+    channel: 1
+    clips:
+    - {fileID: 8300000, guid: 5c13728525640584bb0ece5d2f03a27d, type: 3}
+    - {fileID: 8300000, guid: 8d8861d0d9db7f4468ee2f05172a0ba9, type: 3}
+    - {fileID: 8300000, guid: 7fd47098a9cdb3e4e86533739e6af415, type: 3}
+    mixerGroup: {fileID: -1377188511162530804, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 0
+    allowOverlap: 0
+    cooldown: 1
+    loop: 0
+    enableFade: 1
+    fadeDuration: 0.3
+  - id: GoalConceded
+    channel: 1
+    clips:
+    - {fileID: 8300000, guid: 5c13728525640584bb0ece5d2f03a27d, type: 3}
+    - {fileID: 8300000, guid: 8d8861d0d9db7f4468ee2f05172a0ba9, type: 3}
+    - {fileID: 8300000, guid: 7fd47098a9cdb3e4e86533739e6af415, type: 3}
+    mixerGroup: {fileID: -1377188511162530804, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 0
+    allowOverlap: 0
+    cooldown: 1
+    loop: 0
+    enableFade: 1
+    fadeDuration: 0.3
+  - id: MatchStart
+    channel: 1
+    clips:
+    - {fileID: 8300000, guid: 8968d6703357f8846b756aed16464207, type: 3}
+    - {fileID: 8300000, guid: d958ec5dfab0ad94cb7c038cad22750f, type: 3}
+    - {fileID: 8300000, guid: 1b04d98808bf93a44a9d493d5af39c55, type: 3}
+    mixerGroup: {fileID: -3873310943506016352, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 5
+    allowOverlap: 0
+    cooldown: 0.5
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: MatchEnd
+    channel: 1
+    clips:
+    - {fileID: 8300000, guid: 8968d6703357f8846b756aed16464207, type: 3}
+    - {fileID: 8300000, guid: d958ec5dfab0ad94cb7c038cad22750f, type: 3}
+    mixerGroup: {fileID: -3873310943506016352, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 5
+    allowOverlap: 0
+    cooldown: 0.5
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: MusicMatch
+    channel: 0
+    clips:
+    - {fileID: 8300000, guid: e6dc21bc676df284f8dbeae66f3c33bd, type: 3}
+    - {fileID: 8300000, guid: 785b11e2cdf26fc4db2d01072fa26cde, type: 3}
+    - {fileID: 8300000, guid: 08a62c6072d6a374b931a86236ccdaa3, type: 3}
+    mixerGroup: {fileID: 6570628444785268977, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 0
+    allowOverlap: 0
+    cooldown: 0
+    loop: 1
+    enableFade: 1
+    fadeDuration: 1.5
+  - id: PerkPick
+    channel: 1
+    clips:
+    - {fileID: 8300000, guid: 5c13728525640584bb0ece5d2f03a27d, type: 3}
+    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 10
+    allowOverlap: 0
+    cooldown: 0.5
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: DefenderHit
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 70
+    allowOverlap: 1
+    cooldown: 0.15
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: DefenderDestroyed
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 60
+    allowOverlap: 0
+    cooldown: 0.3
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: PromotionStarted
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 50
+    allowOverlap: 0
+    cooldown: 0.5
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: PromotionCompleted
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 50
+    allowOverlap: 0
+    cooldown: 0.5
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: DefenderReturned
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 55
+    allowOverlap: 1
+    cooldown: 0.2
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: DefenderRoleChanged
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 45
+    allowOverlap: 0
+    cooldown: 1
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: BonusPickOpen
+    channel: 2
+    clips: []
+    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 20
+    allowOverlap: 0
+    cooldown: 0.5
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: LevelUp
+    channel: 2
+    clips: []
+    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 15
+    allowOverlap: 0
+    cooldown: 1
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: ReshuffleStart
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 40
+    allowOverlap: 0
+    cooldown: 1
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: TimeBonus
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: -3873310943506016352, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 30
+    allowOverlap: 0
+    cooldown: 0.5
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: TimePenalty
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: -3873310943506016352, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 30
+    allowOverlap: 0
+    cooldown: 0.5
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: UiMenuOpen
+    channel: 2
+    clips: []
+    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 25
+    allowOverlap: 0
+    cooldown: 0.3
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: UiPauseOpen
+    channel: 2
+    clips: []
+    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 25
+    allowOverlap: 0
+    cooldown: 0.3
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: UiTournamentOpen
+    channel: 2
+    clips: []
+    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 25
+    allowOverlap: 0
+    cooldown: 0.3
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  maxSfxVoices: 8
