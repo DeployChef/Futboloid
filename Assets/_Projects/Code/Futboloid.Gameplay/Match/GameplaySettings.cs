@@ -14,6 +14,7 @@ namespace Futboloid.Gameplay.Match
         [SerializeField] private int matchesToWin = DefaultMatchesToWin;
         [SerializeField] private DefenderGenerationSettings defenderGeneration;
         [SerializeField] private DefenderMatchSettings defenderMatch;
+        [SerializeField] private ComboScoreSettings comboScore = new();
 
         public float MatchDurationSeconds => Mathf.Max(1f, matchDurationSeconds);
         public int MatchesToWin => Mathf.Max(1, matchesToWin);
@@ -25,6 +26,7 @@ namespace Futboloid.Gameplay.Match
             defenderMatch != null
                 ? defenderMatch
                 : DefenderMatchSettings.Load();
+        public ComboScoreSettings ComboScore => comboScore ??= new ComboScoreSettings();
 
         public static GameplaySettings Load()
         {

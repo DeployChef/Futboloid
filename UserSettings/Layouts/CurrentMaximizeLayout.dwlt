@@ -24,7 +24,7 @@ MonoBehaviour:
   m_MinSize: {x: 500, y: 112}
   m_MaxSize: {x: 40480, y: 16192}
   vertical: 0
-  controlID: 7089
+  controlID: 11844
   draggingID: 0
 --- !u!114 &2
 MonoBehaviour:
@@ -153,7 +153,7 @@ MonoBehaviour:
   m_MinSize: {x: 400, y: 112}
   m_MaxSize: {x: 32384, y: 16192}
   vertical: 1
-  controlID: 7090
+  controlID: 11845
   draggingID: 0
 --- !u!114 &4
 MonoBehaviour:
@@ -181,7 +181,7 @@ MonoBehaviour:
   m_MinSize: {x: 400, y: 56}
   m_MaxSize: {x: 32384, y: 8096}
   vertical: 0
-  controlID: 7091
+  controlID: 11846
   draggingID: 0
 --- !u!114 &5
 MonoBehaviour:
@@ -249,12 +249,14 @@ MonoBehaviour:
     m_DynamicPanelBehavior: 0
   m_SceneHierarchy:
     m_TreeViewState:
-      scrollPos: {x: 0, y: 0}
+      scrollPos: {x: 0, y: 28}
       m_SelectedIDs:
-      - m_Data: 51508
+      - m_Data: -71372
       m_LastClickedID:
-        m_Data: 0
+        m_Data: -71372
       m_ExpandedIDs:
+      - m_Data: -71534
+      - m_Data: -71372
       - m_Data: -1344
       - m_Data: -1342
       - m_Data: -12
@@ -262,8 +264,10 @@ MonoBehaviour:
       - m_Data: 53974
       - m_Data: 54044
       - m_Data: 60462
+      - m_Data: 76586
       - m_Data: 76662
       - m_Data: 76822
+      - m_Data: 77076
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -912,9 +916,9 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
-    m_Target: {x: -0.7141304, y: -0.31976497, z: 0.8566801}
+    m_Target: {x: 619.7436, y: 1159.2919, z: -5.965507}
     speed: 2
-    m_Value: {x: -0.7141304, y: -0.31976497, z: 0.8566801}
+    m_Value: {x: 619.7436, y: 1159.2919, z: -5.965507}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 2
@@ -965,9 +969,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 6.3158627
+    m_Target: 688.5351
     speed: 2
-    m_Value: 6.3158627
+    m_Value: 688.5351
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -1158,7 +1162,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/_Projects/Resources/Data/Settings
+    - Assets/_Projects/Code/Futboloid.UI/Views/ComboScore
     m_Globs: []
     m_ProductIds: 
     m_AnyWithAssetOrigin: 0
@@ -1168,18 +1172,18 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 96
   m_LastFolders:
-  - Assets/_Projects/Resources/Data/Settings
+  - Assets/_Projects/Code/Futboloid.UI/Views/ComboScore
   m_LastFoldersGridSize: 96
   m_LastProjectPath: F:\Unity\Futboloid
   m_LockTracker:
     m_IsLocked: 0
   m_LastLocalAssetsSearchArea: 1
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 207}
+    scrollPos: {x: 0, y: 300}
     m_SelectedIDs:
-    - m_Data: 53454
+    - m_Data: 95372
     m_LastClickedID:
-      m_Data: 53454
+      m_Data: 95372
     m_ExpandedIDs:
     - m_Data: 0
     - m_Data: 53224
@@ -1187,6 +1191,7 @@ MonoBehaviour:
     - m_Data: 53228
     - m_Data: 53230
     - m_Data: 53232
+    - m_Data: 53234
     - m_Data: 53236
     - m_Data: 53238
     - m_Data: 53240
@@ -1239,6 +1244,7 @@ MonoBehaviour:
     - m_Data: 53230
     - m_Data: 53232
     - m_Data: 53236
+    - m_Data: 53238
     - m_Data: 53240
     - m_Data: 53242
     - m_Data: 53244
@@ -1278,10 +1284,10 @@ MonoBehaviour:
       m_ResourceFile: 
   m_ListAreaState:
     m_SelectedInstanceIDs:
-    - m_Data: 51508
+    - m_Data: -71372
     m_LastClickedEntityId:
-      m_Data: 51508
-    m_HadKeyboardFocusLastEvent: 1
+      m_Data: -71372
+    m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs:
     - m_Data: -99400
     - m_Data: 82040
@@ -1331,7 +1337,7 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
     m_NewAssetIndexInList: -1
-    m_ScrollPosition: {x: 0, y: 204}
+    m_ScrollPosition: {x: 0, y: 0}
     m_GridSize: 96
   m_SkipHiddenPackages: 0
   m_DirectoriesAreaWidth: 308

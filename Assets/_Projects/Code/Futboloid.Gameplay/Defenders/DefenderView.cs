@@ -31,6 +31,7 @@ namespace Futboloid.Gameplay.Defenders
         [Tooltip("Минимальный интервал между взаимодействиями с мячом: отскок и урон (сек).")]
         [FormerlySerializedAs("damageCooldown")]
         [SerializeField] private float interactionCooldown = 0.1f;
+        [SerializeField] private int pointValue = 10;
 
         [Header("Movement")]
         [SerializeField] private DefenderMovementType movementType = DefenderMovementType.Idle;
@@ -69,6 +70,7 @@ namespace Futboloid.Gameplay.Defenders
         private readonly DefenderReshuffleMotion _reshuffle = new();
 
         public int SlotId => slotId;
+        public int PointValue => pointValue;
         public Collider2D ContactCollider => bodyCollider;
         public DefenderRole Role => role;
         public DefenderHitType HitType => hitType;
@@ -101,6 +103,7 @@ namespace Futboloid.Gameplay.Defenders
             launchSpeed = build.LaunchSpeed;
             openGoalChancePercent = build.OpenGoalChancePercent;
             interactionCooldown = build.InteractionCooldown;
+            pointValue = Mathf.Max(1, build.PointValue);
 
             if (build.TrackSpeed > 0f)
                 trackSpeed = build.TrackSpeed;
@@ -421,7 +424,7 @@ namespace Futboloid.Gameplay.Defenders
             _lastInteractionTime = Time.time;
             _logic.ResolveBallHit(motion, hit, this);
             health.ApplyDamage(1, slotId, transform.position);
-            _bus?.Publish(new DefenderHitEvent(slotId));
+            _bus?.Publish(new DefenderHitEvent(slotId, pointValue));
         }
     }
 }

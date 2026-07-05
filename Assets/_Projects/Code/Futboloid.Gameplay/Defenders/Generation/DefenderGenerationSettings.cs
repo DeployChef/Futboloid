@@ -22,6 +22,9 @@ namespace Futboloid.Gameplay.Defenders
         [SerializeField] private int fieldBaseHp = 3;
         [SerializeField] private AnimationCurve pacingCurve = AnimationCurve.Linear(1f, 0.35f, 10f, 1f);
 
+        [Header("Scoring")]
+        [SerializeField] private int gkPointValue = 30;
+
         [Header("Tutorial (match 1)")]
         [SerializeField] private TutorialMatchDefinition tutorialMatch = TutorialMatchDefinition.CreateDefault();
 
@@ -42,6 +45,7 @@ namespace Futboloid.Gameplay.Defenders
         public int GkHpPerMatch => Mathf.Max(0, gkHpPerMatch);
         public float GkTrackSpeed => Mathf.Max(0.1f, gkTrackSpeed);
         public int FieldBaseHp => Mathf.Max(1, fieldBaseHp);
+        public int GkPointValue => Mathf.Max(1, gkPointValue);
         public AnimationCurve PacingCurve => pacingCurve;
         public TutorialMatchDefinition TutorialMatch => tutorialMatch;
         public FormationShapeDefinition[] Formations => formations;
@@ -195,6 +199,7 @@ namespace Futboloid.Gameplay.Defenders
         public float LaunchSpeed;
         public int OpenGoalChancePercent;
         public float InteractionCooldown;
+        public int PointValue;
 
         public DefenderBuild ToBuild(int slotId, int maxHp)
         {
@@ -216,7 +221,8 @@ namespace Futboloid.Gameplay.Defenders
                 LaunchSpeed = LaunchSpeed,
                 OpenGoalChancePercent = OpenGoalChancePercent,
                 InteractionCooldown = InteractionCooldown,
-                TrackSpeed = 0f
+                TrackSpeed = 0f,
+                PointValue = Mathf.Max(1, PointValue)
             };
         }
 
@@ -228,6 +234,7 @@ namespace Futboloid.Gameplay.Defenders
                 MinTier = 0,
                 Weight = 4f,
                 Hp = 3,
+                PointValue = 10,
                 HitType = DefenderHitType.Reflect,
                 MovementType = DefenderMovementType.Idle,
                 PatrolPointCount = 4,
@@ -248,6 +255,7 @@ namespace Futboloid.Gameplay.Defenders
                 MinTier = 0,
                 Weight = 3f,
                 Hp = 2,
+                PointValue = 8,
                 HitType = DefenderHitType.Reflect,
                 MovementType = DefenderMovementType.WanderInRadius,
                 PatrolPointCount = 4,
@@ -268,6 +276,7 @@ namespace Futboloid.Gameplay.Defenders
                 MinTier = 1,
                 Weight = 2.5f,
                 Hp = 3,
+                PointValue = 12,
                 HitType = DefenderHitType.Reflect,
                 MovementType = DefenderMovementType.ChaseBallInRadius,
                 PatrolPointCount = 4,
@@ -288,6 +297,7 @@ namespace Futboloid.Gameplay.Defenders
                 MinTier = 1,
                 Weight = 1.5f,
                 Hp = 2,
+                PointValue = 15,
                 HitType = DefenderHitType.ToPlayerGoal,
                 MovementType = DefenderMovementType.Idle,
                 PatrolPointCount = 4,
@@ -308,6 +318,7 @@ namespace Futboloid.Gameplay.Defenders
                 MinTier = 2,
                 Weight = 2f,
                 Hp = 5,
+                PointValue = 25,
                 HitType = DefenderHitType.Reflect,
                 MovementType = DefenderMovementType.Idle,
                 PatrolPointCount = 4,
@@ -328,6 +339,7 @@ namespace Futboloid.Gameplay.Defenders
                 MinTier = 3,
                 Weight = 1.5f,
                 Hp = 3,
+                PointValue = 18,
                 HitType = DefenderHitType.ToPlayerGoal,
                 MovementType = DefenderMovementType.ChaseBallInRadius,
                 PatrolPointCount = 4,
