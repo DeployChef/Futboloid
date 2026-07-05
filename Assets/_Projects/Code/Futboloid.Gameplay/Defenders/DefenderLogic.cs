@@ -41,7 +41,7 @@ namespace Futboloid.Gameplay.Defenders
             _patrolIndex = 0;
         }
 
-        public DefenderLocomotionResult TickFieldMovement(
+        public DefenderMoveResult TickFieldMovement(
             Vector2 current,
             DefenderMovementType movementType,
             Vector2 home,
@@ -76,10 +76,10 @@ namespace Futboloid.Gameplay.Defenders
                 next = ClampToPitch(ApplySeparation(moved, neighborPositions, separationRadius, moveSpeed, deltaTime));
             }
 
-            return new DefenderLocomotionResult(next, _fieldVelocity);
+            return new DefenderMoveResult(next, _fieldVelocity);
         }
 
-        public DefenderLocomotionResult TickRunTowards(
+        public DefenderMoveResult TickRunTowards(
             Vector2 current,
             Vector2 target,
             float maxSpeed,
@@ -94,7 +94,7 @@ namespace Futboloid.Gameplay.Defenders
             {
                 arrived = true;
                 _runVelocity = Vector2.zero;
-                return new DefenderLocomotionResult(ClampToPitch(target), _runVelocity);
+                return new DefenderMoveResult(ClampToPitch(target), _runVelocity);
             }
 
             arrived = false;
@@ -108,13 +108,13 @@ namespace Futboloid.Gameplay.Defenders
             {
                 _runVelocity = Vector2.zero;
                 arrived = true;
-                return new DefenderLocomotionResult(ClampToPitch(target), _runVelocity);
+                return new DefenderMoveResult(ClampToPitch(target), _runVelocity);
             }
 
-            return new DefenderLocomotionResult(ClampToPitch(next), _runVelocity);
+            return new DefenderMoveResult(ClampToPitch(next), _runVelocity);
         }
 
-        public DefenderLocomotionResult TickGoalkeeperOnParabola(
+        public DefenderMoveResult TickGoalkeeperOnParabola(
             Vector2 current,
             GoalAnchor zone,
             float ballWorldX,
@@ -122,14 +122,14 @@ namespace Futboloid.Gameplay.Defenders
             float deltaTime)
         {
             if (zone == null)
-                return new DefenderLocomotionResult(current, Vector2.zero);
+                return new DefenderMoveResult(current, Vector2.zero);
 
             var targetT = zone.ParamFromWorldX(ballWorldX);
             var speed = Mathf.Max(0.01f, trackSpeed);
             _goalkeeperParam = Mathf.MoveTowards(_goalkeeperParam, targetT, speed * deltaTime);
             var next = zone.PositionOnParabola(_goalkeeperParam);
             var velocity = deltaTime > 0f ? (next - current) / deltaTime : Vector2.zero;
-            return new DefenderLocomotionResult(next, velocity);
+            return new DefenderMoveResult(next, velocity);
         }
 
         public void ResetGoalkeeperParam(float startParam)

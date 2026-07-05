@@ -121,16 +121,6 @@ namespace Futboloid.Gameplay.Defenders
             }
 
             _spawned.Clear();
-
-            if (spawnRoot == null)
-                return;
-
-            for (var i = spawnRoot.childCount - 1; i >= 0; i--)
-            {
-                var child = spawnRoot.GetChild(i);
-                if (child.GetComponent<DefenderView>() != null)
-                    Destroy(child.gameObject);
-            }
         }
     }
 }

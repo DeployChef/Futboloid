@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 9216872615087905485}
   - component: {fileID: 1864416684892860211}
   - component: {fileID: 8128865829371798977}
+  - component: {fileID: 3152381632761037567}
+  - component: {fileID: 7692808108287274353}
   m_Layer: 10
   m_Name: Defender
   m_TagString: Untagged
@@ -94,10 +96,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.DefenderView
   slotId: 0
   role: 0
-  maxHp: 3
   bodyCollider: {fileID: 1864416684892860211}
-  hpLabel: {fileID: 2968189813365401722}
   animationPresenter: {fileID: 7438566234465488061}
+  health: {fileID: 3152381632761037567}
   hitType: 0
   launchSpeed: 12
   openGoalChancePercent: 70
@@ -111,13 +112,40 @@ MonoBehaviour:
   fieldMoveSpeed: 1.6
   fieldAcceleration: 12
   fieldArriveThreshold: 0.12
-  goalAnchor: {fileID: 0}
   trackSpeed: 1.25
+--- !u!114 &3152381632761037567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4969127172605605462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22254d755a2663a43887983f06e46a5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.DefenderHealth
+  maxHp: 3
+  hpLabel: {fileID: 2968189813365401722}
+  defender: {fileID: 8128865829371798977}
+--- !u!114 &7692808108287274353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4969127172605605462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e9ed60b5b7757d47a252e1e202c70df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.DefenderViewGizmos
   drawGizmos: 1
   gizmoLabelHeight: 0.35
   gizmoLabelPadding: 0.12
-  gizmoGoalHalfWidth: 2
-  gizmoParabolaHeight: 0.35
+  defender: {fileID: 8128865829371798977}
+  health: {fileID: 3152381632761037567}
+  bodyCollider: {fileID: 1864416684892860211}
 --- !u!1 &5333510178830016538
 GameObject:
   m_ObjectHideFlags: 0
@@ -350,6 +378,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Characters.CharacterAnimationPresenter
   animator: {fileID: 696242960672357460}
+  facingRoot: {fileID: 0}
 --- !u!1 &7680952560169528931
 GameObject:
   m_ObjectHideFlags: 0

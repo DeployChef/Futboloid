@@ -8,7 +8,6 @@ using Futboloid.Core.Bus.Events;
 using Futboloid.Gameplay.Ball;
 using Futboloid.Gameplay.Characters;
 using Futboloid.Gameplay.Match;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 using VContainer;
@@ -19,10 +18,9 @@ namespace Futboloid.Gameplay.Defenders
     {
         [SerializeField] private int slotId;
         [SerializeField] private DefenderRole role = DefenderRole.Field;
-        [SerializeField] private int maxHp = 3;
         [SerializeField] private Collider2D bodyCollider;
-        [SerializeField] private TextMeshProUGUI hpLabel;
         [SerializeField] private CharacterAnimationPresenter animationPresenter;
+        [SerializeField] private DefenderHealth health;
 
         [Header("Hit")]
         [SerializeField] private DefenderHitType hitType = DefenderHitType.Reflect;
@@ -50,11 +48,6 @@ namespace Futboloid.Gameplay.Defenders
         [Tooltip("Скорость слежения по параметру t (−1…1) в секунду — насколько быстро GK едет по дуге к X мяча.")]
         [SerializeField] private float trackSpeed = 1.25f;
 
-        [Header("Gizmos")]
-        [SerializeField] private bool drawGizmos = true;
-        [SerializeField] private float gizmoLabelHeight = 0.35f;
-        [SerializeField] private float gizmoLabelPadding = 0.12f;
-
         private IGameEventBus _bus;
         private DefenderGridRegistry _registry;
         private DefenderLogic _logic;
@@ -62,8 +55,6 @@ namespace Futboloid.Gameplay.Defenders
         private PitchBounds _pitchBounds;
         private GoalAnchor _goalAnchor;
         private readonly List<IDisposable> _subscriptions = new();
-        private int _hp;
-        private bool _isAlive = true;
         private bool _onField;
         private bool _simulating;
         private bool _runningToGoal;
@@ -83,15 +74,20 @@ namespace Futboloid.Gameplay.Defenders
         public DefenderHitType HitType => hitType;
         public float LaunchSpeed => launchSpeed;
         public int OpenGoalChancePercent => openGoalChancePercent;
-        public bool IsAlive => _isAlive;
+        public bool IsAlive => health.IsAlive;
         public bool RunningToGoal => _runningToGoal;
         public Vector2 HomePosition => _homePosition;
+        public DefenderMovementType MovementType => movementType;
+        public int PatrolPointCount => patrolPointCount;
+        public float PatrolRadius => patrolRadius;
+        public float WanderRadius => wanderRadius;
+        public float ChaseRadius => chaseRadius;
+        public float SeparationRadius => separationRadius;
 
         public void ApplySpawnSetup(in DefenderBuild build, Vector2 home)
         {
             slotId = build.SlotId;
             role = build.Role;
-            maxHp = build.MaxHp;
             hitType = build.HitType;
             movementType = build.MovementType;
             patrolPointCount = build.PatrolPointCount;
@@ -111,10 +107,8 @@ namespace Futboloid.Gameplay.Defenders
 
             transform.position = new Vector3(home.x, home.y, transform.position.z);
             _homePosition = home;
-            _hp = maxHp;
-            _isAlive = true;
             _runningToGoal = false;
-            RefreshHpLabel();
+            health.Configure(build.MaxHp);
         }
 
         private void Awake()
@@ -124,8 +118,7 @@ namespace Futboloid.Gameplay.Defenders
 
             _homePosition = transform.position;
             _previousFlipPositionX = transform.position.x;
-            _hp = maxHp;
-            RefreshHpLabel();
+            health.Reset();
         }
 
         [Inject]
@@ -154,14 +147,25 @@ namespace Futboloid.Gameplay.Defenders
             _registry?.Register(this);
         }
 
-        private void SyncPitchState(PitchPhase phase)
+        internal void NotifyDestroyed(bool wasGoalkeeper)
         {
-            _simulating = phase == PitchPhase.Simulating;
+            _runningToGoal = false;
+            SyncRunningAnimation(false);
+            KillReshuffleTween();
+
+            if (bodyCollider != null)
+                bodyCollider.enabled = false;
+
+            _registry?.Unregister(this);
+            Debug.Log($"[DefenderView] Slot {slotId} destroyed{(wasGoalkeeper ? " (GK)" : "")}.");
+            Destroy(gameObject);
         }
+
+        private void SyncPitchState(PitchPhase phase) => _simulating = phase == PitchPhase.Simulating;
 
         private void Update()
         {
-            if (!_isAlive)
+            if (!health.IsAlive)
             {
                 SyncRunningAnimation(false);
                 return;
@@ -253,7 +257,7 @@ namespace Futboloid.Gameplay.Defenders
 
         public void BeginRunToGoal(float maxSpeed, float acceleration, float arriveThreshold)
         {
-            if (!_isAlive || role != DefenderRole.Field)
+            if (!health.IsAlive || role != DefenderRole.Field)
                 return;
 
             _runSpeed = maxSpeed;
@@ -304,7 +308,7 @@ namespace Futboloid.Gameplay.Defenders
             float arriveThreshold,
             CancellationToken ct)
         {
-            if (!_isAlive)
+            if (!health.IsAlive)
                 return;
 
             KillReshuffleTween();
@@ -322,7 +326,7 @@ namespace Futboloid.Gameplay.Defenders
                 moveDuration,
                 ct);
 
-            if (!_isAlive || !arrived)
+            if (!health.IsAlive || !arrived)
             {
                 SyncRunningAnimation(false);
                 return;
@@ -350,12 +354,8 @@ namespace Futboloid.Gameplay.Defenders
 
         private void ApplyReshuffleHeal()
         {
-            var heal = Mathf.CeilToInt(maxHp * 0.25f);
-            if (heal <= 0)
-                return;
-
-            _hp = Mathf.Min(maxHp, _hp + heal);
-            RefreshHpLabel();
+            var heal = Mathf.CeilToInt(health.MaxHp * 0.25f);
+            health.Heal(heal);
         }
 
         private void CompleteRunToGoal()
@@ -410,10 +410,8 @@ namespace Futboloid.Gameplay.Defenders
             transform.position = new Vector3(position.x, position.y, transform.position.z);
         }
 
-        private float ResolveBallWorldX()
-        {
-            return _ball != null ? _ball.Position.x : transform.position.x;
-        }
+        private float ResolveBallWorldX() =>
+            _ball != null ? _ball.Position.x : transform.position.x;
 
         public void HandleBallContact(BallMotion motion, RaycastHit2D hit)
         {
@@ -422,135 +420,8 @@ namespace Futboloid.Gameplay.Defenders
 
             _lastInteractionTime = Time.time;
             _logic.ResolveBallHit(motion, hit, this);
-            ApplyDamage(1);
+            health.ApplyDamage(1, slotId, transform.position);
             _bus?.Publish(new DefenderHitEvent(slotId));
-        }
-
-        private void ApplyDamage(int amount)
-        {
-            if (!_isAlive)
-                return;
-
-            _hp = Mathf.Max(0, _hp - amount);
-            RefreshHpLabel();
-            _bus?.Publish(new DefenderDamagedEvent(slotId, _hp, transform.position));
-
-            if (_hp <= 0)
-                Die();
-        }
-
-        private void Die()
-        {
-            if (!_isAlive)
-                return;
-
-            var wasGoalkeeper = role == DefenderRole.Goalkeeper;
-            _isAlive = false;
-            _runningToGoal = false;
-            SyncRunningAnimation(false);
-            KillReshuffleTween();
-
-            if (bodyCollider != null)
-                bodyCollider.enabled = false;
-
-            if (hpLabel != null)
-                hpLabel.gameObject.SetActive(false);
-
-            _bus?.Publish(new DefenderDestroyedEvent(slotId, wasGoalkeeper));
-            _registry?.Unregister(this);
-            Debug.Log($"[DefenderView] Slot {slotId} destroyed.");
-            Destroy(gameObject);
-        }
-
-        private void RefreshHpLabel()
-        {
-            if (hpLabel == null)
-                return;
-
-            hpLabel.text = _hp.ToString();
-        }
-
-        private void OnDrawGizmosSelected()
-        {
-            if (!drawGizmos)
-                return;
-
-            DrawGizmos(selected: true);
-        }
-
-        private void OnDrawGizmos()
-        {
-            if (!drawGizmos)
-                return;
-
-            DrawGizmos(selected: false);
-        }
-
-        private void DrawGizmos(bool selected)
-        {
-            var home = Application.isPlaying ? _homePosition : (Vector2)transform.position;
-            var center = new Vector3(home.x, home.y, transform.position.z);
-            var labelPos = GetGizmoLabelPosition(center);
-
-            var label = $"#{slotId}  {role}\nHit: {hitType}";
-            if (_runningToGoal)
-                label += "\n→ GK";
-            if (role == DefenderRole.Field && !_runningToGoal)
-                label += $"\nMove: {movementType}";
-            if (Application.isPlaying)
-                label += $"\nHP: {_hp}/{maxHp}";
-
-            DefenderGizmoDrawer.DrawLabel(labelPos, label);
-
-            if (role == DefenderRole.Goalkeeper)
-                return;
-
-            var alpha = selected ? 0.85f : 0.4f;
-            DefenderGizmoDrawer.DrawWireCircle(
-                center,
-                separationRadius,
-                new Color(1f, 0.55f, 0.1f, alpha * 0.7f));
-
-            switch (movementType)
-            {
-                case DefenderMovementType.PatrolGenerated:
-                    DefenderGizmoDrawer.DrawWireCircle(
-                        center,
-                        patrolRadius,
-                        new Color(0.3f, 1f, 0.45f, alpha));
-                    var path = PatrolPathGenerator.Generate(
-                        home,
-                        patrolPointCount,
-                        patrolRadius,
-                        slotId * 7919 + 17);
-                    DefenderGizmoDrawer.DrawPatrolPath(
-                        path,
-                        new Color(1f, 0.92f, 0.2f, alpha),
-                        closed: true);
-                    break;
-
-                case DefenderMovementType.WanderInRadius:
-                    DefenderGizmoDrawer.DrawWireCircle(
-                        center,
-                        wanderRadius,
-                        new Color(0.3f, 0.75f, 1f, alpha));
-                    break;
-
-                case DefenderMovementType.ChaseBallInRadius:
-                    DefenderGizmoDrawer.DrawWireCircle(
-                        center,
-                        chaseRadius,
-                        new Color(0.2f, 0.95f, 1f, alpha));
-                    break;
-            }
-        }
-
-        private Vector3 GetGizmoLabelPosition(Vector3 center)
-        {
-            if (bodyCollider != null)
-                return new Vector3(center.x, bodyCollider.bounds.max.y + gizmoLabelPadding, center.z);
-
-            return center + Vector3.up * gizmoLabelHeight;
         }
     }
 }
