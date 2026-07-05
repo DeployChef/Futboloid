@@ -17,7 +17,6 @@ namespace Futboloid.Gameplay.Ball
         [SerializeField] private Transform directionArrow;
         [SerializeField] private Vector2 fallbackServeDirection = Vector2.up;
         [SerializeField] private float maxAimAngleDegrees = 45f;
-
         private readonly List<IDisposable> _subscriptions = new();
 
         public Vector2 WorldPosition => transform.position;
@@ -74,6 +73,15 @@ namespace Futboloid.Gameplay.Ball
         {
             foreach (var subscription in _subscriptions)
                 subscription.Dispose();
+        }
+
+        private void OnDrawGizmos()
+        {
+            
+            // 1. Set the color of the gizmo
+            Gizmos.color = Color.yellow;
+            // 2. Draw a wire sphere representing the sight range
+            Gizmos.DrawWireSphere(transform.position, 0.4f);
         }
     }
 }

@@ -40,6 +40,10 @@ namespace Futboloid.Main.Navigation
             var isColdStart = !_initialized;
             var previous = _initialized ? Current : next;
             _initialized = true;
+
+            // Сохраняем флаг ДО ApplyState, который его сбрасывает
+            var wasPausedInMenu = IsMatchPausedInMenu;
+
             Current = next;
 
             if (next == NavigationState.MainMenu)
@@ -47,7 +51,11 @@ namespace Futboloid.Main.Navigation
 
             ApplyState(next, previous, isColdStart);
             _uiService.ApplyNavigation(next, IsMatchPausedInMenu);
-            _bus.Publish(new NavigationChangedEvent(previous, next, IsMatchPausedInMenu));
+
+            var resumingPausedMatch = next == NavigationState.OnField
+                && previous == NavigationState.MainMenu
+                && wasPausedInMenu;
+            _bus.Publish(new NavigationChangedEvent(previous, next, IsMatchPausedInMenu, resumingPausedMatch));
 
             Debug.Log($"[OverlayStateController] {previous} → {next}");
             return UniTask.CompletedTask;
@@ -63,9 +71,10 @@ namespace Futboloid.Main.Navigation
 
                 case NavigationState.OnField:
                     Time.timeScale = 1f;
-                    var resumingFromPause = previous == NavigationState.MainMenu && IsMatchPausedInMenu;
+                    var resumingFromPause = previous == NavigationState.Pause;
+                    var resumingFromMenu = previous == NavigationState.MainMenu && IsMatchPausedInMenu;
                     var newRunFromMenu = previous == NavigationState.MainMenu && !IsMatchPausedInMenu;
-                    if (!resumingFromPause)
+                    if (!resumingFromPause && !resumingFromMenu)
                     {
                         if (newRunFromMenu || isColdStart)
                         {
@@ -74,7 +83,7 @@ namespace Futboloid.Main.Navigation
                         }
                         _bus.Publish(new PitchResetRequestedEvent());
                     }
-                    else
+                    else if (resumingFromMenu)
                         IsMatchPausedInMenu = false;
                     break;
 

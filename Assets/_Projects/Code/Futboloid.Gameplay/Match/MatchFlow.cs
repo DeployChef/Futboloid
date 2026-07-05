@@ -203,7 +203,10 @@ namespace Futboloid.Gameplay.Match
             _timerStarted = true;
 
             if (_onField)
+            {
                 StartTimerLoop();
+                _bus.Publish(new MatchStartedEvent());
+            }
         }
 
         private void OnPitchPhaseChanged(PitchPhaseChangedEvent e)
