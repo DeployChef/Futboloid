@@ -1,4 +1,6 @@
 using Futboloid.Main.Navigation;
+using Futboloid.Core.Audio;
+using Futboloid.Main.Audio;
 using Futboloid.UI;
 using Futboloid.UI.Views.MainMenu;
 using Futboloid.UI.Views.PauseMenu;
@@ -11,6 +13,7 @@ namespace Futboloid.Main.DI
     {
         public static IContainerBuilder RegisterRootScope(this IContainerBuilder builder)
         {
+            builder.RegisterComponentInHierarchy<AudioPlaybackHost>().As<IAudioPlayback>();
             builder.Register<UIService>(Lifetime.Singleton);
             builder.RegisterBuildCallback(RegisterUiWidgets);
 

@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Futboloid.Core;
+using Futboloid.Core.Audio;
 using Futboloid.Core.Run;
 using Futboloid.Main.DI;
 using Futboloid.Main.Navigation;
@@ -37,6 +38,8 @@ namespace Futboloid.Main.GameAppStates
                 return;
             }
 
+            await WarmupAudioClipsAsync(LifetimeScope.Container.Resolve<AudioCatalog>());
+
             SceneManager.SetActiveScene(gameScene);
 
             _gameState = new GameState(LifetimeScope);
@@ -60,6 +63,7 @@ namespace Futboloid.Main.GameAppStates
 
             if (LifetimeScope != null)
             {
+                _parentLifetimeScope.Container.Resolve<IAudioPlayback>().StopAll();
                 LifetimeScope.Dispose();
                 LifetimeScope = null;
             }
@@ -120,6 +124,18 @@ namespace Futboloid.Main.GameAppStates
 
             gameScene = default;
             return false;
+        }
+
+        private static async UniTask WarmupAudioClipsAsync(AudioCatalog catalog)
+        {
+            if (catalog == null)
+                return;
+
+            foreach (var clip in catalog.EnumerateClips())
+            {
+                catalog.WarmupClip(clip);
+                await UniTask.Yield();
+            }
         }
     }
 }

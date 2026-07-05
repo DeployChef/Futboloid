@@ -1,4 +1,5 @@
 using Futboloid.Core;
+using Futboloid.Core.Audio;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Run;
 using Futboloid.Gameplay.Match;
@@ -20,6 +21,11 @@ namespace Futboloid.Main.DI
                 .As<ITournamentBracketReadModel>();
             builder.Register<OverlayStateController>(Lifetime.Singleton);
             builder.Register<MatchEndHandler>(Lifetime.Singleton);
+
+            var audioCatalog = AudioCatalog.Load();
+            builder.RegisterInstance(audioCatalog);
+            builder.Register<AudioService>(Lifetime.Singleton);
+            builder.RegisterBuildCallback(resolver => resolver.Resolve<AudioService>());
 
             var runProgressionSettings = RunProgressionSettings.Load();
             var perkCatalog = PerkCatalog.Load();

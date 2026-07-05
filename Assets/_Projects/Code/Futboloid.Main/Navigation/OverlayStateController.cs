@@ -51,17 +51,11 @@ namespace Futboloid.Main.Navigation
 
             ApplyState(next, previous, isColdStart);
             _uiService.ApplyNavigation(next, IsMatchPausedInMenu);
-            _bus.Publish(new NavigationChangedEvent(previous, next, IsMatchPausedInMenu));
 
-            // Пауза/возобновление музыки при выходе в меню и возврате в игру
-            if (next == NavigationState.MainMenu && previous == NavigationState.OnField)
-            {
-                AudioManager.Instance?.PauseMusic();
-            }
-            else if (next == NavigationState.OnField && previous == NavigationState.MainMenu && wasPausedInMenu)
-            {
-                AudioManager.Instance?.ResumeMusic();
-            }
+            var resumingPausedMatch = next == NavigationState.OnField
+                && previous == NavigationState.MainMenu
+                && wasPausedInMenu;
+            _bus.Publish(new NavigationChangedEvent(previous, next, IsMatchPausedInMenu, resumingPausedMatch));
 
             Debug.Log($"[OverlayStateController] {previous} → {next}");
             return UniTask.CompletedTask;

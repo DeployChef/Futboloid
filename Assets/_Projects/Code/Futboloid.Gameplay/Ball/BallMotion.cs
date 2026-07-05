@@ -67,7 +67,6 @@ namespace Futboloid.Gameplay.Ball
             Speed = _settings.ServeSpeed;
             Direction = ClampMinAngle(Direction);
             _bus.Publish(new BallServedEvent());
-            AudioManager.Instance.PlayEvent("MatchStart");
         }
 
         public void Tick(float deltaTime)
@@ -159,13 +158,11 @@ namespace Futboloid.Gameplay.Ball
                 defender.HandleBallContact(this, hit);
                 _bus.Publish(new BallContactEvent(
                     BallContactKind.Defender, hit.point, hit.normal, Speed, defender.SlotId));
-                AudioManager.Instance.PlayEvent("BallHit");
                 return;
             }
 
             ReflectFromHit(hit);
             _bus.Publish(new BallContactEvent(BallContactKind.Wall, hit.point, hit.normal, Speed));
-            AudioManager.Instance.PlayEvent("BallHit");
         }
 
         private bool TryScoreGoal()
@@ -181,7 +178,6 @@ namespace Futboloid.Gameplay.Ball
                 {
                     Stop();
                     _bus.Publish(new GoalScoredEvent(isPlayerGoal: true));
-                    AudioManager.Instance.PlayEvent("GoalScored");
                     return true;
                 }
 
@@ -189,7 +185,6 @@ namespace Futboloid.Gameplay.Ball
                 {
                     Stop();
                     _bus.Publish(new GoalScoredEvent(isPlayerGoal: false));
-                    AudioManager.Instance.PlayEvent("GoalConceded");
                     return true;
                 }
             }

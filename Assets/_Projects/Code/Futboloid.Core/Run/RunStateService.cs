@@ -110,7 +110,6 @@ namespace Futboloid.Core.Run
             _currentOffers = new PerkDefinition[3];
 
             _bus.Publish(new PerkPickedEvent(perkId, newLevel));
-            AudioManager.Instance.PlayEvent("PerkPick");
             Debug.Log($"[RunStateService] Picked {perkId} → level {newLevel}.");
             PublishProgressionUpdated();
 
