@@ -13,6 +13,7 @@ namespace Futboloid.Gameplay.Match
         [SerializeField] private float matchDurationSeconds = DefaultMatchDurationSeconds;
         [SerializeField] private int matchesToWin = DefaultMatchesToWin;
         [SerializeField] private DefenderGenerationSettings defenderGeneration;
+        [SerializeField] private DefenderMatchSettings defenderMatch;
 
         public float MatchDurationSeconds => Mathf.Max(1f, matchDurationSeconds);
         public int MatchesToWin => Mathf.Max(1, matchesToWin);
@@ -20,6 +21,10 @@ namespace Futboloid.Gameplay.Match
             defenderGeneration != null
                 ? defenderGeneration
                 : DefenderGenerationSettings.Load();
+        public DefenderMatchSettings DefenderMatch =>
+            defenderMatch != null
+                ? defenderMatch
+                : DefenderMatchSettings.Load();
 
         public static GameplaySettings Load()
         {

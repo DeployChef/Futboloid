@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Futboloid.Core;
 using Futboloid.Core.Audio;
+using Futboloid.Core.Pause;
 using Futboloid.Core.Run;
 using Futboloid.Main.DI;
 using Futboloid.Main.Navigation;
@@ -63,6 +64,7 @@ namespace Futboloid.Main.GameAppStates
 
             if (LifetimeScope != null)
             {
+                _parentLifetimeScope.Container.Resolve<PauseCoordinator>().ReleaseAll();
                 _parentLifetimeScope.Container.Resolve<IAudioPlayback>().StopAll();
                 LifetimeScope.Dispose();
                 LifetimeScope = null;

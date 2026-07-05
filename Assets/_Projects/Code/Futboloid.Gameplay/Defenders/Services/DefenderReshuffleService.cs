@@ -17,6 +17,7 @@ namespace Futboloid.Gameplay.Defenders
     {
         private readonly PitchStateMachine _pitch;
         private readonly DefenderGridRegistry _registry;
+        private readonly DefenderMatchSettings _matchSettings;
         private readonly BallView _ball;
         private readonly GoalkeeperView _keeper;
         private readonly List<IDisposable> _subscriptions = new();
@@ -27,11 +28,13 @@ namespace Futboloid.Gameplay.Defenders
             IGameEventBus bus,
             PitchStateMachine pitch,
             DefenderGridRegistry registry,
+            DefenderMatchSettings matchSettings,
             BallView ball,
             GoalkeeperView keeper)
         {
             _pitch = pitch;
             _registry = registry;
+            _matchSettings = matchSettings;
             _ball = ball;
             _keeper = keeper;
             _subscriptions.Add(bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged));
@@ -64,7 +67,7 @@ namespace Futboloid.Gameplay.Defenders
                 if (_ball != null)
                     tasks.Add(_ball.PlayReshuffleToKickoffAsync(ct));
 
-                var moveDuration = _registry != null ? _registry.ReshuffleMoveDuration : 0.55f;
+                var moveDuration = _matchSettings.ReshuffleMoveDuration;
                 if (_keeper != null)
                     tasks.Add(_keeper.PlayReshuffleToCenterAsync(moveDuration, ct));
 
@@ -72,8 +75,8 @@ namespace Futboloid.Gameplay.Defenders
                 {
                     _registry.ForEachLiving(defender =>
                         tasks.Add(defender.PlayReshuffleTweenAsync(
-                            _registry.ReshuffleMoveDuration,
-                            _registry.ArriveThreshold,
+                            _matchSettings.ReshuffleMoveDuration,
+                            _matchSettings.ArriveThreshold,
                             ct)));
                 }
 

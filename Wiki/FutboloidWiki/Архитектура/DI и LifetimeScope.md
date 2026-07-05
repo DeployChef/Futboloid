@@ -26,20 +26,21 @@ flowchart TB
     App --> Game
 
     Root --- R1[IGameDirector]
-    Root --- R2[AudioService]
+    Root --- R2[IAudioPlayback / AudioPlaybackHost]
     Root --- R3[UIService]
-    Root --- R4[SceneTransition]
-    Root --- R5[ISaveStorage]
-    Root --- R6[PlayerProgressionService post-MVP]
+    Root --- R4[SceneTransition post-MVP]
 
     App --- A1[IGameEventBus]
-    App --- A2[OverlayController]
+    App --- A2[OverlayStateController]
     App --- A3[TournamentRunService]
     App --- A4[MatchEndHandler]
+    App --- A5[RunStateService]
+    App --- A6[AudioService]
+    App --- A7[PauseCoordinator]
 
     Game --- G1[MatchFlow / PitchFSM]
-    Game --- G3[BotSimulation]
-    Game --- G4[StatusEffectService]
+    Game --- G2[BonusPickCoordinator]
+    Game --- G3[DefenderPromotion / Reshuffle]
 ```
 
 ---
@@ -73,23 +74,9 @@ Futboloid.Main/
 ### Пример: Root
 
 ```csharp
-// RootScopeExtensions.cs
-public static class RootScopeExtensions
-{
-    public static IContainerBuilder RegisterRootScope(
-        this IContainerBuilder builder,
-        IGameDirector gameDirector)
-    {
-        builder.RegisterInstance(gameDirector).As<IGameDirector>();
-        builder.Register<AudioService>(Lifetime.Singleton);
-        builder.Register<UIService>(Lifetime.Singleton).AsImplementedInterfaces();
-        builder.Register<SceneTransitionService>(Lifetime.Singleton);
-        builder.Register<ISaveStorage, PlayerPrefsSaveStorage>(Lifetime.Singleton);
-        // PlayerProgressionService — post-MVP, не регистрируем в первой версии
-
-        return builder;
-    }
-}
+// RootScopeExtensions.cs — актуально
+builder.RegisterComponentInHierarchy<AudioPlaybackHost>().As<IAudioPlayback>();
+builder.Register<UIService>(Lifetime.Singleton);
 ```
 
 ### App scope
@@ -99,14 +86,22 @@ public static class AppScopeExtensions
 {
     public static IContainerBuilder RegisterAppScope(this IContainerBuilder builder)
     {
-        builder.RegisterInstance(GameplaySettings.Load());
+        var gameplaySettings = GameplaySettings.Load();
+        builder.RegisterInstance(gameplaySettings);
+        builder.RegisterInstance(gameplaySettings.DefenderGeneration);
+        builder.RegisterInstance(gameplaySettings.DefenderMatch);
+        builder.Register<PauseCoordinator>(Lifetime.Singleton);
         builder.Register<IGameEventBus, GameEventBus>(Lifetime.Singleton);
         builder.Register<TournamentRunService>(Lifetime.Singleton)
             .As<ITournamentRunService>()
             .As<ITournamentBracketReadModel>();
         builder.Register<OverlayStateController>(Lifetime.Singleton);
         builder.Register<MatchEndHandler>(Lifetime.Singleton);
-
+        builder.RegisterInstance(AudioCatalog.Load());
+        builder.Register<AudioService>(Lifetime.Singleton);
+        builder.Register<RunStateService>(Lifetime.Singleton)
+            .As<IRunProgressionService>();
+        // …
         return builder;
     }
 }
@@ -117,12 +112,16 @@ public static class AppScopeExtensions
 ```csharp
 public static class GameScopeExtensions
 {
-    public static IContainerBuilder RegisterGameScope(this IContainerBuilder builder)
+    public static IContainerBuilder RegisterGameScope(this IContainerBuilder builder, Scene gameScene)
     {
         builder.Register<MatchFlow>(Lifetime.Singleton);
         builder.Register<PitchStateMachine>(Lifetime.Singleton);
-        // post-MVP: BotSimulationController, ComboScoreService, StatusEffectService…
-
+        builder.Register<BonusPickCoordinator>(Lifetime.Singleton);
+        builder.RegisterComponentInScene<GoalAnchor>(gameScene);
+        builder.RegisterComponentInScene<BallView>(gameScene);
+        builder.RegisterComponentInScene<GoalkeeperView>(gameScene);
+        builder.RegisterComponentInScene<DefenderGridRegistry>(gameScene);
+        // … RegisterBuildCallback → InjectGameObject на всех root GO сцены
         return builder;
     }
 }
@@ -149,11 +148,12 @@ LifetimeScope = parentLifetimeScope.CreateChild(builder => builder
 ### Game — `GameState.Enter`
 
 ```csharp
-LifetimeScope = parentLifetimeScope.CreateChild(builder => builder
-    .RegisterGameScope());
+LifetimeScope = parentLifetimeScope.CreateChild(builder =>
+    builder.RegisterGameScope(gameScene));
+// OnGameScopeBuilt: InjectGameObject на root-объектах сцены
 ```
 
-`GameState` резолвит `IGameEventBus` из **parent App scope** и передаёт в `Initialize(bus)` на view.
+View с `[Inject]` получают `IGameEventBus` и сервисы из parent/child scope автоматически.
 
 ---
 
@@ -167,7 +167,7 @@ LifetimeScope = parentLifetimeScope.CreateChild(builder => builder
 | Навигация → UI / views | `OverlayStateController` → `NavigationChangedEvent` |
 | Сброс поля перед матчем | `PitchResetRequestedEvent` → `PitchStateMachine` слушает и `Reset()` |
 | Конец матча → турнир | `MatchEndedEvent` → `MatchEndHandler` → `Navigation.Tournament` |
-| View на сцене | `GameState.Enter` → `Initialize(IGameEventBus)` — bus из App |
+| View на сцене | `RegisterComponentInScene` + `InjectGameObject` |
 
 **Правило:** App **не держит ссылку** на `PitchStateMachine` и не вызывает его напрямую. Game-сервисы **не инжектятся** в App-конструкторы — только общие из parent (`IGameEventBus`) или реакция на шину.
 
@@ -203,10 +203,10 @@ Child scope нужен пока `MatchFlow` / `PitchStateMachine` живут о�
 
 ## View на сцене
 
-MonoBehaviour получает `IGameEventBus` в `Initialize`. `BallView` держит `BallMotion` (pure C#). См. [[Шина событий]], [[Связь сцены с кодом]].
+MonoBehaviour на `Game.unity` — `[Inject] void Construct(...)` или поля с `[Inject]`. VContainer вызывает `InjectGameObject` при сборке Game scope. `BallView` держит `BallMotion` (pure C#). См. [[Шина событий]], [[Связь сцены с кодом]].
 
-- `GameState.Enter`: `RegisterGameScope()` → `Initialize(bus)` на view (bus из App)
-- Сброс поля перед матчем: `PitchResetRequestedEvent` на шине
+- `GameState.Enter`: `RegisterGameScope(gameScene)` → `InjectGameObject` на корнях сцены
+- Сброс поля: `PitchResetRequestedEvent` на шине
 
 ---
 

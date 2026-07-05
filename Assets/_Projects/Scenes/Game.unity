@@ -2982,7 +2982,7 @@ MonoBehaviour:
   centerX: 0
   centerArriveThreshold: 0.02
   kickoffAnchor: {fileID: 743293818}
-  animator: {fileID: 2022565238}
+  animationPresenter: {fileID: 2022565239}
 --- !u!1 &737458358
 GameObject:
   m_ObjectHideFlags: 0
@@ -3346,8 +3346,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d6c3066ea4f66a4694604db8c8ef179, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.GoalAnchor
-  halfWidth: 2.17
-  parabolaHeight: 0.85
+  halfWidth: 1.61
+  parabolaHeight: 0.58
 --- !u!1 &845075443
 GameObject:
   m_ObjectHideFlags: 0
@@ -4305,7 +4305,6 @@ MonoBehaviour:
   defenderPrefab: {fileID: 8128865829371798977, guid: 20f98d3534ea76a409cea291622d762b, type: 3}
   spawnRoot: {fileID: 1676729250}
   slotLayout: {fileID: 665380154}
-  goalAnchor: {fileID: 844577608}
   generationSettingsOverride: {fileID: 0}
 --- !u!1 &1471480362
 GameObject:
@@ -6850,6 +6849,7 @@ GameObject:
   - component: {fileID: 2022565236}
   - component: {fileID: 2022565237}
   - component: {fileID: 2022565238}
+  - component: {fileID: 2022565239}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -6953,6 +6953,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2022565239
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2022565235}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80ae2da49eae0fe4293f2495d3c07e10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Characters.CharacterAnimationPresenter
+  animator: {fileID: 2022565238}
+  facingRoot: {fileID: 0}
 --- !u!1 &2066945371
 GameObject:
   m_ObjectHideFlags: 0
@@ -7219,7 +7233,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94874b7eab947db489edc83aac8bb066, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.DefenderGridRegistry
-  goalAnchor: {fileID: 0}
   runToGoalSpeed: 4
   runToGoalAcceleration: 18
   arriveThreshold: 0.08
