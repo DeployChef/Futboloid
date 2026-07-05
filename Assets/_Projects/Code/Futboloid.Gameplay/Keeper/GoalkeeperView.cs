@@ -28,6 +28,8 @@ namespace Futboloid.Gameplay.Keeper
         private readonly GoalkeeperMotor _motor = new();
         private readonly GoalkeeperReshuffleMotion _reshuffle = new();
 
+        private float _reshuffleFaceVelocityX;
+
         private PitchPhase _phase = PitchPhase.KickoffWait;
         private bool _onField;
         private IGameplayInput _input;
@@ -63,6 +65,8 @@ namespace Futboloid.Gameplay.Keeper
         public UniTask PlayReshuffleToCenterAsync(float moveDuration, CancellationToken ct)
         {
             _motor.ResetVelocity();
+            _reshuffleFaceVelocityX = centerX - transform.position.x;
+            animationPresenter?.SetLocomotion(true, _reshuffleFaceVelocityX);
             return _reshuffle.PlayToCenterAsync(
                 transform,
                 centerX,
@@ -79,8 +83,14 @@ namespace Futboloid.Gameplay.Keeper
 
         private void Update()
         {
-            if (!_onField || _reshuffle.IsActive || _pitchBounds == null)
+            if (!_onField || _pitchBounds == null)
                 return;
+
+            if (_reshuffle.IsActive)
+            {
+                animationPresenter?.SetLocomotion(true, _reshuffleFaceVelocityX);
+                return;
+            }
 
             switch (_phase)
             {
@@ -123,7 +133,7 @@ namespace Futboloid.Gameplay.Keeper
                 Time.deltaTime);
 
             transform.position = result.Position;
-            animationPresenter?.SetRunning(result.IsMoving);
+            animationPresenter?.SetLocomotion(result.IsMoving, result.VelocityX);
         }
 
         private void UpdateKickoffAim()

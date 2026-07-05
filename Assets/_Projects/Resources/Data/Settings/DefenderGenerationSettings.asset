@@ -17,7 +17,7 @@ MonoBehaviour:
   generationSeedSalt: 7919
   gkBaseHp: 10
   gkHpPerMatch: 2
-  gkTrackSpeed: 1.25
+  gkTrackSpeed: 0.75
   fieldBaseHp: 3
   pacingCurve:
     serializedVersion: 2
