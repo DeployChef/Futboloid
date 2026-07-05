@@ -7,6 +7,7 @@ using Futboloid.Core.Run;
 using Futboloid.Gameplay.Ball;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
+using Futboloid.Gameplay.Characters;
 using Futboloid.Gameplay.Input;
 using Futboloid.Gameplay.Match;
 using UnityEngine;
@@ -21,7 +22,7 @@ namespace Futboloid.Gameplay.Keeper
         [SerializeField] private float centerX = 0f;
         [SerializeField] private float centerArriveThreshold = 0.02f;
         [SerializeField] private BallKickoffAnchor kickoffAnchor;
-        [SerializeField] private GoalkeeperAnimationPresenter animationPresenter;
+        [SerializeField] private CharacterAnimationPresenter animationPresenter;
 
         private readonly List<IDisposable> _subscriptions = new();
         private readonly GoalkeeperMotor _motor = new();

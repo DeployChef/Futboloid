@@ -6,6 +6,7 @@ using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
 using Futboloid.Gameplay.Ball;
+using Futboloid.Gameplay.Characters;
 using Futboloid.Gameplay.Match;
 using TMPro;
 using UnityEngine;
@@ -21,6 +22,7 @@ namespace Futboloid.Gameplay.Defenders
         [SerializeField] private int maxHp = 3;
         [SerializeField] private Collider2D bodyCollider;
         [SerializeField] private TextMeshProUGUI hpLabel;
+        [SerializeField] private CharacterAnimationPresenter animationPresenter;
 
         [Header("Hit")]
         [SerializeField] private DefenderHitType hitType = DefenderHitType.Reflect;
@@ -79,7 +81,7 @@ namespace Futboloid.Gameplay.Defenders
         private readonly DefenderReshuffleMotion _reshuffle = new();
 
         public int SlotId => slotId;
-        public Collider2D ContactCollider => bodyCollider != null ? bodyCollider : GetComponent<Collider2D>();
+        public Collider2D ContactCollider => bodyCollider;
         public DefenderRole Role => role;
         public DefenderHitType HitType => hitType;
         public float LaunchSpeed => launchSpeed;
@@ -122,7 +124,7 @@ namespace Futboloid.Gameplay.Defenders
         private void Awake()
         {
             if (bodyCollider == null)
-                bodyCollider = GetComponent<Collider2D>();
+                Debug.LogWarning("[DefenderView] bodyCollider is not assigned.", this);
 
             _homePosition = transform.position;
             _hp = maxHp;
@@ -150,6 +152,7 @@ namespace Futboloid.Gameplay.Defenders
             SyncPitchState(pitch.Current);
             _onField = matchFlow.IsOnField;
             _logic.InitializeFieldMovement(_homePosition, slotId, patrolPointCount, patrolRadius);
+            _registry?.Register(this);
         }
 
         private void SyncPitchState(PitchPhase phase)
@@ -159,8 +162,17 @@ namespace Futboloid.Gameplay.Defenders
 
         private void Update()
         {
-            if (!_isAlive || _reshuffle.IsActive)
+            if (!_isAlive)
+            {
+                SyncRunningAnimation(false);
                 return;
+            }
+
+            if (_reshuffle.IsActive)
+            {
+                SyncRunningAnimation(true);
+                return;
+            }
 
             if (_runningToGoal)
             {
@@ -169,7 +181,10 @@ namespace Futboloid.Gameplay.Defenders
             }
 
             if (!_onField || !_simulating)
+            {
+                SyncRunningAnimation(false);
                 return;
+            }
 
             if (role == DefenderRole.Goalkeeper)
             {
@@ -181,17 +196,24 @@ namespace Futboloid.Gameplay.Defenders
                 TickFieldMovement();
         }
 
+        private void SyncRunningAnimation(bool isRunning) =>
+            animationPresenter?.SetRunning(isRunning);
+
         private void TickGoalkeeper()
         {
             var zone = ResolveGoalAnchor();
             if (zone == null)
+            {
+                SyncRunningAnimation(false);
                 return;
+            }
 
+            var current = (Vector2)transform.position;
             var ballX = ResolveBallWorldX();
-            var position = _logic.TickGoalkeeperOnParabola(zone, ballX, trackSpeed, Time.deltaTime);
-            if (_pitchBounds != null)
-                position = _pitchBounds.Clamp(position);
+            var result = _logic.TickGoalkeeperOnParabola(current, zone, ballX, trackSpeed, Time.deltaTime);
+            var position = _pitchBounds != null ? _pitchBounds.Clamp(result.Position) : result.Position;
             transform.position = new Vector3(position.x, position.y, transform.position.z);
+            SyncRunningAnimation(result.IsMoving);
         }
 
         private void TickFieldMovement()
@@ -200,7 +222,7 @@ namespace Futboloid.Gameplay.Defenders
 
             Vector2? ballPosition = _ball != null ? _ball.Position : null;
             var current = (Vector2)transform.position;
-            var next = _logic.TickFieldMovement(
+            var result = _logic.TickFieldMovement(
                 current,
                 movementType,
                 _homePosition,
@@ -213,7 +235,8 @@ namespace Futboloid.Gameplay.Defenders
                 separationRadius,
                 _neighborPositions,
                 Time.deltaTime);
-            transform.position = new Vector3(next.x, next.y, transform.position.z);
+            transform.position = new Vector3(result.Position.x, result.Position.y, transform.position.z);
+            SyncRunningAnimation(result.IsMoving);
         }
 
         private void CollectNeighborPositions()
@@ -245,6 +268,7 @@ namespace Futboloid.Gameplay.Defenders
             _logic.ResetRunVelocity();
             _logic.ResetFieldVelocity();
             _runningToGoal = true;
+            SyncRunningAnimation(true);
         }
 
         public void SetRole(DefenderRole newRole)
@@ -263,7 +287,7 @@ namespace Futboloid.Gameplay.Defenders
         private void TickRunningToGoal()
         {
             var current = (Vector2)transform.position;
-            var next = _logic.TickRunTowards(
+            var result = _logic.TickRunTowards(
                 current,
                 _runTarget,
                 _runSpeed,
@@ -271,7 +295,8 @@ namespace Futboloid.Gameplay.Defenders
                 _runArriveThreshold,
                 Time.deltaTime,
                 out var arrived);
-            transform.position = new Vector3(next.x, next.y, transform.position.z);
+            transform.position = new Vector3(result.Position.x, result.Position.y, transform.position.z);
+            SyncRunningAnimation(result.IsMoving);
 
             if (!arrived)
                 return;
@@ -288,6 +313,7 @@ namespace Futboloid.Gameplay.Defenders
                 return;
 
             KillReshuffleTween();
+            SyncRunningAnimation(true);
             ApplyReshuffleHeal();
 
             var completePromotion = _runningToGoal;
@@ -301,7 +327,10 @@ namespace Futboloid.Gameplay.Defenders
                 ct);
 
             if (!_isAlive || !arrived)
+            {
+                SyncRunningAnimation(false);
                 return;
+            }
 
             if (completePromotion)
                 CompleteRunToGoal();
@@ -309,7 +338,11 @@ namespace Futboloid.Gameplay.Defenders
                 _bus?.Publish(new DefenderReturnedHomeEvent(slotId));
         }
 
-        public void KillReshuffleTween() => _reshuffle.Kill(transform);
+        public void KillReshuffleTween()
+        {
+            _reshuffle.Kill(transform);
+            SyncRunningAnimation(false);
+        }
 
         private Vector2 ResolveReshuffleTarget()
         {
@@ -347,14 +380,6 @@ namespace Futboloid.Gameplay.Defenders
 
             var zone = anchor.GetComponent<GoalAnchor>();
             return zone != null ? zone.PositionOnParabola(0f) : anchor.position;
-        }
-
-        private void Start()
-        {
-            if (_registry == null)
-                _registry = FindAnyObjectByType<DefenderGridRegistry>();
-
-            _registry?.Register(this);
         }
 
         private void OnDestroy()
@@ -462,6 +487,7 @@ namespace Futboloid.Gameplay.Defenders
             var wasGoalkeeper = role == DefenderRole.Goalkeeper;
             _isAlive = false;
             _runningToGoal = false;
+            SyncRunningAnimation(false);
             KillReshuffleTween();
 
             if (bodyCollider != null)
@@ -576,9 +602,8 @@ namespace Futboloid.Gameplay.Defenders
 
         private Vector3 GetGizmoLabelPosition(Vector3 center)
         {
-            var collider = bodyCollider != null ? bodyCollider : GetComponent<Collider2D>();
-            if (collider != null)
-                return new Vector3(center.x, collider.bounds.max.y + gizmoLabelPadding, center.z);
+            if (bodyCollider != null)
+                return new Vector3(center.x, bodyCollider.bounds.max.y + gizmoLabelPadding, center.z);
 
             return center + Vector3.up * gizmoLabelHeight;
         }

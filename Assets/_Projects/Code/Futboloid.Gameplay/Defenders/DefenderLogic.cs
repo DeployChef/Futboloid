@@ -41,7 +41,7 @@ namespace Futboloid.Gameplay.Defenders
             _patrolIndex = 0;
         }
 
-        public Vector2 TickFieldMovement(
+        public DefenderLocomotionResult TickFieldMovement(
             Vector2 current,
             DefenderMovementType movementType,
             Vector2 home,
@@ -55,26 +55,31 @@ namespace Futboloid.Gameplay.Defenders
             IReadOnlyList<Vector2> neighborPositions,
             float deltaTime)
         {
+            Vector2 next;
             if (movementType == DefenderMovementType.Idle)
             {
                 var idle = MoveTowards(current, ClampToPitch(home), moveSpeed, acceleration, arriveThreshold, deltaTime, ref _fieldVelocity);
-                return ClampToPitch(ApplySeparation(idle, neighborPositions, separationRadius, moveSpeed, deltaTime));
+                next = ClampToPitch(ApplySeparation(idle, neighborPositions, separationRadius, moveSpeed, deltaTime));
+            }
+            else
+            {
+                var target = ResolveFieldTarget(
+                    movementType,
+                    home,
+                    wanderRadius,
+                    chaseRadius,
+                    ballPosition,
+                    current,
+                    arriveThreshold);
+
+                var moved = MoveTowards(current, target, moveSpeed, acceleration, arriveThreshold, deltaTime, ref _fieldVelocity);
+                next = ClampToPitch(ApplySeparation(moved, neighborPositions, separationRadius, moveSpeed, deltaTime));
             }
 
-            var target = ResolveFieldTarget(
-                movementType,
-                home,
-                wanderRadius,
-                chaseRadius,
-                ballPosition,
-                current,
-                arriveThreshold);
-
-            var next = MoveTowards(current, target, moveSpeed, acceleration, arriveThreshold, deltaTime, ref _fieldVelocity);
-            return ClampToPitch(ApplySeparation(next, neighborPositions, separationRadius, moveSpeed, deltaTime));
+            return new DefenderLocomotionResult(next, _fieldVelocity);
         }
 
-        public Vector2 TickRunTowards(
+        public DefenderLocomotionResult TickRunTowards(
             Vector2 current,
             Vector2 target,
             float maxSpeed,
@@ -89,7 +94,7 @@ namespace Futboloid.Gameplay.Defenders
             {
                 arrived = true;
                 _runVelocity = Vector2.zero;
-                return ClampToPitch(target);
+                return new DefenderLocomotionResult(ClampToPitch(target), _runVelocity);
             }
 
             arrived = false;
@@ -103,25 +108,28 @@ namespace Futboloid.Gameplay.Defenders
             {
                 _runVelocity = Vector2.zero;
                 arrived = true;
-                return ClampToPitch(target);
+                return new DefenderLocomotionResult(ClampToPitch(target), _runVelocity);
             }
 
-            return ClampToPitch(next);
+            return new DefenderLocomotionResult(ClampToPitch(next), _runVelocity);
         }
 
-        public Vector2 TickGoalkeeperOnParabola(
+        public DefenderLocomotionResult TickGoalkeeperOnParabola(
+            Vector2 current,
             GoalAnchor zone,
             float ballWorldX,
             float trackSpeed,
             float deltaTime)
         {
             if (zone == null)
-                return Vector2.zero;
+                return new DefenderLocomotionResult(current, Vector2.zero);
 
             var targetT = zone.ParamFromWorldX(ballWorldX);
             var speed = Mathf.Max(0.01f, trackSpeed);
             _goalkeeperParam = Mathf.MoveTowards(_goalkeeperParam, targetT, speed * deltaTime);
-            return zone.PositionOnParabola(_goalkeeperParam);
+            var next = zone.PositionOnParabola(_goalkeeperParam);
+            var velocity = deltaTime > 0f ? (next - current) / deltaTime : Vector2.zero;
+            return new DefenderLocomotionResult(next, velocity);
         }
 
         public void ResetGoalkeeperParam(float startParam)

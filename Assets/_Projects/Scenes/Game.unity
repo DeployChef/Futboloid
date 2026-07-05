@@ -6963,9 +6963,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 2022565235}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fef1a5f420bc44818a2452563082432e, type: 3}
+  m_Script: {fileID: 11500000, guid: 80ae2da49eae0fe4293f2495d3c07e10, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Keeper.GoalkeeperAnimationPresenter
+  m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Characters.CharacterAnimationPresenter
   animator: {fileID: 2022565238}
 --- !u!1 &2066945371
 GameObject:

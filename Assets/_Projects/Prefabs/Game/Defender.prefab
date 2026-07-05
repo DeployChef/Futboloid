@@ -32,7 +32,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6301102691141668545}
-  - {fileID: 2532175341332586269}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &1864416684892860211
@@ -96,18 +95,29 @@ MonoBehaviour:
   slotId: 0
   role: 0
   maxHp: 3
+  bodyCollider: {fileID: 1864416684892860211}
+  hpLabel: {fileID: 2968189813365401722}
+  animationPresenter: {fileID: 7438566234465488061}
   hitType: 0
   launchSpeed: 12
   openGoalChancePercent: 70
+  interactionCooldown: 0.1
   movementType: 0
   patrolPointCount: 4
   patrolRadius: 1.5
   wanderRadius: 1.5
   chaseRadius: 3
   separationRadius: 0.6
+  fieldMoveSpeed: 1.6
+  fieldAcceleration: 12
+  fieldArriveThreshold: 0.12
+  goalAnchor: {fileID: 0}
   trackSpeed: 1.25
-  bodyCollider: {fileID: 1864416684892860211}
-  hpLabel: {fileID: 2968189813365401722}
+  drawGizmos: 1
+  gizmoLabelHeight: 0.35
+  gizmoLabelPadding: 0.12
+  gizmoGoalHalfWidth: 2
+  gizmoParabolaHeight: 0.35
 --- !u!1 &5333510178830016538
 GameObject:
   m_ObjectHideFlags: 0
@@ -136,11 +146,11 @@ RectTransform:
   m_GameObject: {fileID: 5333510178830016538}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.1904762, y: 0.1904762, z: 0.1904762}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 9106807716564350281}
-  m_Father: {fileID: 9216872615087905485}
+  m_Father: {fileID: 6301102691141668545}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -221,6 +231,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6301102691141668545}
   - component: {fileID: 3005694690385198493}
+  - component: {fileID: 696242960672357460}
+  - component: {fileID: 7438566234465488061}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -240,7 +252,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 5.25, y: 5.25, z: 5.25}
   m_ConstrainProportionsScale: 1
-  m_Children: []
+  m_Children:
+  - {fileID: 2532175341332586269}
   m_Father: {fileID: 9216872615087905485}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &3005694690385198493
@@ -302,6 +315,41 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!95 &696242960672357460
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6797947194657875002}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 5a5a023b573aa7d4f9c2e54b121fa269, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7438566234465488061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6797947194657875002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80ae2da49eae0fe4293f2495d3c07e10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Characters.CharacterAnimationPresenter
+  animator: {fileID: 696242960672357460}
 --- !u!1 &7680952560169528931
 GameObject:
   m_ObjectHideFlags: 0

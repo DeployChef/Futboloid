@@ -1,11 +1,11 @@
 using UnityEngine;
 
-namespace Futboloid.Gameplay.Keeper
+namespace Futboloid.Gameplay.Characters
 {
     /// <summary>
-    /// Только Animator-параметры вратаря. Animator назначается в Inspector — без GetComponent.
+    /// Idle / Run через bool Run на Animator. Animator — только из Inspector.
     /// </summary>
-    public sealed class GoalkeeperAnimationPresenter : MonoBehaviour
+    public sealed class CharacterAnimationPresenter : MonoBehaviour
     {
         private static readonly int RunHash = Animator.StringToHash("Run");
 
@@ -23,7 +23,7 @@ namespace Futboloid.Gameplay.Keeper
         private void OnValidate()
         {
             if (animator == null)
-                Debug.LogWarning("[GoalkeeperAnimationPresenter] Animator is not assigned.", this);
+                Debug.LogWarning("[CharacterAnimationPresenter] Animator is not assigned.", this);
         }
 #endif
     }
