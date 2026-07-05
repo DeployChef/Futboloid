@@ -48,7 +48,7 @@ namespace Futboloid.Gameplay.Ball
             _motion = new BallMotion(settings, bus, defenderRegistry, pitchBounds);
 
             if (kickoffAnchor == null)
-                kickoffAnchor = FindAnyObjectByType<BallKickoffAnchor>();
+                Debug.LogWarning("[BallView] BallKickoffAnchor is not assigned.", this);
 
             _subscriptions.Add(bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged));
             _subscriptions.Add(bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged));

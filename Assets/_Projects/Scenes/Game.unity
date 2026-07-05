@@ -2982,7 +2982,7 @@ MonoBehaviour:
   centerX: 0
   centerArriveThreshold: 0.02
   kickoffAnchor: {fileID: 743293818}
-  animator: {fileID: 2022565238}
+  animationPresenter: {fileID: 2022565239}
 --- !u!1 &737458358
 GameObject:
   m_ObjectHideFlags: 0
@@ -6850,6 +6850,7 @@ GameObject:
   - component: {fileID: 2022565236}
   - component: {fileID: 2022565237}
   - component: {fileID: 2022565238}
+  - component: {fileID: 2022565239}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -6953,6 +6954,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2022565239
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2022565235}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fef1a5f420bc44818a2452563082432e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Keeper.GoalkeeperAnimationPresenter
+  animator: {fileID: 2022565238}
 --- !u!1 &2066945371
 GameObject:
   m_ObjectHideFlags: 0
