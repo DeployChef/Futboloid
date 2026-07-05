@@ -46,7 +46,6 @@ namespace Futboloid.Gameplay.Defenders
         [SerializeField] private float fieldArriveThreshold = 0.12f;
 
         [Header("Goalkeeper")]
-        [SerializeField] private Transform goalAnchor;
         [FormerlySerializedAs("paramSpeed")]
         [Tooltip("Скорость слежения по параметру t (−1…1) в секунду — насколько быстро GK едет по дуге к X мяча.")]
         [SerializeField] private float trackSpeed = 1.25f;
@@ -55,21 +54,18 @@ namespace Futboloid.Gameplay.Defenders
         [SerializeField] private bool drawGizmos = true;
         [SerializeField] private float gizmoLabelHeight = 0.35f;
         [SerializeField] private float gizmoLabelPadding = 0.12f;
-        [SerializeField] private float gizmoGoalHalfWidth = 2f;
-        [FormerlySerializedAs("gizmoHyperbolaA")]
-        [SerializeField] private float gizmoParabolaHeight = 0.35f;
 
         private IGameEventBus _bus;
         private DefenderGridRegistry _registry;
         private DefenderLogic _logic;
         private BallView _ball;
         private PitchBounds _pitchBounds;
+        private GoalAnchor _goalAnchor;
         private readonly List<IDisposable> _subscriptions = new();
         private int _hp;
         private bool _isAlive = true;
         private bool _onField;
         private bool _simulating;
-        private bool _warnedMissingGoalAnchor;
         private bool _runningToGoal;
         private float _runSpeed = 4f;
         private float _runAcceleration = 18f;
@@ -90,7 +86,7 @@ namespace Futboloid.Gameplay.Defenders
         public bool RunningToGoal => _runningToGoal;
         public Vector2 HomePosition => _homePosition;
 
-        public void ApplySpawnSetup(in DefenderBuild build, Vector2 home, Transform anchor)
+        public void ApplySpawnSetup(in DefenderBuild build, Vector2 home)
         {
             slotId = build.SlotId;
             role = build.Role;
@@ -112,7 +108,6 @@ namespace Futboloid.Gameplay.Defenders
             if (build.TrackSpeed > 0f)
                 trackSpeed = build.TrackSpeed;
 
-            goalAnchor = anchor;
             transform.position = new Vector3(home.x, home.y, transform.position.z);
             _homePosition = home;
             _hp = maxHp;
@@ -139,13 +134,15 @@ namespace Futboloid.Gameplay.Defenders
             DefenderGridRegistry registry,
             DefenderLogic logic,
             BallView ball,
-            PitchBounds pitchBounds)
+            PitchBounds pitchBounds,
+            GoalAnchor goalAnchor)
         {
             _bus = bus;
             _registry = registry;
             _logic = logic;
             _ball = ball;
             _pitchBounds = pitchBounds;
+            _goalAnchor = goalAnchor;
             _subscriptions.Add(bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged));
             _subscriptions.Add(bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged));
 
@@ -201,16 +198,9 @@ namespace Futboloid.Gameplay.Defenders
 
         private void TickGoalkeeper()
         {
-            var zone = ResolveGoalAnchor();
-            if (zone == null)
-            {
-                SyncRunningAnimation(false);
-                return;
-            }
-
             var current = (Vector2)transform.position;
             var ballX = ResolveBallWorldX();
-            var result = _logic.TickGoalkeeperOnParabola(current, zone, ballX, trackSpeed, Time.deltaTime);
+            var result = _logic.TickGoalkeeperOnParabola(current, _goalAnchor, ballX, trackSpeed, Time.deltaTime);
             var position = _pitchBounds != null ? _pitchBounds.Clamp(result.Position) : result.Position;
             transform.position = new Vector3(position.x, position.y, transform.position.z);
             SyncRunningAnimation(result.IsMoving);
@@ -255,16 +245,15 @@ namespace Futboloid.Gameplay.Defenders
             });
         }
 
-        public void BeginRunToGoal(Transform anchor, float maxSpeed, float acceleration, float arriveThreshold)
+        public void BeginRunToGoal(float maxSpeed, float acceleration, float arriveThreshold)
         {
             if (!_isAlive || role != DefenderRole.Field)
                 return;
 
-            goalAnchor = anchor;
             _runSpeed = maxSpeed;
             _runAcceleration = acceleration;
             _runArriveThreshold = arriveThreshold;
-            _runTarget = ResolveRunTarget(anchor);
+            _runTarget = ResolveRunTarget();
             _logic.ResetRunVelocity();
             _logic.ResetFieldVelocity();
             _runningToGoal = true;
@@ -347,11 +336,7 @@ namespace Futboloid.Gameplay.Defenders
         private Vector2 ResolveReshuffleTarget()
         {
             if (role == DefenderRole.Goalkeeper)
-            {
-                var zone = ResolveGoalAnchor();
-                if (zone != null)
-                    return zone.PositionOnParabola(0f);
-            }
+                return _goalAnchor.PositionOnParabola(0f);
 
             return _homePosition;
         }
@@ -373,14 +358,7 @@ namespace Futboloid.Gameplay.Defenders
             _bus?.Publish(new DefenderPromotionCompletedEvent(slotId));
         }
 
-        private static Vector2 ResolveRunTarget(Transform anchor)
-        {
-            if (anchor == null)
-                return Vector2.zero;
-
-            var zone = anchor.GetComponent<GoalAnchor>();
-            return zone != null ? zone.PositionOnParabola(0f) : anchor.position;
-        }
+        private Vector2 ResolveRunTarget() => _goalAnchor.PositionOnParabola(0f);
 
         private void OnDestroy()
         {
@@ -414,45 +392,20 @@ namespace Futboloid.Gameplay.Defenders
 
         private void SyncGoalkeeperMotorFromPosition()
         {
-            var zone = ResolveGoalAnchor();
-            if (zone == null)
-                return;
-
-            _logic.ResetGoalkeeperParam(zone.ParamFromWorldX(transform.position.x));
+            _logic.ResetGoalkeeperParam(_goalAnchor.ParamFromWorldX(transform.position.x));
         }
 
         private void SnapGoalkeeperToBall()
         {
-            var zone = ResolveGoalAnchor();
-            if (zone == null)
-                return;
-
-            var t = zone.ParamFromWorldX(ResolveBallWorldX());
+            var t = _goalAnchor.ParamFromWorldX(ResolveBallWorldX());
             _logic.ResetGoalkeeperParam(t);
-            var position = zone.PositionOnParabola(t);
+            var position = _goalAnchor.PositionOnParabola(t);
             transform.position = new Vector3(position.x, position.y, transform.position.z);
         }
 
         private float ResolveBallWorldX()
         {
             return _ball != null ? _ball.Position.x : transform.position.x;
-        }
-
-        private GoalAnchor ResolveGoalAnchor()
-        {
-            if (goalAnchor == null)
-                return null;
-
-            var zone = goalAnchor.GetComponent<GoalAnchor>();
-            if (zone == null && !_warnedMissingGoalAnchor)
-            {
-                _warnedMissingGoalAnchor = true;
-                Debug.LogWarning(
-                    $"[DefenderView] Slot {slotId}: goalAnchor '{goalAnchor.name}' has no GoalAnchor component — GK cannot move.",
-                    goalAnchor);
-            }
-
-            return zone;
         }
 
         public void HandleBallContact(BallMotion motion, RaycastHit2D hit)
@@ -543,22 +496,7 @@ namespace Futboloid.Gameplay.Defenders
             DefenderGizmoDrawer.DrawLabel(labelPos, label);
 
             if (role == DefenderRole.Goalkeeper)
-            {
-                var zone = ResolveGoalAnchor();
-                var gkCenter = zone != null
-                    ? new Vector3(zone.Center.x, zone.GoalLineY, transform.position.z)
-                    : center;
-                var halfWidth = zone != null ? zone.HalfWidth : gizmoGoalHalfWidth;
-                var parabolaHeight = zone != null ? zone.ParabolaHeight : gizmoParabolaHeight;
-
-                DefenderGizmoDrawer.DrawGoalkeeperParabola(
-                    gkCenter,
-                    halfWidth,
-                    parabolaHeight,
-                    selected ? new Color(1f, 0.4f, 1f, 0.9f) : new Color(1f, 0.4f, 1f, 0.45f),
-                    selected);
                 return;
-            }
 
             var alpha = selected ? 0.85f : 0.4f;
             DefenderGizmoDrawer.DrawWireCircle(

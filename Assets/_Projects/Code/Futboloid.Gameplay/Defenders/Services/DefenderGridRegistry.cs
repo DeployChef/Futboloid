@@ -15,7 +15,6 @@ namespace Futboloid.Gameplay.Defenders
     public class DefenderGridRegistry : MonoBehaviour
     {
         [Header("Goalkeeper promotion (read by DefenderPromotionService)")]
-        [SerializeField] private Transform goalAnchor;
         [SerializeField] private float runToGoalSpeed = 4f;
         [SerializeField] private float runToGoalAcceleration = 18f;
         [SerializeField] private float arriveThreshold = 0.08f;
@@ -157,15 +156,6 @@ namespace Futboloid.Gameplay.Defenders
                 if (defender != null && defender.IsAlive)
                     action(defender);
             }
-        }
-
-        public Transform ResolveGoalAnchor()
-        {
-            if (goalAnchor != null)
-                return goalAnchor;
-
-            var zone = FindAnyObjectByType<GoalAnchor>();
-            return zone != null ? zone.transform : null;
         }
 
         private void OnDefenderDestroyed(DefenderDestroyedEvent _)
