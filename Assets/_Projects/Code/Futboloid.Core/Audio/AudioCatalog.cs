@@ -10,13 +10,40 @@ namespace Futboloid.Core.Audio
 
         public static class Ids
         {
+            // Мяч
             public const string BallHit = "BallHit";
+
+            // Голы
             public const string GoalScored = "GoalScored";
             public const string GoalConceded = "GoalConceded";
+
+            // Матч
             public const string MatchStart = "MatchStart";
             public const string MatchEnd = "MatchEnd";
             public const string MusicMatch = "MusicMatch";
+            public const string TimeBonus = "TimeBonus";
+            public const string TimePenalty = "TimePenalty";
+
+            // Защитники
+            public const string DefenderHit = "DefenderHit";
+            public const string DefenderDestroyed = "DefenderDestroyed";
+            public const string PromotionStarted = "PromotionStarted";
+            public const string PromotionCompleted = "PromotionCompleted";
+            public const string DefenderReturned = "DefenderReturned";
+            public const string DefenderRoleChanged = "DefenderRoleChanged";
+
+            // Прогрессия забега
             public const string PerkPick = "PerkPick";
+            public const string BonusPickOpen = "BonusPickOpen";
+            public const string LevelUp = "LevelUp";
+
+            // Фазы поля
+            public const string ReshuffleStart = "ReshuffleStart";
+
+            // UI / навигация
+            public const string UiMenuOpen = "UiMenuOpen";
+            public const string UiPauseOpen = "UiPauseOpen";
+            public const string UiTournamentOpen = "UiTournamentOpen";
         }
 
         [SerializeField] private List<SoundDefinition> sounds = new();

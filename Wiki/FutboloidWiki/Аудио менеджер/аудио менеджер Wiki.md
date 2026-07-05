@@ -60,17 +60,32 @@ BallMotion → bus.Publish(BallContactEvent)
 
 ## Маппинг событий → звуки
 
+**Полный справочник для звукаря:** [[Каталог событий и звуков]].
+
+Кратко — всё, на что подписан `AudioService`:
+
 | Событие | Условие | Sound ID |
 |---------|---------|----------|
-| `BallContactEvent` | Wall или Defender | `BallHit` |
-| `GoalScoredEvent` | `IsPlayerGoal == true` | `GoalScored` |
-| `GoalScoredEvent` | `IsPlayerGoal == false` | `GoalConceded` |
+| `BallContactEvent` | любой контакт | `BallHit` |
+| `GoalScoredEvent` | `IsPlayerGoal` | `GoalScored` / `GoalConceded` |
 | `MatchStartedEvent` | — | `MatchStart` + `MusicMatch` |
-| `MatchEndedEvent` | — | `MatchEnd` + stop `MusicMatch` |
+| `MatchEndedEvent` | — | `MatchEnd` + stop music |
 | `PitchResetRequestedEvent` | — | stop `MusicMatch` |
+| `MatchTimeAdjustedEvent` | Δt &gt; 0 / &lt; 0 | `TimeBonus` / `TimePenalty` |
+| `DefenderHitEvent` | — | `DefenderHit` |
+| `DefenderDestroyedEvent` | — | `DefenderDestroyed` |
+| `DefenderPromotionStartedEvent` | — | `PromotionStarted` |
+| `DefenderPromotionCompletedEvent` | — | `PromotionCompleted` |
+| `DefenderReturnedHomeEvent` | — | `DefenderReturned` |
+| `DefenderRoleChangedEvent` | `IsGoalkeeper` | `DefenderRoleChanged` |
 | `PerkPickedEvent` | — | `PerkPick` |
+| `RunProgressionUpdatedEvent` | уровень вырос | `LevelUp` |
+| `PitchPhaseChangedEvent` | `Reshuffle` / `BonusPick` | `ReshuffleStart` / `BonusPickOpen` |
 | `NavigationChangedEvent` | OnField → MainMenu | pause music |
-| `NavigationChangedEvent` | MainMenu → OnField (paused) | resume music |
+| `NavigationChangedEvent` | `ResumingPausedMatch` | resume music |
+| `NavigationChangedEvent` | вход в MainMenu / Pause / Tournament | `UiMenuOpen` / `UiPauseOpen` / `UiTournamentOpen` |
+
+Константы id: `AudioCatalog.Ids` в `AudioCatalog.cs`.
 
 ---
 
@@ -83,7 +98,7 @@ BallMotion → bus.Publish(BallContactEvent)
 | `AudioService.cs` | `Futboloid.Core/Audio/` |
 | `IAudioPlayback.cs` | `Futboloid.Core/Audio/` |
 | `AudioPlaybackHost.cs` | `Futboloid.Main/Audio/` |
-| `MatchMusicStartedEvent.cs` | `Futboloid.Core/Bus/Events/` |
+| `MatchStartedEvent.cs` | `Futboloid.Core/Bus/Events/` |
 
 ---
 
@@ -114,6 +129,7 @@ builder.Register<AudioService>(Lifetime.Singleton);
 
 ## Связанные заметки
 
+- [[Каталог событий и звуков]]
 - [[Инструкция по настройке]]
 - [[Система приоритетов и наложения]]
 - [[Архитектура/Шина событий|Шина событий]]
