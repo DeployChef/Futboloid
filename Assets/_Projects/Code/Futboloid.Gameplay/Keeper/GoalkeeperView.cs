@@ -4,6 +4,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using Futboloid.Core;
 using Futboloid.Core.Run;
+using Futboloid.Core.StatusEffects;
 using Futboloid.Gameplay.Ball;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
@@ -36,6 +37,7 @@ namespace Futboloid.Gameplay.Keeper
         private BallView _ball;
         private PitchBounds _pitchBounds;
         private IRunProgressionService _runProgression;
+        private IStatusEffectService _statusEffects;
 
         [Inject]
         public void Construct(
@@ -45,12 +47,14 @@ namespace Futboloid.Gameplay.Keeper
             MatchFlow matchFlow,
             BallView ball,
             PitchBounds pitchBounds,
-            IRunProgressionService runProgression)
+            IRunProgressionService runProgression,
+            IStatusEffectService statusEffects)
         {
             _input = input;
             _ball = ball;
             _pitchBounds = pitchBounds;
             _runProgression = runProgression;
+            _statusEffects = statusEffects;
 
             if (kickoffAnchor == null)
                 Debug.LogWarning("[GoalkeeperView] BallKickoffAnchor is not assigned.", this);
@@ -119,7 +123,9 @@ namespace Futboloid.Gameplay.Keeper
         private void TickMovement(float minX, float maxX)
         {
             var moveInput = _input?.MoveX ?? 0f;
-            var speedMultiplier = _runProgression?.GetGoalkeeperMoveSpeedMultiplier() ?? 1f;
+            var speedMultiplier =
+                (_runProgression?.GetGoalkeeperMoveSpeedMultiplier() ?? 1f)
+                * (_statusEffects?.GetMultiplier(StatId.GoalkeeperMoveSpeed) ?? 1f);
             var result = _motor.Tick(
                 transform.position,
                 minX,

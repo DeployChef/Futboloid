@@ -6,6 +6,7 @@ using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
 using Futboloid.Core.Run;
+using Futboloid.Core.StatusEffects;
 using UnityEngine;
 
 namespace Futboloid.Gameplay.Match
@@ -18,6 +19,7 @@ namespace Futboloid.Gameplay.Match
         private readonly IGameEventBus _bus;
         private readonly ComboScoreSettings _settings;
         private readonly IRunProgressionService _progression;
+        private readonly IStatusEffectService _statusEffects;
         private readonly ITournamentBracketReadModel _tournament;
         private readonly List<IDisposable> _subscriptions = new();
 
@@ -32,11 +34,13 @@ namespace Futboloid.Gameplay.Match
             IGameEventBus bus,
             GameplaySettings gameplaySettings,
             IRunProgressionService progression,
+            IStatusEffectService statusEffects,
             ITournamentBracketReadModel tournament)
         {
             _bus = bus;
             _settings = gameplaySettings.ComboScore;
             _progression = progression;
+            _statusEffects = statusEffects;
             _tournament = tournament;
             Multiplier = ResolveMinMultiplier();
 
@@ -86,7 +90,8 @@ namespace Futboloid.Gameplay.Match
             if (pointValue <= 0)
                 return;
 
-            AddPoints(pointValue * Multiplier);
+            var comboGainMul = _statusEffects?.GetMultiplier(StatId.ComboGain) ?? 1f;
+            AddPoints(Mathf.RoundToInt(pointValue * Multiplier * comboGainMul));
             IncreaseMultiplier();
         }
 
@@ -97,7 +102,10 @@ namespace Futboloid.Gameplay.Match
 
             var bonus = _settings.GoalBonusPoints;
             if (bonus > 0)
-                AddPoints(bonus * Multiplier);
+            {
+                var comboGainMul = _statusEffects?.GetMultiplier(StatId.ComboGain) ?? 1f;
+                AddPoints(Mathf.RoundToInt(bonus * Multiplier * comboGainMul));
+            }
         }
 
         private void OnBallReturnedToKeeper(BallReturnedToKeeperEvent _) =>
