@@ -28,7 +28,7 @@ namespace Futboloid.Core.Audio
             _playback = playback;
 
             // —— Мяч ——
-            _subscriptions.Add(_bus.Subscribe<BallContactEvent>(_ => Play(AudioCatalog.Ids.BallHit)));
+            _subscriptions.Add(_bus.Subscribe<BallContactEvent>(OnBallContact));
 
             // —— Голы ——
             _subscriptions.Add(_bus.Subscribe<GoalScoredEvent>(OnGoalScored));
@@ -67,6 +67,19 @@ namespace Futboloid.Core.Audio
             // BonusPickOfferedEvent — звук через PitchPhaseChangedEvent (BonusPick)
             // MatchTimerChangedEvent, MatchScoreChangedEvent — слишком частые
             // DefenderDamagedEvent — дублирует DefenderHitEvent + BallContactEvent
+        }
+
+        private void OnBallContact(BallContactEvent obj)
+        {
+            if (obj.Kind != BallContactKind.Wall)
+            {
+                //Здесь пинок мячика
+                Play(AudioCatalog.Ids.BallHit);
+            }
+            else
+            {
+                Play(AudioCatalog.Ids.BallHit);
+            }
         }
 
         public void Dispose()
