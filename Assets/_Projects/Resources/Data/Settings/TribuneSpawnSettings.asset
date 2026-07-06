@@ -12,12 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ce31c4079495af42af48a832c83cf7d, type: 3}
   m_Name: TribuneSpawnSettings
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Tribune.TribuneSpawnSettings
-  spawnIntervalSeconds: 10
-  spawnIntervalJitter: 3
+  spawnIntervalSeconds: 4
+  spawnIntervalJitter: 1
+  minSpawnIntervalSeconds: 2
   horizontalSpawnOffset: 1.5
   spawnMinY: 4
   spawnMaxY: 7.5
-  targetMinY: -6
-  targetMaxY: -2
-  flightDurationSeconds: 2.5
-  arcHeight: 2.5
+  targetMinY: -7.5
+  targetMaxY: -6
+  targetSpreadX: 2
+  targetYOffsetMin: -0.4
+  targetYOffsetMax: 0.6
+  flightDurationSeconds: 5
+  flightVisualScale: 0.35
+  launchHeight: 5
+  launchHorizontalBias: 0.2
+  overshootPastTarget: 3.5
+  catchRadius: 1.4

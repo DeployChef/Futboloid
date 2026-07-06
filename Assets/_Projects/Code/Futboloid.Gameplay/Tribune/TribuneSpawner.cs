@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Futboloid.Core.StatusEffects;
+using Futboloid.Gameplay.Keeper;
 using Futboloid.Gameplay.Match;
 using UnityEngine;
 using VContainer;
@@ -18,6 +19,7 @@ namespace Futboloid.Gameplay.Tribune
 
         private PitchStateMachine _pitch;
         private PitchBounds _bounds;
+        private GoalkeeperView _goalkeeper;
         private IStatusEffectService _statusEffects;
         private TribuneSpawnSettings _settings;
         private float _spawnTimer;
@@ -26,11 +28,13 @@ namespace Futboloid.Gameplay.Tribune
         public void Construct(
             PitchStateMachine pitch,
             PitchBounds bounds,
+            GoalkeeperView goalkeeper,
             IStatusEffectService statusEffects,
             TribuneSpawnSettings settings)
         {
             _pitch = pitch;
             _bounds = bounds;
+            _goalkeeper = goalkeeper;
             _statusEffects = statusEffects;
             _settings = settings;
             ResetSpawnTimer();
@@ -76,19 +80,43 @@ namespace Futboloid.Gameplay.Tribune
                 startX,
                 Random.Range(_settings.SpawnMinY, _settings.SpawnMaxY));
 
-            var end = new Vector2(
-                Random.Range(_bounds.MinX, _bounds.MaxX),
-                Random.Range(_settings.TargetMinY, _settings.TargetMaxY));
+            var aim = ResolveTargetPosition();
+            var flyDirection = aim - start;
+            if (flyDirection.sqrMagnitude < 0.01f)
+                flyDirection = Vector2.down;
+            else
+                flyDirection.Normalize();
+
+            var end = aim + flyDirection * _settings.OvershootPastTarget;
 
             var parent = itemRoot != null ? itemRoot : transform;
             var item = Instantiate(itemPrefab, parent);
             item.Initialize(
                 definition,
                 _statusEffects,
+                _goalkeeper,
                 start,
                 end,
-                _settings.ArcHeight,
+                _settings.LaunchHeight,
+                _settings.LaunchHorizontalBias,
+                _settings.FlightVisualScale,
+                _settings.CatchRadius,
                 _settings.FlightDurationSeconds);
+        }
+
+        private Vector2 ResolveTargetPosition()
+        {
+            if (_goalkeeper != null)
+            {
+                var keeperPosition = _goalkeeper.transform.position;
+                return new Vector2(
+                    keeperPosition.x + Random.Range(-_settings.TargetSpreadX, _settings.TargetSpreadX),
+                    keeperPosition.y + Random.Range(_settings.TargetYOffsetMin, _settings.TargetYOffsetMax));
+            }
+
+            return new Vector2(
+                Random.Range(_bounds.KickoffMinX, _bounds.KickoffMaxX),
+                Random.Range(_settings.TargetMinY, _settings.TargetMaxY));
         }
 
         private void ResetSpawnTimer()
@@ -97,8 +125,9 @@ namespace Futboloid.Gameplay.Tribune
                 ? Random.Range(-_settings.SpawnIntervalJitter, _settings.SpawnIntervalJitter)
                 : 0f;
 
-            var interval = (_settings?.SpawnIntervalSeconds ?? 10f) + jitter;
-            _spawnTimer = Mathf.Max(1f, interval);
+            var interval = (_settings?.SpawnIntervalSeconds ?? 4f) + jitter;
+            var minInterval = _settings?.MinSpawnIntervalSeconds ?? 2f;
+            _spawnTimer = Mathf.Max(minInterval, interval);
         }
     }
 }
