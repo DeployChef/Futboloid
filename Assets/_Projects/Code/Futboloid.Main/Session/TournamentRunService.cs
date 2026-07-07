@@ -1,5 +1,6 @@
 using Futboloid.Core;
 using Futboloid.Gameplay.Match;
+using UnityEngine;
 
 namespace Futboloid.Main.Session
 {
@@ -8,30 +9,47 @@ namespace Futboloid.Main.Session
     /// </summary>
     public class TournamentRunService : ITournamentRunService
     {
+        private readonly GameplaySettings _settings;
         private readonly int _matchesToWin;
 
         private int _matchesCompleted;
         private int _lastPlayerScore;
         private int _lastOpponentScore;
+        private int _runSeed;
 
         public TournamentRunState RunState { get; private set; } = TournamentRunState.InProgress;
 
         public int CurrentMatchNumber => _matchesCompleted + 1;
+        public int MatchesToWin => _matchesToWin;
+        public int RunSeed => _runSeed;
 
         public string RoundLabel => GetRoundLabel();
         public string StatusLine => GetStatusLine();
 
         public TournamentRunService(GameplaySettings settings)
         {
+            _settings = settings;
             _matchesToWin = settings.MatchesToWin;
+            _runSeed = Random.Range(1, int.MaxValue);
         }
 
         public void ResetRun()
         {
-            _matchesCompleted = 0;
             _lastPlayerScore = 0;
             _lastOpponentScore = 0;
+            _runSeed = Random.Range(1, int.MaxValue);
             RunState = TournamentRunState.InProgress;
+
+            var startMatch = _settings.DebugStartMatchEnabled
+                ? _settings.DebugStartMatch
+                : 1;
+            _matchesCompleted = Mathf.Clamp(startMatch - 1, 0, _matchesToWin - 1);
+
+            if (_settings.DebugStartMatchEnabled)
+            {
+                Debug.Log(
+                    $"[TournamentRunService] Debug start: match {CurrentMatchNumber} / {_matchesToWin}");
+            }
         }
 
         public void RecordMatchResult(int playerScore, int opponentScore, bool playerWon)
@@ -53,15 +71,14 @@ namespace Futboloid.Main.Session
                 case TournamentRunState.Completed:
                     return "Финал пройден";
                 case TournamentRunState.Eliminated:
-                    return $"Матч {_matchesCompleted}";
+                    return $"Матч {CurrentMatchNumber}";
                 default:
-                    return $"Матч {_matchesCompleted} из {_matchesToWin}";
+                    return $"Матч {CurrentMatchNumber} из {_matchesToWin}";
             }
         }
 
         private string GetStatusLine()
         {
-            
             switch (RunState)
             {
                 case TournamentRunState.Completed:

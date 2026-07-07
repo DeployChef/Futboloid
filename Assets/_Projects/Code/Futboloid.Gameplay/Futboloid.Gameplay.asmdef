@@ -5,6 +5,7 @@
         "Futboloid.Core",
         "Unity.InputSystem",
         "Unity.TextMeshPro",
+        "Unity.UGUI",
         "UniTask",
         "VContainer"
     ],

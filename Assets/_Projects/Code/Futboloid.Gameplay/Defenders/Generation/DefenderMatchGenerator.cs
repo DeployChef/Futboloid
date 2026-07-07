@@ -16,8 +16,11 @@ namespace Futboloid.Gameplay.Defenders
 
             var result = new DefenderGenerationResult();
             var matchNumber = context.MatchNumber;
-            var pacing = settings.EvaluatePacing(matchNumber);
+            var totalMatches = context.TotalMatches;
+            var pacing = settings.EvaluatePacing(matchNumber, totalMatches);
             var hpMul = context.EnemyHpMultiplier;
+            var fieldDefaults = settings.FieldDefaults;
+            var rng = CreateRng(settings.GenerationSeedSalt, matchNumber, context.RunSeed);
 
             result.Goalkeeper = new DefenderBuild
             {
@@ -29,137 +32,66 @@ namespace Futboloid.Gameplay.Defenders
                 TrackSpeed = settings.GkTrackSpeed,
                 LaunchSpeed = 12f,
                 OpenGoalChancePercent = 70,
-                InteractionCooldown = 0.1f,
-                PatrolPointCount = 4,
-                PatrolRadius = 1.5f,
-                WanderRadius = 1.5f,
-                ChaseRadius = 3f,
-                SeparationRadius = 0.6f,
+                InteractionCooldown = fieldDefaults.InteractionCooldown,
+                PatrolPointCount = Mathf.Max(1, fieldDefaults.PatrolPointCount),
+                PatrolRadius = fieldDefaults.PatrolRadius,
+                WanderRadius = fieldDefaults.PatrolRadius,
+                SeparationRadius = fieldDefaults.SeparationRadius,
                 FieldMoveSpeed = 1.6f,
-                FieldAcceleration = 12f,
-                FieldArriveThreshold = 0.12f,
+                FieldAcceleration = fieldDefaults.FieldAcceleration,
+                FieldArriveThreshold = fieldDefaults.FieldArriveThreshold,
                 PointValue = settings.GkPointValue
             };
 
-            if (matchNumber <= 1)
-            {
-                GenerateTutorial(settings, result, pacing, hpMul);
-                return result;
-            }
-
-            var tier = settings.ResolveTier(matchNumber);
-            var rng = CreateRng(settings.GenerationSeedSalt, matchNumber);
-            var formation = PickFormation(settings, tier.Tier, rng);
-            if (formation.SlotIds == null || formation.SlotIds.Length == 0)
-                return result;
-
-            var slotCount = Mathf.Min(formation.SlotIds.Length, tier.MaxFieldCount);
-            for (var i = 0; i < slotCount; i++)
-            {
-                var slotId = formation.SlotIds[i];
-                if (!IsValidSlot(settings, slotId))
-                    continue;
-
-                var archetype = PickArchetype(settings, tier.Tier, rng);
-                if (string.IsNullOrEmpty(archetype.Id))
-                    continue;
-
-                var hp = settings.ResolveFieldHp(
-                    archetype.Hp > 0 ? archetype.Hp : settings.FieldBaseHp,
-                    pacing,
-                    hpMul);
-
-                result.Field.Add(archetype.ToBuild(slotId, hp));
-            }
-
+            GenerateFieldDefenders(settings, result, matchNumber, totalMatches, pacing, hpMul, fieldDefaults, rng);
             return result;
         }
 
-        private static void GenerateTutorial(
+        private static void GenerateFieldDefenders(
             DefenderGenerationSettings settings,
             DefenderGenerationResult result,
+            int matchNumber,
+            int totalMatches,
             float pacing,
-            float hpMul)
+            float hpMul,
+            in FieldBehaviorDefaults fieldDefaults,
+            System.Random rng)
         {
-            var tutorial = settings.TutorialMatch;
-            var slots = tutorial.SlotIds;
-            var archetypeIds = tutorial.ArchetypeIds;
-            if (slots == null || slots.Length == 0)
+            var tier = settings.ResolveTier(matchNumber, totalMatches);
+            var fieldCount = settings.ResolveFieldCount(matchNumber, totalMatches, rng);
+            var zone = settings.ResolvePlacementZone(matchNumber, totalMatches);
+            var slotIds = DefenderFormationComposer.Compose(settings, tier.Tier, fieldCount, zone, rng);
+            if (slotIds.Count == 0)
                 return;
 
-            for (var i = 0; i < slots.Length; i++)
+            var pickedArchetypeIds = new List<string>(slotIds.Count);
+
+            for (var i = 0; i < slotIds.Count; i++)
             {
-                var slotId = slots[i];
+                var slotId = slotIds[i];
                 if (!IsValidSlot(settings, slotId))
                     continue;
 
-                var archetypeId = archetypeIds != null && i < archetypeIds.Length
-                    ? archetypeIds[i]
-                    : "Shield";
-
-                if (!TryFindArchetype(settings, archetypeId, out var archetype))
+                var archetype = PickArchetype(settings, tier.Tier, rng, pickedArchetypeIds);
+                if (string.IsNullOrEmpty(archetype.Id))
                     continue;
+
+                pickedArchetypeIds.Add(archetype.Id);
 
                 var hp = settings.ResolveFieldHp(
                     archetype.Hp > 0 ? archetype.Hp : settings.FieldBaseHp,
                     pacing,
                     hpMul);
 
-                result.Field.Add(archetype.ToBuild(slotId, hp));
+                result.Field.Add(archetype.ToBuild(slotId, hp, fieldDefaults));
             }
-        }
-
-        private static FormationShapeDefinition PickFormation(
-            DefenderGenerationSettings settings,
-            int tier,
-            System.Random rng)
-        {
-            var candidates = new List<FormationShapeDefinition>();
-            var totalWeight = 0f;
-
-            var formations = settings.Formations;
-            if (formations == null)
-                return default;
-
-            for (var i = 0; i < formations.Length; i++)
-            {
-                var formation = formations[i];
-                if (formation.MinTier > tier || formation.SlotIds == null || formation.SlotIds.Length == 0)
-                    continue;
-
-                if (formation.Weight <= 0f)
-                    continue;
-
-                candidates.Add(formation);
-                totalWeight += formation.Weight;
-            }
-
-            if (candidates.Count == 0)
-            {
-                for (var i = 0; i < formations.Length; i++)
-                {
-                    if (formations[i].SlotIds != null && formations[i].SlotIds.Length > 0)
-                        return formations[i];
-                }
-
-                return default;
-            }
-
-            var roll = (float)rng.NextDouble() * totalWeight;
-            for (var i = 0; i < candidates.Count; i++)
-            {
-                roll -= candidates[i].Weight;
-                if (roll <= 0f)
-                    return candidates[i];
-            }
-
-            return candidates[candidates.Count - 1];
         }
 
         private static DefenderArchetypeDefinition PickArchetype(
             DefenderGenerationSettings settings,
             int tier,
-            System.Random rng)
+            System.Random rng,
+            IReadOnlyList<string> alreadyPicked)
         {
             var archetypes = settings.Archetypes;
             if (archetypes == null || archetypes.Length == 0)
@@ -172,11 +104,20 @@ namespace Futboloid.Gameplay.Defenders
                 if (archetype.MinTier > tier || archetype.Weight <= 0f)
                     continue;
 
+                if (IsArchetypeCapped(archetype.Id, alreadyPicked))
+                    continue;
+
                 totalWeight += archetype.Weight;
             }
 
             if (totalWeight <= 0f)
             {
+                for (var i = 0; i < archetypes.Length; i++)
+                {
+                    if (archetypes[i].MinTier <= tier && !IsArchetypeCapped(archetypes[i].Id, alreadyPicked))
+                        return archetypes[i];
+                }
+
                 for (var i = 0; i < archetypes.Length; i++)
                 {
                     if (archetypes[i].MinTier <= tier)
@@ -193,6 +134,9 @@ namespace Futboloid.Gameplay.Defenders
                 if (archetype.MinTier > tier || archetype.Weight <= 0f)
                     continue;
 
+                if (IsArchetypeCapped(archetype.Id, alreadyPicked))
+                    continue;
+
                 roll -= archetype.Weight;
                 if (roll <= 0f)
                     return archetype;
@@ -201,39 +145,29 @@ namespace Futboloid.Gameplay.Defenders
             return archetypes[archetypes.Length - 1];
         }
 
-        private static bool TryFindArchetype(
-            DefenderGenerationSettings settings,
-            string id,
-            out DefenderArchetypeDefinition archetype)
+        private static bool IsArchetypeCapped(string archetypeId, IReadOnlyList<string> alreadyPicked)
         {
-            archetype = default;
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(archetypeId) || alreadyPicked == null)
                 return false;
 
-            var archetypes = settings.Archetypes;
-            if (archetypes == null)
-                return false;
-
-            for (var i = 0; i < archetypes.Length; i++)
+            var count = 0;
+            for (var i = 0; i < alreadyPicked.Count; i++)
             {
-                if (archetypes[i].Id != id)
-                    continue;
-
-                archetype = archetypes[i];
-                return true;
+                if (alreadyPicked[i] == archetypeId)
+                    count++;
             }
 
-            return false;
+            return count >= DefenderGenerationSettings.MaxSameArchetypePerMatch;
         }
 
         private static bool IsValidSlot(DefenderGenerationSettings settings, int slotId) =>
             slotId >= 0 && slotId < settings.SlotCount;
 
-        private static System.Random CreateRng(int salt, int matchNumber)
+        private static System.Random CreateRng(int salt, int matchNumber, int runSeed)
         {
             unchecked
             {
-                var seed = salt * 397 ^ matchNumber * 1009;
+                var seed = salt * 397 ^ matchNumber * 1009 ^ runSeed * 9176;
                 return new System.Random(seed);
             }
         }

@@ -36,7 +36,8 @@ namespace Futboloid.Gameplay.Defenders
             var center = new Vector3(home.x, home.y, transform.position.z);
             var labelPos = GetLabelPosition(center);
 
-            var label = $"#{defender.SlotId}  {defender.Role}\nHit: {defender.HitType}";
+            var behavior = DefenderBehaviorMapping.GetShortLabel(defender.BehaviorKind);
+            var label = $"#{defender.SlotId}  {defender.Role}\n{behavior} ({defender.HitType}+{defender.MovementType})";
             if (defender.RunningToGoal)
                 label += "\n→ GK";
             if (defender.Role == DefenderRole.Field && !defender.RunningToGoal)
@@ -74,17 +75,13 @@ namespace Futboloid.Gameplay.Defenders
                     break;
 
                 case DefenderMovementType.WanderInRadius:
+                case DefenderMovementType.ChaseBall:
                     DefenderGizmoDrawer.DrawWireCircle(
                         center,
                         defender.WanderRadius,
-                        new Color(0.3f, 0.75f, 1f, alpha));
-                    break;
-
-                case DefenderMovementType.ChaseBallInRadius:
-                    DefenderGizmoDrawer.DrawWireCircle(
-                        center,
-                        defender.ChaseRadius,
-                        new Color(0.2f, 0.95f, 1f, alpha));
+                        defender.MovementType == DefenderMovementType.ChaseBall
+                            ? new Color(0.2f, 0.95f, 1f, alpha)
+                            : new Color(0.3f, 0.75f, 1f, alpha));
                     break;
             }
         }

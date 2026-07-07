@@ -8,16 +8,24 @@ namespace Futboloid.Gameplay.Match
     {
         public const string ResourcePath = "Data/Settings/GameplaySettings";
         public const float DefaultMatchDurationSeconds = 90f;
-        public const int DefaultMatchesToWin = 3;
+        public const int DefaultMatchesToWin = 9;
 
         [SerializeField] private float matchDurationSeconds = DefaultMatchDurationSeconds;
         [SerializeField] private int matchesToWin = DefaultMatchesToWin;
+
+        [Header("Debug")]
+        [Tooltip("Старт забега с выбранного матча (для проверки баланса). Только при новом забеге из меню.")]
+        [SerializeField] private bool debugStartMatchEnabled;
+        [SerializeField] private int debugStartMatch = 1;
+
         [SerializeField] private DefenderGenerationSettings defenderGeneration;
         [SerializeField] private DefenderMatchSettings defenderMatch;
         [SerializeField] private ComboScoreSettings comboScore = new();
 
         public float MatchDurationSeconds => Mathf.Max(1f, matchDurationSeconds);
         public int MatchesToWin => Mathf.Max(1, matchesToWin);
+        public bool DebugStartMatchEnabled => debugStartMatchEnabled;
+        public int DebugStartMatch => Mathf.Clamp(debugStartMatch, 1, MatchesToWin);
         public DefenderGenerationSettings DefenderGeneration =>
             defenderGeneration != null
                 ? defenderGeneration
