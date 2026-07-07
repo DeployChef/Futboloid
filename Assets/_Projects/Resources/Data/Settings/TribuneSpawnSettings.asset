@@ -24,7 +24,7 @@ MonoBehaviour:
   targetYOffsetMin: -0.4
   targetYOffsetMax: 0.6
   flightDurationSeconds: 5
-  flightVisualScale: 0.35
+  flightVisualScale: 0.15
   launchHeight: 5
   launchHorizontalBias: 0.2
   overshootPastTarget: 3.5

@@ -102,6 +102,7 @@ GameObject:
   - component: {fileID: 5709325287968688134}
   - component: {fileID: 7623623041087299147}
   - component: {fileID: 2590551274272570966}
+  - component: {fileID: -185034217881356440}
   m_Layer: 0
   m_Name: TribuneItem
   m_TagString: Untagged
@@ -174,3 +175,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Tribune.TribuneItemView
   spriteRenderer: {fileID: 1574625978548635283}
+--- !u!95 &-185034217881356440
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8692531535037747598}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d97c285570a59ff44b6dfeee84148bea, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
