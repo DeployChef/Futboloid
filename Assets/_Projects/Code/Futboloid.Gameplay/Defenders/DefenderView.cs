@@ -20,6 +20,7 @@ namespace Futboloid.Gameplay.Defenders
         [SerializeField] private DefenderRole role = DefenderRole.Field;
         [SerializeField] private Collider2D bodyCollider;
         [SerializeField] private CharacterAnimationPresenter animationPresenter;
+        [SerializeField] private DefenderBehaviorVisual behaviorVisual;
         [SerializeField] private DefenderHealth health;
 
         [Header("Hit")]
@@ -79,6 +80,7 @@ namespace Futboloid.Gameplay.Defenders
         public bool RunningToGoal => _runningToGoal;
         public Vector2 HomePosition => _homePosition;
         public DefenderMovementType MovementType => movementType;
+        public DefenderBehaviorKind BehaviorKind => DefenderBehaviorMapping.From(hitType, movementType);
         public int PatrolPointCount => patrolPointCount;
         public float PatrolRadius => patrolRadius;
         public float WanderRadius => wanderRadius;
@@ -109,10 +111,14 @@ namespace Futboloid.Gameplay.Defenders
             _homePosition = home;
             _runningToGoal = false;
             health.Configure(build.MaxHp);
+            behaviorVisual?.Apply(hitType, movementType, role);
         }
 
         private void Awake()
         {
+            if (behaviorVisual == null)
+                behaviorVisual = GetComponentInChildren<DefenderBehaviorVisual>(true);
+
             if (bodyCollider == null)
                 Debug.LogWarning("[DefenderView] bodyCollider is not assigned.", this);
 
@@ -276,6 +282,7 @@ namespace Futboloid.Gameplay.Defenders
 
             role = newRole;
             _runningToGoal = false;
+            behaviorVisual?.Apply(hitType, movementType, role);
             _bus?.Publish(new DefenderRoleChangedEvent(slotId, newRole == DefenderRole.Goalkeeper));
 
             if (newRole == DefenderRole.Goalkeeper)

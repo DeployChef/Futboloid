@@ -36,7 +36,8 @@ namespace Futboloid.Gameplay.Defenders
             var center = new Vector3(home.x, home.y, transform.position.z);
             var labelPos = GetLabelPosition(center);
 
-            var label = $"#{defender.SlotId}  {defender.Role}\nHit: {defender.HitType}";
+            var behavior = DefenderBehaviorMapping.GetShortLabel(defender.BehaviorKind);
+            var label = $"#{defender.SlotId}  {defender.Role}\n{behavior} ({defender.HitType}+{defender.MovementType})";
             if (defender.RunningToGoal)
                 label += "\n→ GK";
             if (defender.Role == DefenderRole.Field && !defender.RunningToGoal)
