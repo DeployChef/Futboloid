@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 938ec414089961d4085f53e3c44fe020
+guid: e2794a4fbad63b74a9c06be20de35198
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -435438601720267737
-    second: "ChatGPT Image 6 \u0438\u044E\u043B. 2026 \u0433., 23_22_02_0"
+      213: 1528225844555991761
+    second: botinok_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "ChatGPT Image 6 \u0438\u044E\u043B. 2026 \u0433., 23_22_02_0"
+      name: botinok_0
       rect:
         serializedVersion: 2
-        x: 11
-        y: 0
-        width: 1494
-        height: 1024
+        x: 0
+        y: 18
+        width: 64
+        height: 30
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 72c78f616e205f9f0800000000000000
-      internalID: -435438601720267737
+      spriteID: 1dac4590f49553510800000000000000
+      internalID: 1528225844555991761
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      "ChatGPT Image 6 \u0438\u044E\u043B. 2026 \u0433., 23_22_02_0": -435438601720267737
+      botinok_0: 1528225844555991761
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
