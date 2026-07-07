@@ -38,7 +38,6 @@ namespace Futboloid.Gameplay.Defenders
         [SerializeField] private int patrolPointCount = 4;
         [SerializeField] private float patrolRadius = 1.5f;
         [SerializeField] private float wanderRadius = 1.5f;
-        [SerializeField] private float chaseRadius = 3f;
         [SerializeField] private float separationRadius = 0.6f;
         [SerializeField] private float fieldMoveSpeed = 1.6f;
         [SerializeField] private float fieldAcceleration = 12f;
@@ -83,7 +82,6 @@ namespace Futboloid.Gameplay.Defenders
         public int PatrolPointCount => patrolPointCount;
         public float PatrolRadius => patrolRadius;
         public float WanderRadius => wanderRadius;
-        public float ChaseRadius => chaseRadius;
         public float SeparationRadius => separationRadius;
 
         public void ApplySpawnSetup(in DefenderBuild build, Vector2 home)
@@ -95,7 +93,6 @@ namespace Futboloid.Gameplay.Defenders
             patrolPointCount = build.PatrolPointCount;
             patrolRadius = build.PatrolRadius;
             wanderRadius = build.WanderRadius;
-            chaseRadius = build.ChaseRadius;
             separationRadius = build.SeparationRadius;
             fieldMoveSpeed = build.FieldMoveSpeed;
             fieldAcceleration = build.FieldAcceleration;
@@ -230,7 +227,6 @@ namespace Futboloid.Gameplay.Defenders
                 movementType,
                 _homePosition,
                 wanderRadius,
-                chaseRadius,
                 ballPosition,
                 fieldMoveSpeed,
                 fieldAcceleration,

@@ -107,7 +107,6 @@ MonoBehaviour:
   patrolPointCount: 4
   patrolRadius: 1.5
   wanderRadius: 1.5
-  chaseRadius: 3
   separationRadius: 0.6
   fieldMoveSpeed: 1.6
   fieldAcceleration: 12
