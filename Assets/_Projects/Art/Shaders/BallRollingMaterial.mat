@@ -71,8 +71,8 @@ Material:
     - _FlipX: 0
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _UVScale: 0.73
-    - _WorldUVScale: 0.55
+    - _UVScale: 0.63
+    - _WorldUVScale: 0.41
     - _ZWrite: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
