@@ -12,6 +12,7 @@ namespace Futboloid.Core.Audio
         {
             // Мяч
             public const string BallHit = "BallHit";
+            public const string BallHitMan = "BallHitMan";
 
             // Голы
             public const string GoalScored = "GoalScored";
@@ -47,9 +48,6 @@ namespace Futboloid.Core.Audio
         }
 
         [SerializeField] private List<SoundDefinition> sounds = new();
-        [SerializeField] private int maxSfxVoices = 8;
-
-        public int MaxSfxVoices => maxSfxVoices;
 
         public IEnumerable<AudioClip> EnumerateClips()
         {

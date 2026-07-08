@@ -23,13 +23,38 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 167df36e6db7c714491566e35c7b77cd, type: 3}
     - {fileID: 8300000, guid: 87d22419712f2b84f8746b2a94209cbe, type: 3}
     - {fileID: 8300000, guid: 6b6a61313cd6dbf42849866d4245fef4, type: 3}
-    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    mixerGroup: {fileID: 3690802993860650769, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
     priority: 80
     allowOverlap: 1
     cooldown: 0.2
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0.08
+  - id: BallHitMan
+    channel: 1
+    clips:
+    - {fileID: 8300000, guid: ad7c9c3d6585da84097b6d1756e8c68d, type: 3}
+    - {fileID: 8300000, guid: edef1619dedc3ca4aa4309ef3c50f8bb, type: 3}
+    - {fileID: 8300000, guid: 3a00879f3854350419ed18ce42851e9d, type: 3}
+    - {fileID: 8300000, guid: 726183406c55ae642867c0161604b5af, type: 3}
+    - {fileID: 8300000, guid: 17d43560a3bb6044d923c0f39176eec2, type: 3}
+    - {fileID: 8300000, guid: 6d84b8596b359c647a7eb634f0163a04, type: 3}
+    - {fileID: 8300000, guid: f077230ba82560f4aa9679b9201256d6, type: 3}
+    - {fileID: 8300000, guid: b5f343bd6b083e44b80001da859612ca, type: 3}
+    - {fileID: 8300000, guid: 42c6f2ca5470c324fa1dcf771539edbb, type: 3}
+    - {fileID: 8300000, guid: 9d5251388594942409c3ab383fcf15a5, type: 3}
+    - {fileID: 8300000, guid: 28ad199cf16160047933f7d8eac1b548, type: 3}
+    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 75
+    allowOverlap: 1
+    cooldown: 0.15
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0.08
   - id: GoalScored
     channel: 1
     clips:
@@ -46,9 +71,9 @@ MonoBehaviour:
   - id: GoalConceded
     channel: 1
     clips:
-    - {fileID: 8300000, guid: 74a3d035b56d03c4cabc2c79342bedce, type: 3}
-    - {fileID: 8300000, guid: 69237c39ac9ba844a937b53c0d866ee2, type: 3}
-    - {fileID: 8300000, guid: eab32f980268ff245b60968d3a9f33e9, type: 3}
+    - {fileID: 8300000, guid: aa172408b7f24b64d9d96de9a98138bf, type: 3}
+    - {fileID: 8300000, guid: 8cad0069adfde534193a67d3dce4effb, type: 3}
+    - {fileID: 8300000, guid: 6bc45d4278ee32f4a921847748190fa7, type: 3}
     mixerGroup: {fileID: -6072428715209177553, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
     priority: 0
     allowOverlap: 0
@@ -256,4 +281,3 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
-  maxSfxVoices: 8

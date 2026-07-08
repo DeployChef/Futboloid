@@ -7,8 +7,9 @@ using UnityEngine.Audio;
 
 namespace Futboloid.Main.Audio
 {
-    public sealed class AudioPlaybackHost : MonoBehaviour, IAudioPlayback
+    public sealed class AudioManager : MonoBehaviour, IAudioManager
     {
+        [SerializeField] private AudioCatalog config;
         [SerializeField] private int sfxPoolSize = 8;
         [SerializeField] private int uiPoolSize = 3;
         [SerializeField] private bool enableFade = true;
@@ -16,6 +17,7 @@ namespace Futboloid.Main.Audio
         private AudioSource _musicSource;
         private readonly List<SfxVoice> _sfxVoices = new();
         private readonly List<SfxVoice> _uiVoices = new();
+        private readonly Dictionary<string, float> _lastPlayTimes = new();
         private string _musicSoundId;
         private float _musicFadeDuration = 1f;
         private bool _musicWasPlaying;
@@ -45,23 +47,24 @@ namespace Futboloid.Main.Audio
                 voice.CancelFade();
         }
 
-        public void Play(SoundDefinition sound)
+        public void Play(string soundId, float? pitch = null, float? pitchRandomRange = null)
         {
-            if (sound == null || sound.Clips == null || sound.Clips.Length == 0)
+            if (config == null || !config.TryGet(soundId, out var definition))
                 return;
 
-            if (sound.Channel == AudioChannel.Music)
-            {
-                PlayMusic(sound);
-                return;
-            }
-
-            var pool = sound.Channel == AudioChannel.UiSfx ? _uiVoices : _sfxVoices;
-            var voice = AcquireVoice(pool, sound);
-            if (voice == null)
+            if (definition.Clips == null || definition.Clips.Length == 0)
                 return;
 
-            PlayOnVoice(voice, sound);
+            if (definition.Cooldown > 0f
+                && _lastPlayTimes.TryGetValue(soundId, out var lastTime)
+                && Time.time - lastTime < definition.Cooldown)
+                return;
+
+            if (!definition.AllowOverlap && IsPlaying(soundId))
+                return;
+
+            PlayDefinition(definition, pitch, pitchRandomRange);
+            _lastPlayTimes[soundId] = Time.time;
         }
 
         public void Stop(string soundId)
@@ -136,7 +139,31 @@ namespace Futboloid.Main.Audio
             return IsPlayingInPool(_sfxVoices, soundId) || IsPlayingInPool(_uiVoices, soundId);
         }
 
-        public bool TryStopLowestPrioritySfx(int incomingPriority)
+        public IEnumerable<AudioClip> EnumerateClips() =>
+            config != null ? config.EnumerateClips() : System.Array.Empty<AudioClip>();
+
+        public void WarmupClip(AudioClip clip)
+        {
+            config?.WarmupClip(clip);
+        }
+
+        private void PlayDefinition(SoundDefinition sound, float? pitch, float? pitchRandomRange)
+        {
+            if (sound.Channel == AudioChannel.Music)
+            {
+                PlayMusic(sound, pitch, pitchRandomRange);
+                return;
+            }
+
+            var pool = sound.Channel == AudioChannel.UiSfx ? _uiVoices : _sfxVoices;
+            var voice = AcquireVoice(pool, sound);
+            if (voice == null)
+                return;
+
+            PlayOnVoice(voice, sound, pitch, pitchRandomRange);
+        }
+
+        private bool TryStopLowestPrioritySfx(int incomingPriority)
         {
             SfxVoice lowest = null;
             var lowestPriority = int.MinValue;
@@ -160,7 +187,7 @@ namespace Futboloid.Main.Audio
             return true;
         }
 
-        private void PlayMusic(SoundDefinition sound)
+        private void PlayMusic(SoundDefinition sound, float? pitch, float? pitchRandomRange)
         {
             CancelMusicFade();
 
@@ -168,6 +195,7 @@ namespace Futboloid.Main.Audio
             _musicSource.outputAudioMixerGroup = sound.MixerGroup;
             _musicSource.loop = sound.Loop;
             _musicSource.clip = clip;
+            _musicSource.pitch = ResolvePitch(sound, pitch, pitchRandomRange);
             _musicSoundId = sound.Id;
             _musicFadeDuration = sound.EnableFade ? sound.FadeDuration : 0f;
             _musicFadeCts = new CancellationTokenSource();
@@ -213,7 +241,7 @@ namespace Futboloid.Main.Audio
             return null;
         }
 
-        private void PlayOnVoice(SfxVoice voice, SoundDefinition sound)
+        private void PlayOnVoice(SfxVoice voice, SoundDefinition sound, float? pitch, float? pitchRandomRange)
         {
             voice.CancelFade();
 
@@ -221,6 +249,7 @@ namespace Futboloid.Main.Audio
             voice.Source.outputAudioMixerGroup = sound.MixerGroup;
             voice.Source.loop = sound.Loop;
             voice.Source.clip = clip;
+            voice.Source.pitch = ResolvePitch(sound, pitch, pitchRandomRange);
             voice.SoundId = sound.Id;
             voice.Priority = sound.Priority;
 
@@ -236,6 +265,17 @@ namespace Futboloid.Main.Audio
                 voice.Source.volume = 1f;
                 voice.Source.Play();
             }
+        }
+
+        private static float ResolvePitch(SoundDefinition sound, float? pitch, float? pitchRandomRange)
+        {
+            var basePitch = pitch ?? sound.BasePitch;
+            var range = pitchRandomRange ?? sound.PitchRandomRange;
+
+            if (range <= 0f)
+                return basePitch;
+
+            return basePitch + Random.Range(-range, range);
         }
 
         private void StopInPool(List<SfxVoice> pool, string soundId)
@@ -262,6 +302,7 @@ namespace Futboloid.Main.Audio
         {
             voice.CancelFade();
             voice.Source.volume = 0f;
+            voice.Source.pitch = 1f;
             voice.Source.Stop();
             voice.Source.clip = null;
             voice.SoundId = null;
@@ -285,6 +326,7 @@ namespace Futboloid.Main.Audio
                 await FadeToAsync(_musicSource, 0f, duration, ct);
                 _musicSource.Stop();
                 _musicSource.clip = null;
+                _musicSource.pitch = 1f;
             }
             catch (System.OperationCanceledException)
             {

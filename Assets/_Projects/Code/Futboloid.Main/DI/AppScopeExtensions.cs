@@ -25,8 +25,6 @@ namespace Futboloid.Main.DI
             builder.Register<OverlayStateController>(Lifetime.Singleton);
             builder.Register<MatchEndHandler>(Lifetime.Singleton);
 
-            var audioCatalog = AudioCatalog.Load();
-            builder.RegisterInstance(audioCatalog);
             builder.Register<AudioService>(Lifetime.Singleton);
             builder.RegisterBuildCallback(resolver => resolver.Resolve<AudioService>());
 
