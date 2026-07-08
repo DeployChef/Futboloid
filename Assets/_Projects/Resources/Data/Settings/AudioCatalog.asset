@@ -35,26 +35,20 @@ MonoBehaviour:
   - id: BallHitMan
     channel: 1
     clips:
-    - {fileID: 8300000, guid: ad7c9c3d6585da84097b6d1756e8c68d, type: 3}
-    - {fileID: 8300000, guid: edef1619dedc3ca4aa4309ef3c50f8bb, type: 3}
-    - {fileID: 8300000, guid: 3a00879f3854350419ed18ce42851e9d, type: 3}
-    - {fileID: 8300000, guid: 726183406c55ae642867c0161604b5af, type: 3}
-    - {fileID: 8300000, guid: 17d43560a3bb6044d923c0f39176eec2, type: 3}
-    - {fileID: 8300000, guid: 6d84b8596b359c647a7eb634f0163a04, type: 3}
     - {fileID: 8300000, guid: f077230ba82560f4aa9679b9201256d6, type: 3}
     - {fileID: 8300000, guid: b5f343bd6b083e44b80001da859612ca, type: 3}
     - {fileID: 8300000, guid: 42c6f2ca5470c324fa1dcf771539edbb, type: 3}
     - {fileID: 8300000, guid: 9d5251388594942409c3ab383fcf15a5, type: 3}
     - {fileID: 8300000, guid: 28ad199cf16160047933f7d8eac1b548, type: 3}
-    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    mixerGroup: {fileID: -6752885603388043566, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
     priority: 75
     allowOverlap: 1
-    cooldown: 0.15
+    cooldown: 0.3
     loop: 0
     enableFade: 0
     fadeDuration: 0
     basePitch: 1
-    pitchRandomRange: 0.08
+    pitchRandomRange: 0.11
   - id: GoalScored
     channel: 1
     clips:
@@ -68,6 +62,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 1
     fadeDuration: 0.3
+    basePitch: 1
+    pitchRandomRange: 0
   - id: GoalConceded
     channel: 1
     clips:
@@ -81,6 +77,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 1
     fadeDuration: 0.3
+    basePitch: 1
+    pitchRandomRange: 0
   - id: MatchStart
     channel: 1
     clips:
@@ -94,6 +92,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
   - id: MatchEnd
     channel: 1
     clips:
@@ -106,6 +106,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
   - id: MusicMatch
     channel: 0
     clips:
@@ -119,6 +121,8 @@ MonoBehaviour:
     loop: 1
     enableFade: 1
     fadeDuration: 1.5
+    basePitch: 1
+    pitchRandomRange: 0
   - id: PerkPick
     channel: 1
     clips:
@@ -130,6 +134,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
   - id: DefenderHit
     channel: 1
     clips: []
@@ -140,6 +146,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
   - id: DefenderDestroyed
     channel: 1
     clips:
@@ -159,6 +167,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 1
     fadeDuration: 0.3
+    basePitch: 1
+    pitchRandomRange: 0
   - id: PromotionStarted
     channel: 1
     clips: []
@@ -169,6 +179,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
   - id: PromotionCompleted
     channel: 1
     clips: []
@@ -179,6 +191,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
   - id: DefenderReturned
     channel: 1
     clips: []
@@ -189,6 +203,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
   - id: DefenderRoleChanged
     channel: 1
     clips: []
@@ -199,6 +215,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
   - id: BonusPickOpen
     channel: 2
     clips:
@@ -210,6 +228,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
   - id: LevelUp
     channel: 2
     clips:
@@ -221,6 +241,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 1
     fadeDuration: 0.3
+    basePitch: 1
+    pitchRandomRange: 0
   - id: ScorePoints
     channel: 1
     clips: []
@@ -243,6 +265,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
   - id: ComboMultiplierDown
     channel: 1
     clips: []
@@ -253,6 +277,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
   - id: BuffApplied
     channel: 1
     clips: []
@@ -263,6 +289,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
   - id: DebuffApplied
     channel: 1
     clips: []
@@ -273,6 +301,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
   - id: BuffConsumed
     channel: 1
     clips: []
@@ -283,6 +313,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
   - id: ReshuffleStart
     channel: 1
     clips: []
@@ -293,6 +325,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
   - id: TimeBonus
     channel: 1
     clips: []
@@ -303,6 +337,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
   - id: TimePenalty
     channel: 1
     clips: []
@@ -313,6 +349,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
   - id: UiMenuOpen
     channel: 2
     clips: []
@@ -323,6 +361,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
   - id: UiPauseOpen
     channel: 2
     clips: []
@@ -333,6 +373,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
   - id: UiTournamentOpen
     channel: 2
     clips: []
@@ -343,3 +385,5 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0
