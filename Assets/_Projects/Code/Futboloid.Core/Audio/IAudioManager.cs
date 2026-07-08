@@ -11,6 +11,8 @@ namespace Futboloid.Core.Audio
         void ResumeMusic();
         void StopAll();
         bool IsPlaying(string soundId);
+        bool IsMusicPaused { get; }
+        bool HasMusicClip { get; }
         System.Collections.Generic.IEnumerable<AudioClip> EnumerateClips();
         void WarmupClip(AudioClip clip);
     }

@@ -20,8 +20,13 @@ namespace Futboloid.Main.Audio
         private readonly Dictionary<string, float> _lastPlayTimes = new();
         private string _musicSoundId;
         private float _musicFadeDuration = 1f;
-        private bool _musicWasPlaying;
+        private float _musicVolumeBeforePause = 1f;
+        private bool _musicPaused;
         private CancellationTokenSource _musicFadeCts;
+
+        public bool IsMusicPaused => _musicPaused;
+
+        public bool HasMusicClip => _musicSource != null && _musicSource.clip != null;
 
         private void Awake()
         {
@@ -81,43 +86,49 @@ namespace Futboloid.Main.Audio
 
         public void StopMusic()
         {
-            if (_musicSource == null || !_musicSource.isPlaying && _musicSource.clip == null)
+            if (_musicSource == null || !HasMusicClip)
                 return;
 
             CancelMusicFade();
+            _musicPaused = false;
 
-            if (enableFade && _musicSource.isPlaying)
+            if (_musicSource.isPlaying && enableFade)
             {
                 _musicFadeCts = new CancellationTokenSource();
                 FadeAndStopMusicAsync(_musicFadeDuration, _musicFadeCts.Token).Forget();
-            }
-            else
-            {
-                _musicSource.Stop();
-                _musicSource.clip = null;
-                _musicSource.volume = 0f;
+                _musicSoundId = null;
+                return;
             }
 
+            _musicSource.Stop();
+            _musicSource.clip = null;
+            _musicSource.volume = 0f;
             _musicSoundId = null;
-            _musicWasPlaying = false;
         }
 
         public void PauseMusic()
         {
-            if (_musicSource == null || !_musicSource.isPlaying)
+            if (_musicSource == null || _musicSource.clip == null || _musicPaused)
                 return;
 
-            _musicWasPlaying = true;
-            _musicSource.Pause();
+            if (!_musicSource.isPlaying && _musicSource.time <= 0f)
+                return;
+
+            FadeOutAndPauseMusicAsync().Forget();
         }
 
         public void ResumeMusic()
         {
-            if (_musicSource == null || !_musicWasPlaying)
+            if (_musicSource == null || _musicSource.clip == null || !_musicPaused)
                 return;
 
-            _musicWasPlaying = false;
+            _musicPaused = false;
             _musicSource.UnPause();
+
+            CancelMusicFade();
+            _musicFadeCts = new CancellationTokenSource();
+            var targetVolume = _musicVolumeBeforePause > 0f ? _musicVolumeBeforePause : 1f;
+            FadeToAsync(_musicSource, targetVolume, _musicFadeDuration, _musicFadeCts.Token).Forget();
         }
 
         public void StopAll()
@@ -133,7 +144,7 @@ namespace Futboloid.Main.Audio
 
         public bool IsPlaying(string soundId)
         {
-            if (_musicSoundId == soundId && _musicSource != null && _musicSource.isPlaying)
+            if (_musicSoundId == soundId && _musicSource != null && (_musicSource.isPlaying || _musicPaused))
                 return true;
 
             return IsPlayingInPool(_sfxVoices, soundId) || IsPlayingInPool(_uiVoices, soundId);
@@ -212,7 +223,8 @@ namespace Futboloid.Main.Audio
                 _musicSource.Play();
             }
 
-            _musicWasPlaying = false;
+            _musicPaused = false;
+            _musicVolumeBeforePause = _musicSource.volume;
         }
 
         private SfxVoice AcquireVoice(List<SfxVoice> pool, SoundDefinition sound)
@@ -319,6 +331,32 @@ namespace Futboloid.Main.Audio
             _musicFadeCts = null;
         }
 
+        private async UniTaskVoid FadeOutAndPauseMusicAsync()
+        {
+            CancelMusicFade();
+            _musicFadeCts = new CancellationTokenSource();
+            var ct = _musicFadeCts.Token;
+            _musicVolumeBeforePause = _musicSource.volume > 0f ? _musicSource.volume : 1f;
+
+            try
+            {
+                if (enableFade && _musicFadeDuration > 0f)
+                    await FadeToAsync(_musicSource, 0f, _musicFadeDuration, ct);
+
+                if (_musicSource == null || _musicSource.clip == null)
+                    return;
+
+                if (_musicSource.isPlaying)
+                    _musicSource.Pause();
+
+                _musicSource.volume = 0f;
+                _musicPaused = true;
+            }
+            catch (System.OperationCanceledException)
+            {
+            }
+        }
+
         private async UniTaskVoid FadeAndStopMusicAsync(float duration, CancellationToken ct)
         {
             try
@@ -327,6 +365,7 @@ namespace Futboloid.Main.Audio
                 _musicSource.Stop();
                 _musicSource.clip = null;
                 _musicSource.pitch = 1f;
+                _musicPaused = false;
             }
             catch (System.OperationCanceledException)
             {
