@@ -221,6 +221,68 @@ MonoBehaviour:
     loop: 0
     enableFade: 1
     fadeDuration: 0.3
+  - id: ScorePoints
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: 6924800920253028459, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 60
+    allowOverlap: 1
+    cooldown: 0.08
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0.05
+  - id: ComboMultiplierUp
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: -2415376625052221150, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 35
+    allowOverlap: 0
+    cooldown: 0.15
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: ComboMultiplierDown
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: -2415376625052221150, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 35
+    allowOverlap: 0
+    cooldown: 0.3
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: BuffApplied
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: -626621296518138596, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 25
+    allowOverlap: 0
+    cooldown: 0.3
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: DebuffApplied
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: -626621296518138596, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 25
+    allowOverlap: 0
+    cooldown: 0.3
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: BuffConsumed
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: -626621296518138596, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 30
+    allowOverlap: 0
+    cooldown: 0.2
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
   - id: ReshuffleStart
     channel: 1
     clips: []

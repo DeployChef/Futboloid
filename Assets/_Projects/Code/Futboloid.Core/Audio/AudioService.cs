@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
+using Futboloid.Core.StatusEffects;
 
 namespace Futboloid.Core.Audio
 {
@@ -46,6 +47,13 @@ namespace Futboloid.Core.Audio
             // —— Прогрессия забега ——
             _subscriptions.Add(_bus.Subscribe<PerkPickedEvent>(OnPerkPicked));
             _subscriptions.Add(_bus.Subscribe<RunProgressionUpdatedEvent>(OnRunProgressionUpdated));
+
+            // —— Комбо / очки ——
+            _subscriptions.Add(_bus.Subscribe<ComboScoreChangedEvent>(OnComboScoreChanged));
+
+            // —— Баффы / дебаффы ——
+            _subscriptions.Add(_bus.Subscribe<StatusEffectAppliedEvent>(OnStatusEffectApplied));
+            _subscriptions.Add(_bus.Subscribe<StatusEffectRemovedEvent>(OnStatusEffectRemoved));
 
             // —— Фазы поля ——
             _subscriptions.Add(_bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged));
@@ -129,6 +137,37 @@ namespace Futboloid.Core.Audio
                 _audio.Play(AudioCatalog.Ids.LevelUp);
 
             _lastRunLevel = e.RunLevel;
+        }
+
+        private void OnComboScoreChanged(ComboScoreChangedEvent e)
+        {
+            if (e.Multiplier > e.PreviousMultiplier)
+            {
+                _audio.Play(AudioCatalog.Ids.ComboMultiplierUp);
+                return;
+            }
+
+            // Decay шагает по -1 — не спамим звуком; сброс вратарём обычно -3 и больше.
+            if (e.Multiplier < e.PreviousMultiplier
+                && e.PreviousMultiplier - e.Multiplier >= 2)
+            {
+                _audio.Play(AudioCatalog.Ids.ComboMultiplierDown);
+                return;
+            }
+
+            if (e.DeltaPoints > 0)
+                _audio.Play(AudioCatalog.Ids.ScorePoints);
+        }
+
+        private void OnStatusEffectApplied(StatusEffectAppliedEvent e)
+        {
+            _audio.Play(e.IsDebuff ? AudioCatalog.Ids.DebuffApplied : AudioCatalog.Ids.BuffApplied);
+        }
+
+        private void OnStatusEffectRemoved(StatusEffectRemovedEvent e)
+        {
+            if (e.Reason == StatusEffectRemoveReason.Consumed)
+                _audio.Play(AudioCatalog.Ids.BuffConsumed);
         }
 
         private void OnPitchPhaseChanged(PitchPhaseChangedEvent e)

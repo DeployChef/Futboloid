@@ -41,6 +41,16 @@ namespace Futboloid.Core.Audio
             // Фазы поля
             public const string ReshuffleStart = "ReshuffleStart";
 
+            // Комбо / очки
+            public const string ScorePoints = "ScorePoints";
+            public const string ComboMultiplierUp = "ComboMultiplierUp";
+            public const string ComboMultiplierDown = "ComboMultiplierDown";
+
+            // Баффы / дебаффы
+            public const string BuffApplied = "BuffApplied";
+            public const string DebuffApplied = "DebuffApplied";
+            public const string BuffConsumed = "BuffConsumed";
+
             // UI / навигация
             public const string UiMenuOpen = "UiMenuOpen";
             public const string UiPauseOpen = "UiPauseOpen";
