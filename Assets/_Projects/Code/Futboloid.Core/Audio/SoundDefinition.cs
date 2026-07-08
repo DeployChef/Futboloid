@@ -16,6 +16,8 @@ namespace Futboloid.Core.Audio
         [SerializeField] private bool loop;
         [SerializeField] private bool enableFade;
         [SerializeField] private float fadeDuration = 1f;
+        [SerializeField] private float basePitch = 1f;
+        [SerializeField] private float pitchRandomRange;
 
         public string Id => id;
         public AudioChannel Channel => channel;
@@ -27,5 +29,7 @@ namespace Futboloid.Core.Audio
         public bool Loop => loop;
         public bool EnableFade => enableFade;
         public float FadeDuration => fadeDuration;
+        public float BasePitch => basePitch;
+        public float PitchRandomRange => pitchRandomRange;
     }
 }

@@ -39,7 +39,7 @@ namespace Futboloid.Main.GameAppStates
                 return;
             }
 
-            await WarmupAudioClipsAsync(LifetimeScope.Container.Resolve<AudioCatalog>());
+            await WarmupAudioClipsAsync(LifetimeScope.Container.Resolve<IAudioManager>());
 
             SceneManager.SetActiveScene(gameScene);
 
@@ -65,7 +65,7 @@ namespace Futboloid.Main.GameAppStates
             if (LifetimeScope != null)
             {
                 _parentLifetimeScope.Container.Resolve<PauseCoordinator>().ReleaseAll();
-                _parentLifetimeScope.Container.Resolve<IAudioPlayback>().StopAll();
+                _parentLifetimeScope.Container.Resolve<IAudioManager>().StopAll();
                 LifetimeScope.Dispose();
                 LifetimeScope = null;
             }
@@ -128,14 +128,14 @@ namespace Futboloid.Main.GameAppStates
             return false;
         }
 
-        private static async UniTask WarmupAudioClipsAsync(AudioCatalog catalog)
+        private static async UniTask WarmupAudioClipsAsync(IAudioManager audio)
         {
-            if (catalog == null)
+            if (audio == null)
                 return;
 
-            foreach (var clip in catalog.EnumerateClips())
+            foreach (var clip in audio.EnumerateClips())
             {
-                catalog.WarmupClip(clip);
+                audio.WarmupClip(clip);
                 await UniTask.Yield();
             }
         }

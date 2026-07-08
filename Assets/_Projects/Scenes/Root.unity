@@ -1601,7 +1601,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2900000003}
-  - component: {fileID: 2900000002}
+  - component: {fileID: 2900000004}
   m_Layer: 0
   m_Name: Audio
   m_TagString: Untagged
@@ -1609,21 +1609,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2900000002
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2900000001}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Futboloid.Main::Futboloid.Main.Audio.AudioPlaybackHost
-  sfxPoolSize: 8
-  uiPoolSize: 3
-  enableFade: 1
 --- !u!4 &2900000003
 Transform:
   m_ObjectHideFlags: 0
@@ -1639,6 +1624,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2900000004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2900000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f06bac78ec73d4a4d8f910822a24b13b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.Main::Futboloid.Main.Audio.AudioManager
+  config: {fileID: 11400000, guid: 9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b, type: 2}
+  sfxPoolSize: 8
+  uiPoolSize: 3
+  enableFade: 1
 --- !u!1001 &4171201232969605855
 PrefabInstance:
   m_ObjectHideFlags: 0

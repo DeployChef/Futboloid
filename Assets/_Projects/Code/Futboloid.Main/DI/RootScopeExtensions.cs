@@ -13,7 +13,7 @@ namespace Futboloid.Main.DI
     {
         public static IContainerBuilder RegisterRootScope(this IContainerBuilder builder)
         {
-            builder.RegisterComponentInHierarchy<AudioPlaybackHost>().As<IAudioPlayback>();
+            builder.RegisterComponentInHierarchy<AudioManager>().As<IAudioManager>();
             builder.Register<UIService>(Lifetime.Singleton);
             builder.RegisterBuildCallback(RegisterUiWidgets);
 

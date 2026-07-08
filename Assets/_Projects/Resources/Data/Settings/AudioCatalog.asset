@@ -23,13 +23,38 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 167df36e6db7c714491566e35c7b77cd, type: 3}
     - {fileID: 8300000, guid: 87d22419712f2b84f8746b2a94209cbe, type: 3}
     - {fileID: 8300000, guid: 6b6a61313cd6dbf42849866d4245fef4, type: 3}
-    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    mixerGroup: {fileID: 3690802993860650769, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
     priority: 80
     allowOverlap: 1
     cooldown: 0.2
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0.08
+  - id: BallHitMan
+    channel: 1
+    clips:
+    - {fileID: 8300000, guid: ad7c9c3d6585da84097b6d1756e8c68d, type: 3}
+    - {fileID: 8300000, guid: edef1619dedc3ca4aa4309ef3c50f8bb, type: 3}
+    - {fileID: 8300000, guid: 3a00879f3854350419ed18ce42851e9d, type: 3}
+    - {fileID: 8300000, guid: 726183406c55ae642867c0161604b5af, type: 3}
+    - {fileID: 8300000, guid: 17d43560a3bb6044d923c0f39176eec2, type: 3}
+    - {fileID: 8300000, guid: 6d84b8596b359c647a7eb634f0163a04, type: 3}
+    - {fileID: 8300000, guid: f077230ba82560f4aa9679b9201256d6, type: 3}
+    - {fileID: 8300000, guid: b5f343bd6b083e44b80001da859612ca, type: 3}
+    - {fileID: 8300000, guid: 42c6f2ca5470c324fa1dcf771539edbb, type: 3}
+    - {fileID: 8300000, guid: 9d5251388594942409c3ab383fcf15a5, type: 3}
+    - {fileID: 8300000, guid: 28ad199cf16160047933f7d8eac1b548, type: 3}
+    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 75
+    allowOverlap: 1
+    cooldown: 0.15
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0.08
   - id: GoalScored
     channel: 1
     clips:
@@ -39,17 +64,17 @@ MonoBehaviour:
     mixerGroup: {fileID: -1377188511162530804, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
     priority: 0
     allowOverlap: 0
-    cooldown: 1
+    cooldown: 1.47
     loop: 0
     enableFade: 1
     fadeDuration: 0.3
   - id: GoalConceded
     channel: 1
     clips:
-    - {fileID: 8300000, guid: 5c13728525640584bb0ece5d2f03a27d, type: 3}
-    - {fileID: 8300000, guid: 8d8861d0d9db7f4468ee2f05172a0ba9, type: 3}
-    - {fileID: 8300000, guid: 7fd47098a9cdb3e4e86533739e6af415, type: 3}
-    mixerGroup: {fileID: -1377188511162530804, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    - {fileID: 8300000, guid: aa172408b7f24b64d9d96de9a98138bf, type: 3}
+    - {fileID: 8300000, guid: 8cad0069adfde534193a67d3dce4effb, type: 3}
+    - {fileID: 8300000, guid: 6bc45d4278ee32f4a921847748190fa7, type: 3}
+    mixerGroup: {fileID: -6072428715209177553, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
     priority: 0
     allowOverlap: 0
     cooldown: 1
@@ -97,8 +122,8 @@ MonoBehaviour:
   - id: PerkPick
     channel: 1
     clips:
-    - {fileID: 8300000, guid: 5c13728525640584bb0ece5d2f03a27d, type: 3}
-    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    - {fileID: 8300000, guid: 386b1e701c1939143969ba35569bc3cb, type: 3}
+    mixerGroup: {fileID: 6924800920253028459, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
     priority: 10
     allowOverlap: 0
     cooldown: 0.5
@@ -117,14 +142,23 @@ MonoBehaviour:
     fadeDuration: 0
   - id: DefenderDestroyed
     channel: 1
-    clips: []
-    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
-    priority: 60
+    clips:
+    - {fileID: 8300000, guid: 93e1a875f83a7474f9ba9c931353d2f1, type: 3}
+    - {fileID: 8300000, guid: 12ac8a6fb1a9fa24fbceca6c75146fca, type: 3}
+    - {fileID: 8300000, guid: e48db6902565ed34b8c36d15cf0fd6a5, type: 3}
+    - {fileID: 8300000, guid: 16c3f41326f8e274f841003bcd2118ee, type: 3}
+    - {fileID: 8300000, guid: 132105f17a17bd24b85defdf7760e547, type: 3}
+    - {fileID: 8300000, guid: 67d66d36b8c71fb46aae8958464d7b52, type: 3}
+    - {fileID: 8300000, guid: 6b523572db9977f42bb26521677ebe65, type: 3}
+    - {fileID: 8300000, guid: 43bbf24033cf1e44a9c2e494d9c39a66, type: 3}
+    - {fileID: 8300000, guid: 6af52334c7f031642875164eac1f79d4, type: 3}
+    mixerGroup: {fileID: 5952182257295497925, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 30
     allowOverlap: 0
-    cooldown: 0.3
+    cooldown: 0.01
     loop: 0
-    enableFade: 0
-    fadeDuration: 0
+    enableFade: 1
+    fadeDuration: 0.3
   - id: PromotionStarted
     channel: 1
     clips: []
@@ -138,7 +172,7 @@ MonoBehaviour:
   - id: PromotionCompleted
     channel: 1
     clips: []
-    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    mixerGroup: {fileID: 0}
     priority: 50
     allowOverlap: 0
     cooldown: 0.5
@@ -167,8 +201,9 @@ MonoBehaviour:
     fadeDuration: 0
   - id: BonusPickOpen
     channel: 2
-    clips: []
-    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    clips:
+    - {fileID: 8300000, guid: 386b1e701c1939143969ba35569bc3cb, type: 3}
+    mixerGroup: {fileID: 6924800920253028459, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
     priority: 20
     allowOverlap: 0
     cooldown: 0.5
@@ -177,11 +212,74 @@ MonoBehaviour:
     fadeDuration: 0
   - id: LevelUp
     channel: 2
-    clips: []
-    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    clips:
+    - {fileID: 8300000, guid: 56d1cb601041931449a0dcbc8ad3e6d8, type: 3}
+    mixerGroup: {fileID: -2415376625052221150, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
     priority: 15
     allowOverlap: 0
     cooldown: 1
+    loop: 0
+    enableFade: 1
+    fadeDuration: 0.3
+  - id: ScorePoints
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: 6924800920253028459, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 60
+    allowOverlap: 1
+    cooldown: 0.08
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+    basePitch: 1
+    pitchRandomRange: 0.05
+  - id: ComboMultiplierUp
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: -2415376625052221150, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 35
+    allowOverlap: 0
+    cooldown: 0.15
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: ComboMultiplierDown
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: -2415376625052221150, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 35
+    allowOverlap: 0
+    cooldown: 0.3
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: BuffApplied
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: -626621296518138596, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 25
+    allowOverlap: 0
+    cooldown: 0.3
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: DebuffApplied
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: -626621296518138596, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 25
+    allowOverlap: 0
+    cooldown: 0.3
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+  - id: BuffConsumed
+    channel: 1
+    clips: []
+    mixerGroup: {fileID: -626621296518138596, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 30
+    allowOverlap: 0
+    cooldown: 0.2
     loop: 0
     enableFade: 0
     fadeDuration: 0
@@ -245,4 +343,3 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
-  maxSfxVoices: 8
