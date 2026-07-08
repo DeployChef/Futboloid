@@ -15,6 +15,7 @@ namespace Futboloid.Gameplay.Ball
         private readonly DefenderGridRegistry _defenderRegistry;
         private readonly PitchBounds _pitchBounds;
         private readonly LayerMask _goalMask;
+        private readonly Collider2D[] _goalOverlapBuffer = new Collider2D[2];
 
         public Vector2 Position { get; private set; }
         public Vector2 Direction { get; private set; }
@@ -167,9 +168,15 @@ namespace Futboloid.Gameplay.Ball
 
         private bool TryScoreGoal()
         {
-            var hits = Physics2D.OverlapCircleAll(Position, _settings.Radius, _goalMask);
-            foreach (var overlap in hits)
+            var hitCount = Physics2D.OverlapCircleNonAlloc(
+                Position,
+                _settings.Radius,
+                _goalOverlapBuffer,
+                _goalMask);
+
+            for (var i = 0; i < hitCount; i++)
             {
+                var overlap = _goalOverlapBuffer[i];
                 if (overlap == null)
                     continue;
 
