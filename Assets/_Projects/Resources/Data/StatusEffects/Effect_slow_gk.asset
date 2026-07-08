@@ -17,7 +17,7 @@ MonoBehaviour:
   description: "\u0412\u0440\u0430\u0442\u0430\u0440\u044C \u0434\u0432\u0438\u0433\u0430\u0435\u0442\u0441\u044F
     \u043C\u0435\u0434\u043B\u0435\u043D\u043D\u0435\u0435 \u2014 \u221230% \u0441\u043A\u043E\u0440\u043E\u0441\u0442\u0438
     \u043D\u0430 8 \u0441."
-  icon: {fileID: 21300000, guid: 5a48d2f9138e29544b440c1f19e81c38, type: 3}
+  icon: {fileID: 21300000, guid: 290ddc1e481e29447bb8593d67519982, type: 3}
   isDebuff: 1
   durationSeconds: 8
   affectedStat: 0
