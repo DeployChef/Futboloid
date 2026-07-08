@@ -19,5 +19,9 @@ namespace Futboloid.Gameplay.Physics
         public static LayerMask BallContactMask => LayerMask.GetMask(Wall, Keeper, Defender);
 
         public static LayerMask GoalMask => LayerMask.GetMask(GoalEnemy, GoalPlayer);
+
+        public static int GoalEnemyMask => 1 << GoalEnemyId;
+
+        public static int GoalPlayerMask => 1 << GoalPlayerId;
     }
 }

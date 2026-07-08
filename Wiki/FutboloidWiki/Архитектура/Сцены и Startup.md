@@ -20,7 +20,7 @@ aliases:
 ┌─────────────────────────────────────────────┐
 │  Root.unity (единственная сцена в Build)    │
 │  ├─ Startup + RootLifetimeScope             │
-│  ├─ AudioPlaybackHost                       │
+│  ├─ AudioManager                            │
 │  ├─ EventSystem                             │
 │  ├─ UIService / Canvas (меню, пауза)        │
 │  └─ GameDirector (DI)                       │

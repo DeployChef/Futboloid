@@ -14,24 +14,22 @@ aliases:
 ← [[Home|Главная]] | [[Архитектура/Индекс архитектуры|Архитектура]] | [[Архитектура/DI и LifetimeScope|DI]]
 
 > [!date] Обновлено
-> **05.07.2026** — Рефакторинг: шина событий, DI, AudioCatalog SO, без синглтона.
+> **08.07.2026** — `AudioManager`, конфиг на менеджере, музыка на `OnField`, fade pause/resume, комбо и баффы.
 
 ---
 
 ## Краткая выжимка
 
-Геймплей **не вызывает звук напрямую**. Сервис слушает `IGameEventBus` и воспроизводит клипы из `AudioCatalog` (ScriptableObject).
+Геймплей **не вызывает звук напрямую**. `AudioService` слушает `IGameEventBus` и передаёт **Sound Id** в `IAudioManager`. UI и кнопки могут вызывать `IAudioManager.Play(...)` напрямую.
 
 ```
 BallMotion → bus.Publish(BallContactEvent)
                     ↓
-              AudioService (App scope)
+              AudioService (App scope) → Play("BallHitMan")
                     ↓
-              AudioCatalog → SoundDefinition
+              AudioManager (Root scene, config: AudioCatalog)
                     ↓
-              AudioPlaybackHost (Root scene)
-                    ↓
-              MusicChannel / SfxPool → Mixer
+              Music / SfxPool / UiPool → Mixer
 ```
 
 ---
@@ -40,11 +38,11 @@ BallMotion → bus.Publish(BallContactEvent)
 
 | Слой | Класс | Где | Задача |
 |------|-------|-----|--------|
-| CMS | `AudioCatalog` + `SoundDefinition` | `Resources/Data/Settings/` | Клипы, микшер, приоритет, fade |
-| Логика | `AudioService` | App scope (DI) | Подписки на шину, cooldown, voice limit |
-| Unity | `AudioPlaybackHost` | Root.unity | Пул `AudioSource`, музыкальный канал |
+| CMS | `AudioCatalog` + `SoundDefinition` | asset в Inspector менеджера | Клипы, микшер, priority, cooldown, pitch |
+| Маппинг | `AudioService` | App scope (DI) | Подписки на шину → Sound Id |
+| Unity | `AudioManager` | Root.unity | Конфиг, cooldown, overlap, пул, музыка, fade |
 
-**Не два менеджера** (меню / игра) — один `AudioService`, контекст через `NavigationChangedEvent` и группы микшера.
+**Один менеджер** на всю игру. Контекст (меню / пауза / поле) — через `NavigationChangedEvent`.
 
 ---
 
@@ -52,9 +50,27 @@ BallMotion → bus.Publish(BallContactEvent)
 
 | Канал | AudioSource | Для чего |
 |-------|-------------|----------|
-| `Music` | 1 источник | Loop, fade, pause/resume |
-| `GameplaySfx` | Пул (8) | Удары, голы, свистки |
-| `UiSfx` | Пул (3) | UI (позже) |
+| `Music` | 1 источник | Loop, fade in/out, fade pause/resume |
+| `GameplaySfx` | Пул (8, `sfxPoolSize`) | Удары, голы, комбо, баффы |
+| `UiSfx` | Пул (3, `uiPoolSize`) | UI |
+
+Размер пулов задаётся **только** в Inspector `AudioManager`, не в `AudioCatalog`.
+
+---
+
+## Музыка матча
+
+| Когда | Действие |
+|-------|----------|
+| Вход в `OnField` (`NavigationChanged`) | `Play(MusicMatch)` — случайный трек из каталога |
+| `MatchStartedEvent` (подача мяча) | только свисток `MatchStart`, **без музыки** |
+| `OnField → Pause` / `OnField → MainMenu` / `Pause → MainMenu` | fade out + `Pause()` — позиция в треке сохраняется |
+| `Pause → OnField` / возврат из меню с паузой матча | fade in + `UnPause()` — **с того же места** |
+| `MatchEndedEvent` | `MatchEnd` + `StopMusic` (fade out) |
+| `PitchResetRequestedEvent` на поле | `StopMusic` + новый `MusicMatch` (рестарт турнира) |
+| `PitchResetRequestedEvent` не на поле | только `StopMusic`; старт при следующем `OnField` |
+
+`MusicMatch` в каталоге: `loop: true` — выбранный трек зацикливается. Автосмена на другой трек после окончания **не реализована**.
 
 ---
 
@@ -62,15 +78,15 @@ BallMotion → bus.Publish(BallContactEvent)
 
 **Полный справочник для звукаря:** [[Каталог событий и звуков]].
 
-Кратко — всё, на что подписан `AudioService`:
-
-| Событие | Условие | Sound ID |
-|---------|---------|----------|
-| `BallContactEvent` | любой контакт | `BallHit` |
+| Событие | Условие | Sound ID / действие |
+|---------|---------|---------------------|
+| `BallContactEvent` | `Wall` | `BallHit` |
+| `BallContactEvent` | `PlayerKeeper` / `Defender` | `BallHitMan` |
 | `GoalScoredEvent` | `IsPlayerGoal` | `GoalScored` / `GoalConceded` |
-| `MatchStartedEvent` | — | `MatchStart` + `MusicMatch` |
+| `MatchStartedEvent` | — | `MatchStart` |
 | `MatchEndedEvent` | — | `MatchEnd` + stop music |
-| `PitchResetRequestedEvent` | — | stop `MusicMatch` |
+| `PitchResetRequestedEvent` | на поле | stop + `MusicMatch` |
+| `PitchResetRequestedEvent` | не на поле | stop music |
 | `MatchTimeAdjustedEvent` | Δt &gt; 0 / &lt; 0 | `TimeBonus` / `TimePenalty` |
 | `DefenderHitEvent` | — | `DefenderHit` |
 | `DefenderDestroyedEvent` | — | `DefenderDestroyed` |
@@ -81,11 +97,30 @@ BallMotion → bus.Publish(BallContactEvent)
 | `PerkPickedEvent` | — | `PerkPick` |
 | `RunProgressionUpdatedEvent` | уровень вырос | `LevelUp` |
 | `PitchPhaseChangedEvent` | `Reshuffle` / `BonusPick` | `ReshuffleStart` / `BonusPickOpen` |
-| `NavigationChangedEvent` | OnField → MainMenu | pause music |
-| `NavigationChangedEvent` | `ResumingPausedMatch` | resume music |
-| `NavigationChangedEvent` | вход в MainMenu / Pause / Tournament | `UiMenuOpen` / `UiPauseOpen` / `UiTournamentOpen` |
+| `ComboScoreChangedEvent` | множитель вырос | `ComboMultiplierUp` |
+| `ComboScoreChangedEvent` | множитель упал на ≥ 2 | `ComboMultiplierDown` |
+| `ComboScoreChangedEvent` | `DeltaPoints > 0` | `ScorePoints` |
+| `StatusEffectAppliedEvent` | бафф / дебафф | `BuffApplied` / `DebuffApplied` |
+| `StatusEffectRemovedEvent` | `Consumed` | `BuffConsumed` |
+| `NavigationChangedEvent` | вход в `OnField` | `MusicMatch` (если не resume) |
+| `NavigationChangedEvent` | пауза / меню | fade pause music |
+| `NavigationChangedEvent` | возврат на поле | fade resume music |
+| `NavigationChangedEvent` | MainMenu / Pause / Tournament | `UiMenuOpen` / `UiPauseOpen` / `UiTournamentOpen` |
 
 Константы id: `AudioCatalog.Ids` в `AudioCatalog.cs`.
+
+---
+
+## Прямой вызов (UI, кнопки)
+
+```csharp
+[Inject] private IAudioManager _audio;
+
+_audio.Play(AudioCatalog.Ids.UiMenuOpen);
+_audio.Play(AudioCatalog.Ids.BallHit, pitch: 1.1f, pitchRandomRange: 0.05f);
+```
+
+Если `pitch` / `pitchRandomRange` не переданы — берутся из `SoundDefinition` в каталоге.
 
 ---
 
@@ -96,9 +131,8 @@ BallMotion → bus.Publish(BallContactEvent)
 | `AudioCatalog.cs` | `Futboloid.Core/Audio/` |
 | `SoundDefinition.cs` | `Futboloid.Core/Audio/` |
 | `AudioService.cs` | `Futboloid.Core/Audio/` |
-| `IAudioPlayback.cs` | `Futboloid.Core/Audio/` |
-| `AudioPlaybackHost.cs` | `Futboloid.Main/Audio/` |
-| `MatchStartedEvent.cs` | `Futboloid.Core/Bus/Events/` |
+| `IAudioManager.cs` | `Futboloid.Core/Audio/` |
+| `AudioManager.cs` | `Futboloid.Main/Audio/` |
 
 ---
 
@@ -106,14 +140,15 @@ BallMotion → bus.Publish(BallContactEvent)
 
 ```csharp
 // RootScopeExtensions
-builder.RegisterComponentInHierarchy<AudioPlaybackHost>().As<IAudioPlayback>();
+builder.RegisterComponentInHierarchy<AudioManager>().As<IAudioManager>();
 
 // AppScopeExtensions
-builder.RegisterInstance(AudioCatalog.Load());
 builder.Register<AudioService>(Lifetime.Singleton);
 ```
 
-`AudioService` резолвится при старте App scope и подписывается на шину. При `AppGameState.Exit` — `Dispose`, отписка, `StopAll`.
+`AudioCatalog` **не** регистрируется в App DI — только ссылка в Inspector `AudioManager`.
+
+`AudioService` резолвится при старте App scope. При `AppGameState.Exit` — `Dispose`, `StopAll`.
 
 ---
 
@@ -121,9 +156,9 @@ builder.Register<AudioService>(Lifetime.Singleton);
 
 Подробно: [[Инструкция по настройке|Инструкция по настройке]].
 
-1. **Root.unity** — объект `Audio` + компонент `AudioPlaybackHost`
-2. **AudioCatalog** asset — `Resources/Data/Settings/AudioCatalog`
-3. **Game.unity** — удалить старый `AudioManager` и `Speaker_*`
+1. **Root.unity** — объект `Audio` + компонент `AudioManager`, поле **Config** → `AudioCatalog.asset`
+2. **AudioCatalog** — `Assets/_Projects/Resources/Data/Settings/AudioCatalog`
+3. **Game.unity** — старый `AudioManager` / `Speaker_*` удалены
 
 ---
 
@@ -135,3 +170,4 @@ builder.Register<AudioService>(Lifetime.Singleton);
 - [[Архитектура/Шина событий|Шина событий]]
 - [[Архитектура/DI и LifetimeScope|DI и LifetimeScope]]
 - [[Контекст/Контекст чата 05.07.2026 аудио рефакторинг|Контекст рефакторинга]]
+- [[Контекст/Контекст чата 08.07.2026 аудио доработка|Контекст доработки 08.07]]
