@@ -64,7 +64,9 @@ namespace Futboloid.Gameplay.Defenders
             ClearSpawned();
 
             var matchNumber = _tournament?.CurrentMatchNumber ?? 1;
-            var context = new DefenderGenerationContext(matchNumber);
+            var totalMatches = _tournament?.MatchesToWin ?? 9;
+            var runSeed = _tournament?.RunSeed ?? 0;
+            var context = new DefenderGenerationContext(matchNumber, totalMatches, runSeed: runSeed);
             var generation = DefenderMatchGenerator.Generate(_generationSettings, context);
 
             SpawnGoalkeeper(generation.Goalkeeper);

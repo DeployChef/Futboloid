@@ -13,7 +13,6 @@ namespace Futboloid.Gameplay.Defenders
         public int PatrolPointCount;
         public float PatrolRadius;
         public float WanderRadius;
-        public float ChaseRadius;
         public float SeparationRadius;
         public float FieldMoveSpeed;
         public float FieldAcceleration;

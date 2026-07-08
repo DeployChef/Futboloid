@@ -46,7 +46,6 @@ namespace Futboloid.Gameplay.Defenders
             DefenderMovementType movementType,
             Vector2 home,
             float wanderRadius,
-            float chaseRadius,
             Vector2? ballPosition,
             float moveSpeed,
             float acceleration,
@@ -67,7 +66,6 @@ namespace Futboloid.Gameplay.Defenders
                     movementType,
                     home,
                     wanderRadius,
-                    chaseRadius,
                     ballPosition,
                     current,
                     arriveThreshold);
@@ -250,7 +248,6 @@ namespace Futboloid.Gameplay.Defenders
             DefenderMovementType movementType,
             Vector2 home,
             float wanderRadius,
-            float chaseRadius,
             Vector2? ballPosition,
             Vector2 current,
             float arriveThreshold)
@@ -263,12 +260,9 @@ namespace Futboloid.Gameplay.Defenders
                 case DefenderMovementType.WanderInRadius:
                     return ResolveWanderTarget(home, wanderRadius, current, arriveThreshold);
 
-                case DefenderMovementType.ChaseBallInRadius:
-                    if (ballPosition.HasValue
-                        && (ballPosition.Value - home).sqrMagnitude <= chaseRadius * chaseRadius)
-                    {
+                case DefenderMovementType.ChaseBall:
+                    if (ballPosition.HasValue)
                         return ClampToPitch(ballPosition.Value);
-                    }
 
                     return ResolveWanderTarget(home, wanderRadius, current, arriveThreshold);
 
