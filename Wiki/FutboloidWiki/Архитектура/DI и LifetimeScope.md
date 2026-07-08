@@ -26,7 +26,7 @@ flowchart TB
     App --> Game
 
     Root --- R1[IGameDirector]
-    Root --- R2[IAudioPlayback / AudioPlaybackHost]
+    Root --- R2[IAudioManager / AudioManager]
     Root --- R3[UIService]
     Root --- R4[SceneTransition post-MVP]
 
@@ -75,7 +75,7 @@ Futboloid.Main/
 
 ```csharp
 // RootScopeExtensions.cs — актуально
-builder.RegisterComponentInHierarchy<AudioPlaybackHost>().As<IAudioPlayback>();
+builder.RegisterComponentInHierarchy<AudioManager>().As<IAudioManager>();
 builder.Register<UIService>(Lifetime.Singleton);
 ```
 
@@ -97,7 +97,6 @@ public static class AppScopeExtensions
             .As<ITournamentBracketReadModel>();
         builder.Register<OverlayStateController>(Lifetime.Singleton);
         builder.Register<MatchEndHandler>(Lifetime.Singleton);
-        builder.RegisterInstance(AudioCatalog.Load());
         builder.Register<AudioService>(Lifetime.Singleton);
         builder.Register<RunStateService>(Lifetime.Singleton)
             .As<IRunProgressionService>();

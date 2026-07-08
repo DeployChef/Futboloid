@@ -18,6 +18,7 @@ namespace Futboloid.Core.Audio
 
         private readonly List<IDisposable> _subscriptions = new();
         private int _lastRunLevel = -1;
+        private bool _onField;
 
         public AudioService(IGameEventBus bus, IAudioManager audio)
         {
@@ -104,7 +105,14 @@ namespace Futboloid.Core.Audio
                 _audio.Play(AudioCatalog.Ids.TimePenalty);
         }
 
-        private void OnPitchResetRequested(PitchResetRequestedEvent _) => _audio.StopMusic();
+        private void OnPitchResetRequested(PitchResetRequestedEvent _)
+        {
+            _audio.StopMusic();
+
+            // Рестарт на поле: NavigationChanged не приходит (уже OnField) — запускаем здесь.
+            if (_onField)
+                _audio.Play(AudioCatalog.Ids.MusicMatch);
+        }
 
         private void OnDefenderHit(DefenderHitEvent _) => _audio.Play(AudioCatalog.Ids.DefenderHit);
 
@@ -182,6 +190,8 @@ namespace Futboloid.Core.Audio
 
         private void OnNavigationChanged(NavigationChangedEvent e)
         {
+            _onField = e.Current == NavigationState.OnField;
+
             if (ShouldPauseMusic(e))
                 _audio.PauseMusic();
             else if (e.Current == NavigationState.OnField)

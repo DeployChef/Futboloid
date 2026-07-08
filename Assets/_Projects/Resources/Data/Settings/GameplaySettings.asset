@@ -15,5 +15,13 @@ MonoBehaviour:
   matchDurationSeconds: 60
   matchesToWin: 9
   debugStartMatchEnabled: 0
-  debugStartMatch: 1
+  debugStartMatch: 9
   defenderGeneration: {fileID: 11400000, guid: 4c9a7e2f1b8d4a6e9f0c3d5e7a1b2c3d, type: 2}
+  defenderMatch: {fileID: 0}
+  comboScore:
+    goalBonusPoints: 50
+    minMultiplier: 1
+    maxMultiplier: 0
+    keeperTouchPenalty: 3
+    decayIntervalSeconds: 2
+    decayStep: 1
