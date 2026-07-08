@@ -3629,7 +3629,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1836943540}
   - component: {fileID: 1836943541}
-  - component: {fileID: 1836943542}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -3678,7 +3677,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 141e6bb931e8cba4dbe496ea0fddc598, type: 2}
+  - {fileID: 2100000, guid: 09ecd9cbd782599459ce45268f53556b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3711,20 +3710,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!114 &1836943542
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1836943539}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4451ed633ce46d944aaa10254ef72871, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Futboloid.UI::BallRollingUV
-  ballRadius: 0.5
-  rollSpeed: 0.01
 --- !u!1 &1862375559
 GameObject:
   m_ObjectHideFlags: 0
