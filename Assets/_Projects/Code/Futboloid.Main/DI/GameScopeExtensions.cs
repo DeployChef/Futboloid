@@ -7,7 +7,6 @@ using Futboloid.Gameplay.Keeper;
 using Futboloid.Gameplay.Match;
 using Futboloid.Gameplay.Tribune;
 using Futboloid.UI.Views.Tournament;
-using Futboloid.Main.Session;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer;
