@@ -6,6 +6,8 @@ using Futboloid.Gameplay.Input;
 using Futboloid.Gameplay.Keeper;
 using Futboloid.Gameplay.Match;
 using Futboloid.Gameplay.Tribune;
+using Futboloid.UI.Views.Tournament;
+using Futboloid.Main.Session;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer;
@@ -38,6 +40,7 @@ namespace Futboloid.Main.DI
             builder.RegisterComponentInScene<BallView>(gameScene);
             builder.RegisterComponentInScene<GoalkeeperView>(gameScene);
             RegisterOptionalComponentInScene<TribuneSpawner>(builder, gameScene);
+            RegisterOptionalComponentInScene<FirstTimeGuideWidget>(builder, gameScene);
 
             builder.RegisterBuildCallback(resolver => OnGameScopeBuilt(resolver, gameScene));
 

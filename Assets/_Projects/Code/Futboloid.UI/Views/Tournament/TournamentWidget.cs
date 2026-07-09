@@ -20,6 +20,7 @@ namespace Futboloid.UI.Views.Tournament
         [SerializeField] private Button matchButton;
         [SerializeField] private Button restartButton;
         [SerializeField] private Button mainMenuButton;
+        [SerializeField] private FirstTimeGuideWidget firstTimeGuide;
 
         private readonly List<IDisposable> _subscriptions = new();
         private IGameDirector _director;
@@ -100,6 +101,8 @@ namespace Futboloid.UI.Views.Tournament
 
             if (mainMenuButton != null)
                 mainMenuButton.gameObject.SetActive(!inProgress);
+
+            firstTimeGuide?.Refresh();
         }
 
         private void OnMatchClicked() => _director?.GoOnField();

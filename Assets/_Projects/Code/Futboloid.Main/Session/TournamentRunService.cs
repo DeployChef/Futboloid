@@ -16,8 +16,12 @@ namespace Futboloid.Main.Session
         private int _lastPlayerScore;
         private int _lastOpponentScore;
         private int _runSeed;
+        private bool _hasPlayedBefore;
 
         public TournamentRunState RunState { get; private set; } = TournamentRunState.InProgress;
+
+        /// <summary>Флаг первого запуска игры (не сбрасывается при рестарте).</summary>
+        public bool HasPlayedBefore => _hasPlayedBefore;
 
         public int CurrentMatchNumber => _matchesCompleted + 1;
         public int MatchesToWin => _matchesToWin;
@@ -44,6 +48,10 @@ namespace Futboloid.Main.Session
                 ? _settings.DebugStartMatch
                 : 1;
             _matchesCompleted = Mathf.Clamp(startMatch - 1, 0, _matchesToWin - 1);
+
+            // Флаг первого запуска не сбрасываем — он перманентный для сессии
+            if (_matchesCompleted >= 0)
+                _hasPlayedBefore = true;
 
             if (_settings.DebugStartMatchEnabled)
             {
