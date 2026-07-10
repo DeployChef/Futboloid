@@ -2836,6 +2836,28 @@ Transform:
   m_Children: []
   m_Father: {fileID: 665380153}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1329920889 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4137339126493454657, guid: 183f1066ababa1242a91eb1db67ee41f, type: 3}
+  m_PrefabInstance: {fileID: 1939333904}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1329920894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1329920889}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a68e49f4b04b38c4ebb51e0b2ac663eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Views.BonusPick.BonusPickVfxPlayer
+  vfxPrefab: {fileID: 1652143759095011289, guid: e2c1ac940434a5242b54d72b66654687, type: 3}
+  spawnAnchor: {fileID: 2060395589}
+  followAnchor: 1
+  sortingLayerName: FX
+  sortingOrder: 10
 --- !u!1 &1338660034
 GameObject:
   m_ObjectHideFlags: 0
@@ -3320,6 +3342,7 @@ Transform:
   - {fileID: 1655040490}
   - {fileID: 1262396445}
   - {fileID: 2066945372}
+  - {fileID: 2060395589}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1608173587
@@ -4997,6 +5020,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 56754951}
     m_Modifications:
+    - target: {fileID: 53719356757894047, guid: 183f1066ababa1242a91eb1db67ee41f, type: 3}
+      propertyPath: appearDuration
+      value: 0.6
+      objectReference: {fileID: 0}
     - target: {fileID: 437942029438877615, guid: 183f1066ababa1242a91eb1db67ee41f, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -4.6
@@ -5060,6 +5087,10 @@ PrefabInstance:
     - target: {fileID: 3073647639967193038, guid: 183f1066ababa1242a91eb1db67ee41f, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 1732.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3076047261681195901, guid: 183f1066ababa1242a91eb1db67ee41f, type: 3}
+      propertyPath: appearDuration
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 3371640557206774702, guid: 183f1066ababa1242a91eb1db67ee41f, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -5164,6 +5195,10 @@ PrefabInstance:
     - target: {fileID: 5490816669639348008, guid: 183f1066ababa1242a91eb1db67ee41f, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5701937557680414426, guid: 183f1066ababa1242a91eb1db67ee41f, type: 3}
+      propertyPath: appearDuration
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 6017994236614024593, guid: 183f1066ababa1242a91eb1db67ee41f, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -5333,6 +5368,10 @@ PrefabInstance:
       propertyPath: m_fontSizeBase
       value: 40
       objectReference: {fileID: 0}
+    - target: {fileID: 7918516943536035493, guid: 183f1066ababa1242a91eb1db67ee41f, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8052478517335250444, guid: 183f1066ababa1242a91eb1db67ee41f, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -5408,6 +5447,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7482615437208226918, guid: 183f1066ababa1242a91eb1db67ee41f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1489158528}
+    - targetCorrespondingSourceObject: {fileID: 4137339126493454657, guid: 183f1066ababa1242a91eb1db67ee41f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1329920894}
   m_SourcePrefab: {fileID: 100100000, guid: 183f1066ababa1242a91eb1db67ee41f, type: 3}
 --- !u!224 &1939333905 stripped
 RectTransform:
@@ -5890,6 +5932,7 @@ GameObject:
   - component: {fileID: 2022565237}
   - component: {fileID: 2022565238}
   - component: {fileID: 2022565239}
+  - component: {fileID: 2022565240}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -5959,7 +6002,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: -1177217303
   m_SortingLayer: 2
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_MaskInteraction: 0
   m_Sprite: {fileID: 1768679433190182986, guid: 18c83dc9454fe174f80b2f0cb1a619b5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -6008,6 +6051,24 @@ MonoBehaviour:
   animator: {fileID: 2022565238}
   facingRoot: {fileID: 0}
   numbersFace: {fileID: 0}
+--- !u!114 &2022565240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2022565235}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ddb4949130c4964591bf81d6d4eae33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Keeper.LevelUpVfxPlayer
+  vfxPrefab: {fileID: 1141330259687333427, guid: 6718dc24203da53468af9ada8fef7d6d, type: 3}
+  localOffset: {x: 0, y: 0, z: 0}
+  followCharacter: 1
+  destroyAfter: -1
+  sortingLayerName: FX
+  sortingOrder: 10
 --- !u!1 &2023271354
 GameObject:
   m_ObjectHideFlags: 0
@@ -6125,6 +6186,110 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Views.Tournament.FirstTimeGuideWidget
   guidePanel: {fileID: 1447916303}
+--- !u!1 &2060395588
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2060395589}
+  - component: {fileID: 2060395591}
+  - component: {fileID: 2060395590}
+  m_Layer: 0
+  m_Name: BonusPickVfxAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2060395589
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2060395588}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1579946294}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!212 &2060395590
+SpriteRenderer:
+  serializedVersion: 2
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2060395588}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_Sprite: {fileID: 21300000, guid: 7ab74e659e1f0a34d9cfec21c478fc12, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 0.35, y: 0.59}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_SpriteSortPoint: 0
+--- !u!222 &2060395591
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2060395588}
+  m_CullTransparentMesh: 1
 --- !u!1 &2066945371
 GameObject:
   m_ObjectHideFlags: 0
