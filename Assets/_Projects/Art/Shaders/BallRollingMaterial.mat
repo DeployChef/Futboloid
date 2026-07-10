@@ -75,7 +75,7 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _UVScale: 1.3
-    - _WorldUVScale: 0.5
+    - _WorldUVScale: 0.2
     - _ZWrite: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
