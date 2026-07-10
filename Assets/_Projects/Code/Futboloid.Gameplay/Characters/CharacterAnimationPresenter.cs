@@ -13,6 +13,7 @@ namespace Futboloid.Gameplay.Characters
 
         [SerializeField] private Animator animator;
         [SerializeField] private Transform facingRoot;
+        [SerializeField] private Transform numbersFace;
 
         private float _scaleXAbs = 1f;
         private float _lastFaceSign = 1f;
@@ -46,6 +47,14 @@ namespace Futboloid.Gameplay.Characters
             var scale = root.localScale;
             scale.x = _scaleXAbs * _lastFaceSign;
             root.localScale = scale;
+
+            if (numbersFace)
+            {
+                var scaleNumX = Mathf.Abs(numbersFace.localScale.x);
+                var scaleNum = numbersFace.localScale;
+                scaleNum.x = scaleNumX * _lastFaceSign;
+                numbersFace.localScale = scaleNum;
+            }
         }
 
 #if UNITY_EDITOR

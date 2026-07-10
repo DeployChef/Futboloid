@@ -488,6 +488,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Characters.CharacterAnimationPresenter
   animator: {fileID: 696242960672357460}
   facingRoot: {fileID: 0}
+  numbersFace: {fileID: 2532175341332586269}
 --- !u!1 &7680952560169528931
 GameObject:
   m_ObjectHideFlags: 0
