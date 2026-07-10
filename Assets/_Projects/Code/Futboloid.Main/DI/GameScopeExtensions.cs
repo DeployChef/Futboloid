@@ -1,6 +1,7 @@
 using Futboloid.Core;
 using Futboloid.Core.StatusEffects;
 using Futboloid.Gameplay.Ball;
+using Futboloid.Gameplay.Camera;
 using Futboloid.Gameplay.Defenders;
 using Futboloid.Gameplay.Input;
 using Futboloid.Gameplay.Keeper;
@@ -40,6 +41,7 @@ namespace Futboloid.Main.DI
             builder.RegisterComponentInScene<GoalkeeperView>(gameScene);
             RegisterOptionalComponentInScene<TribuneSpawner>(builder, gameScene);
             RegisterOptionalComponentInScene<FirstTimeGuideWidget>(builder, gameScene);
+            RegisterOptionalComponentInScene<GameplayCameraController>(builder, gameScene);
 
             builder.RegisterBuildCallback(resolver => OnGameScopeBuilt(resolver, gameScene));
 
