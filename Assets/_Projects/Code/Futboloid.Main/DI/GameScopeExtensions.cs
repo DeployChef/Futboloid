@@ -27,8 +27,6 @@ namespace Futboloid.Main.DI
             builder.Register<DefenderReshuffleService>(Lifetime.Singleton);
             builder.Register<DefenderLogic>(Lifetime.Transient);
 
-            var tribuneSpawnSettings = TribuneSpawnSettings.Load();
-            builder.RegisterInstance(tribuneSpawnSettings);
             builder.Register<IStatusEffectService, StatusEffectService>(Lifetime.Singleton);
 
             builder.RegisterComponentInScene<GameplayInputHost>(gameScene).As<IGameplayInput>();

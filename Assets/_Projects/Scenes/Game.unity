@@ -3468,10 +3468,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Tribune.TribuneSpawner
   itemPrefab: {fileID: 2590551274272570966, guid: 1d18fa9d5ce3f704e8e800a84b2af7b1, type: 3}
   itemRoot: {fileID: 1611591884}
+  pitchBounds: {fileID: 0}
   spawnPool:
   - {fileID: 11400000, guid: 5b9f3d2e0c4e678901bcdef012345678, type: 2}
   - {fileID: 11400000, guid: 4a8f2c1e9b3d567890abcedf01234561, type: 2}
   - {fileID: 11400000, guid: 6c0a4e3f1d5f789012cdef0123456789, type: 2}
+  spawnLineOffset: 6.43
+  spawnYMin: -0.48
+  spawnYMax: 7.58
+  targetMinX: -3.69
+  targetMaxX: 3.63
+  targetMinY: -8.73
+  targetMaxY: -8.66
+  arcHeightMin: 6.04
+  arcHeightMax: 6.44
+  overshootPastTarget: 1.1
+  spawnIntervalSeconds: 4
+  spawnIntervalJitter: 1
+  minSpawnIntervalSeconds: 2
+  flightDurationSeconds: 5
+  catchRadius: 0.41
+  drawGizmos: 1
+  spawnLineColor: {r: 1, g: 0.75, b: 0.2, a: 0.9}
+  targetZoneColor: {r: 0.3, g: 0.9, b: 0.45, a: 0.85}
+  minArcColor: {r: 0.4, g: 0.85, b: 1, a: 0.9}
+  maxArcColor: {r: 1, g: 0.45, b: 0.35, a: 0.9}
 --- !u!1 &1614532377
 GameObject:
   m_ObjectHideFlags: 0
@@ -5110,7 +5131,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3913782066932557649, guid: 183f1066ababa1242a91eb1db67ee41f, type: 3}
       propertyPath: m_SortingLayerID
-      value: -1177217303
+      value: 1924101363
       objectReference: {fileID: 0}
     - target: {fileID: 4276831861876086219, guid: 183f1066ababa1242a91eb1db67ee41f, type: 3}
       propertyPath: m_SizeDelta.x
@@ -6198,7 +6219,7 @@ Canvas:
   m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: -1177217303
+  m_SortingLayerID: 1924101363
   m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!114 &2023271359
@@ -6458,6 +6479,6 @@ SceneRoots:
   - {fileID: 1203950915}
   - {fileID: 294407854}
   - {fileID: 743293819}
-  - {fileID: 391308740}
   - {fileID: 1611591884}
+  - {fileID: 391308740}
   - {fileID: 56754951}
