@@ -165,6 +165,7 @@ namespace Futboloid.Core.Run
                 RunLevel++;
                 _pendingPerkPicks++;
                 RecalculateXpThreshold();
+                _bus.Publish(new LevelUpEvent(RunLevel));
             }
 
             if (_pendingPerkPicks > 0 && !_bonusPickActive)
