@@ -114,6 +114,8 @@ MonoBehaviour:
     - {fileID: 8300000, guid: e6dc21bc676df284f8dbeae66f3c33bd, type: 3}
     - {fileID: 8300000, guid: 785b11e2cdf26fc4db2d01072fa26cde, type: 3}
     - {fileID: 8300000, guid: 08a62c6072d6a374b931a86236ccdaa3, type: 3}
+    - {fileID: 8300000, guid: 78dda0cae45c8834ea5a3f1b4628f60f, type: 3}
+    - {fileID: 8300000, guid: 20c7bd4212943c04c9dba44982ca25ac, type: 3}
     mixerGroup: {fileID: 6570628444785268977, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
     priority: 0
     allowOverlap: 0
@@ -220,7 +222,7 @@ MonoBehaviour:
   - id: BonusPickOpen
     channel: 2
     clips:
-    - {fileID: 8300000, guid: 386b1e701c1939143969ba35569bc3cb, type: 3}
+    - {fileID: 8300000, guid: 4a167eeb684afff499ea39c27f70a47c, type: 3}
     mixerGroup: {fileID: 6924800920253028459, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
     priority: 20
     allowOverlap: 0
@@ -229,7 +231,7 @@ MonoBehaviour:
     enableFade: 0
     fadeDuration: 0
     basePitch: 1
-    pitchRandomRange: 0
+    pitchRandomRange: 0.6
   - id: LevelUp
     channel: 2
     clips:
@@ -365,14 +367,15 @@ MonoBehaviour:
     pitchRandomRange: 0
   - id: UiPauseOpen
     channel: 2
-    clips: []
-    mixerGroup: {fileID: 1438017212669871657, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    clips:
+    - {fileID: 8300000, guid: 2043bfe25d1c7ef4192fbe7b457925bc, type: 3}
+    mixerGroup: {fileID: 8847932704200365196, guid: 105f75300e131314d9fe0498b0ab8428, type: 2}
     priority: 25
     allowOverlap: 0
     cooldown: 0.3
-    loop: 0
-    enableFade: 0
-    fadeDuration: 0
+    loop: 1
+    enableFade: 1
+    fadeDuration: 2
     basePitch: 1
     pitchRandomRange: 0
   - id: UiTournamentOpen
