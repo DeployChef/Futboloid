@@ -36,6 +36,7 @@ namespace Futboloid.Core.Audio
             // Прогрессия забега
             public const string PerkPick = "PerkPick";
             public const string BonusPickOpen = "BonusPickOpen";
+            public const string BonusPickCardFocus = "BonusPickCardFocus";
             public const string LevelUp = "LevelUp";
 
             // Фазы поля
