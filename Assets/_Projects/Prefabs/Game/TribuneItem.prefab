@@ -81,7 +81,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: 7745631605121502254, guid: 7781fe92a9cec31449199afbe08ba937, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -102,7 +102,6 @@ GameObject:
   - component: {fileID: 5709325287968688134}
   - component: {fileID: 7623623041087299147}
   - component: {fileID: 2590551274272570966}
-  - component: {fileID: -185034217881356440}
   m_Layer: 0
   m_Name: TribuneItem
   m_TagString: Untagged
@@ -120,8 +119,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.63, y: 1.63, z: 1.63}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1743663315125068611}
   m_Father: {fileID: 0}
@@ -161,7 +160,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 0.5
+  m_Radius: 0.41
 --- !u!114 &2590551274272570966
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -175,25 +174,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Tribune.TribuneItemView
   spriteRenderer: {fileID: 1574625978548635283}
---- !u!95 &-185034217881356440
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8692531535037747598}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: d97c285570a59ff44b6dfeee84148bea, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0

@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Futboloid.Core.StatusEffects;
 using Futboloid.Gameplay.Keeper;
 using UnityEngine;
@@ -5,7 +6,7 @@ using UnityEngine;
 namespace Futboloid.Gameplay.Tribune
 {
     /// <summary>
-    /// Предмет с трибуны: полёт по дуге-снаряду, при касании вратаря — timed-эффект.
+    /// Предмет с трибуны: полёт по дуге (DOTween), при касании вратаря — timed-эффект.
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
     public class TribuneItemView : MonoBehaviour
@@ -13,17 +14,16 @@ namespace Futboloid.Gameplay.Tribune
         [SerializeField] private SpriteRenderer spriteRenderer;
 
         private Rigidbody2D _body;
-        private GoalkeeperView _goalkeeper;
         private StatusEffectDefinition _definition;
         private IStatusEffectService _statusEffects;
         private Vector2 _start;
         private Vector2 _control;
         private Vector2 _end;
-        private float _duration;
-        private float _catchRadius;
-        private float _elapsed;
+        private float _progress;
         private bool _consumed;
         private bool _initialized;
+        private Tween _flightTween;
+        private Tween _spinTween;
 
         private void Awake()
         {
@@ -47,80 +47,76 @@ namespace Futboloid.Gameplay.Tribune
         public void Initialize(
             StatusEffectDefinition definition,
             IStatusEffectService statusEffects,
-            GoalkeeperView goalkeeper,
             Vector2 start,
             Vector2 end,
-            float launchHeight,
-            float launchHorizontalBias,
-            float visualScale,
-            float catchRadius,
+            float arcHeight,
             float durationSeconds)
         {
             _definition = definition;
             _statusEffects = statusEffects;
-            _goalkeeper = goalkeeper;
             _start = start;
             _end = end;
             _control = new Vector2(
-                Mathf.Lerp(start.x, end.x, launchHorizontalBias),
-                start.y + launchHeight);
-            _catchRadius = catchRadius;
-            _duration = Mathf.Max(0.1f, durationSeconds);
-            _elapsed = 0f;
+                (start.x + end.x) * 0.5f,
+                start.y + arcHeight);
+            _progress = 0f;
             _consumed = false;
             _initialized = true;
 
-            transform.localScale = Vector3.one;
-
             if (spriteRenderer != null)
             {
-                spriteRenderer.transform.localScale = Vector3.one * visualScale;
-
                 if (definition?.Icon != null)
                     spriteRenderer.sprite = definition.Icon;
 
                 spriteRenderer.sortingOrder = 50;
             }
 
-            if (_body != null)
-                _body.position = start;
-            else
-                transform.position = start;
+            transform.rotation = Quaternion.identity;
+            SetPosition(start);
+
+            var duration = Mathf.Max(0.1f, durationSeconds);
+            StartFlight(duration);
+            StartSpin(duration);
         }
 
-        private void FixedUpdate()
+        private void StartFlight(float durationSeconds)
         {
-            if (!_initialized || _consumed)
-                return;
+            KillFlightTween();
 
-            _elapsed += Time.fixedDeltaTime;
-            var t = Mathf.Clamp01(_elapsed / _duration);
-            var position = EvaluateProjectilePosition(_start, _control, _end, t);
+            _flightTween = DOTween.To(
+                    () => _progress,
+                    value =>
+                    {
+                        _progress = value;
+                        SetPosition(EvaluateBezier(_start, _control, _end, _progress));
+                    },
+                    1f,
+                    durationSeconds)
+                .SetEase(Ease.Linear)
+                .SetTarget(this)
+                .OnComplete(OnFlightComplete);
+        }
 
-            if (_body != null)
-                _body.MovePosition(position);
-            else
-                transform.position = position;
+        private void StartSpin(float durationSeconds)
+        {
+            KillSpinTween();
 
-            TryProximityCatch(position);
+            var spinDirection = Random.value < 0.5f ? -1f : 1f;
+            var spinDegrees = spinDirection * Random.Range(360f, 720f);
 
-            if (t >= 1f)
+            _spinTween = transform
+                .DORotate(new Vector3(0f, 0f, spinDegrees), durationSeconds, RotateMode.FastBeyond360)
+                .SetEase(Ease.Linear)
+                .SetTarget(this);
+        }
+
+        private void OnFlightComplete()
+        {
+            if (!_consumed)
                 Destroy(gameObject);
         }
 
         private void OnTriggerEnter2D(Collider2D other) => TryCatch(other);
-
-        private void OnTriggerStay2D(Collider2D other) => TryCatch(other);
-
-        private void TryProximityCatch(Vector2 position)
-        {
-            if (_goalkeeper == null)
-                return;
-
-            var keeperPosition = (Vector2)_goalkeeper.transform.position;
-            if (Vector2.Distance(position, keeperPosition) <= _catchRadius)
-                Consume();
-        }
 
         private void TryCatch(Collider2D other)
         {
@@ -136,11 +132,44 @@ namespace Futboloid.Gameplay.Tribune
         private void Consume()
         {
             _consumed = true;
+            KillTweens();
             _statusEffects?.Apply(_definition);
             Destroy(gameObject);
         }
 
-        private static Vector2 EvaluateProjectilePosition(Vector2 start, Vector2 control, Vector2 end, float t)
+        private void SetPosition(Vector2 position)
+        {
+            if (_body != null)
+                _body.position = position;
+            else
+                transform.position = position;
+        }
+
+        private void KillTweens()
+        {
+            KillFlightTween();
+            KillSpinTween();
+        }
+
+        private void KillFlightTween()
+        {
+            if (_flightTween != null && _flightTween.IsActive())
+                _flightTween.Kill();
+
+            _flightTween = null;
+        }
+
+        private void KillSpinTween()
+        {
+            if (_spinTween != null && _spinTween.IsActive())
+                _spinTween.Kill();
+
+            _spinTween = null;
+        }
+
+        private void OnDestroy() => KillTweens();
+
+        private static Vector2 EvaluateBezier(Vector2 start, Vector2 control, Vector2 end, float t)
         {
             var u = 1f - t;
             return u * u * start + 2f * u * t * control + t * t * end;
