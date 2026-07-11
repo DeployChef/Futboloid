@@ -14,7 +14,8 @@ namespace Futboloid.Gameplay.Ball
         private readonly IGameEventBus _bus;
         private readonly DefenderGridRegistry _defenderRegistry;
         private readonly PitchBounds _pitchBounds;
-        private readonly LayerMask _goalMask;
+        private readonly ContactFilter2D _ballContactFilter;
+        private readonly RaycastHit2D[] _castHits = new RaycastHit2D[1];
 
         public Vector2 Position { get; private set; }
         public Vector2 Direction { get; private set; }
@@ -35,7 +36,9 @@ namespace Futboloid.Gameplay.Ball
             _bus = bus;
             _defenderRegistry = defenderRegistry;
             _pitchBounds = pitchBounds;
-            _goalMask = PhysicsLayers.GoalMask;
+
+            _ballContactFilter = ContactFilter2D.noFilter;
+            _ballContactFilter.SetLayerMask(PhysicsLayers.BallContactMask);
         }
 
         public void ResetAt(Vector2 position)
@@ -82,15 +85,16 @@ namespace Futboloid.Gameplay.Ball
 
             var distance = Speed * deltaTime;
             var castDistance = distance + _settings.Skin;
-            var hit = Physics2D.CircleCast(
+            var hitCount = Physics2D.CircleCast(
                 Position,
                 _settings.Radius,
                 Direction,
-                castDistance,
-                PhysicsLayers.BallContactMask);
+                _ballContactFilter,
+                _castHits,
+                castDistance);
 
-            if (hit.collider != null)
-                ResolveHit(hit);
+            if (hitCount > 0)
+                ResolveHit(_castHits[0]);
             else
                 Position += Direction * distance;
 
@@ -167,26 +171,18 @@ namespace Futboloid.Gameplay.Ball
 
         private bool TryScoreGoal()
         {
-            var hits = Physics2D.OverlapCircleAll(Position, _settings.Radius, _goalMask);
-            foreach (var overlap in hits)
+            if (Physics2D.OverlapCircle(Position, _settings.Radius, PhysicsLayers.GoalEnemyMask) != null)
             {
-                if (overlap == null)
-                    continue;
+                Stop();
+                _bus.Publish(new GoalScoredEvent(isPlayerGoal: true));
+                return true;
+            }
 
-                var layer = overlap.gameObject.layer;
-                if (layer == PhysicsLayers.GoalEnemyId)
-                {
-                    Stop();
-                    _bus.Publish(new GoalScoredEvent(isPlayerGoal: true));
-                    return true;
-                }
-
-                if (layer == PhysicsLayers.GoalPlayerId)
-                {
-                    Stop();
-                    _bus.Publish(new GoalScoredEvent(isPlayerGoal: false));
-                    return true;
-                }
+            if (Physics2D.OverlapCircle(Position, _settings.Radius, PhysicsLayers.GoalPlayerMask) != null)
+            {
+                Stop();
+                _bus.Publish(new GoalScoredEvent(isPlayerGoal: false));
+                return true;
             }
 
             return false;

@@ -5,6 +5,7 @@ namespace Futboloid.Core
     /// </summary>
     public interface ITournamentRunService : ITournamentBracketReadModel
     {
+        bool HasPlayedBefore { get; }
         void ResetRun();
         void RecordMatchResult(int playerScore, int opponentScore, bool playerWon);
     }

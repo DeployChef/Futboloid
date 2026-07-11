@@ -1,11 +1,13 @@
 using Futboloid.Core;
 using Futboloid.Core.StatusEffects;
 using Futboloid.Gameplay.Ball;
+using Futboloid.Gameplay.Camera;
 using Futboloid.Gameplay.Defenders;
 using Futboloid.Gameplay.Input;
 using Futboloid.Gameplay.Keeper;
 using Futboloid.Gameplay.Match;
 using Futboloid.Gameplay.Tribune;
+using Futboloid.UI.Views.Tournament;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer;
@@ -25,8 +27,6 @@ namespace Futboloid.Main.DI
             builder.Register<DefenderReshuffleService>(Lifetime.Singleton);
             builder.Register<DefenderLogic>(Lifetime.Transient);
 
-            var tribuneSpawnSettings = TribuneSpawnSettings.Load();
-            builder.RegisterInstance(tribuneSpawnSettings);
             builder.Register<IStatusEffectService, StatusEffectService>(Lifetime.Singleton);
 
             builder.RegisterComponentInScene<GameplayInputHost>(gameScene).As<IGameplayInput>();
@@ -38,6 +38,8 @@ namespace Futboloid.Main.DI
             builder.RegisterComponentInScene<BallView>(gameScene);
             builder.RegisterComponentInScene<GoalkeeperView>(gameScene);
             RegisterOptionalComponentInScene<TribuneSpawner>(builder, gameScene);
+            RegisterOptionalComponentInScene<FirstTimeGuideWidget>(builder, gameScene);
+            RegisterOptionalComponentInScene<GameplayCameraController>(builder, gameScene);
 
             builder.RegisterBuildCallback(resolver => OnGameScopeBuilt(resolver, gameScene));
 
