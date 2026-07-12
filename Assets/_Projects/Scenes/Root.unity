@@ -1640,6 +1640,7 @@ MonoBehaviour:
   sfxPoolSize: 8
   uiPoolSize: 3
   enableFade: 1
+  pauseSoundId: UiPauseOpen
 --- !u!1001 &4171201232969605855
 PrefabInstance:
   m_ObjectHideFlags: 0
