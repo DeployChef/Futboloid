@@ -157,6 +157,8 @@ namespace Futboloid.Gameplay.Defenders
                     motion.ReflectFromHit(hit);
                     break;
             }
+
+            motion.ApplyDefenderHitBoost();
         }
 
         private void LaunchToPlayerGoal(BallMotion motion, RaycastHit2D hit, DefenderView view)

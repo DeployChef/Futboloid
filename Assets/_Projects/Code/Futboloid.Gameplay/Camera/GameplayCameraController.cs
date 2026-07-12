@@ -13,7 +13,8 @@ using VContainer;
 namespace Futboloid.Gameplay.Camera
 {
   /// <summary>
-  /// Тактическая камера: сдвиг влево-вправо за вратарём игрока, зум по Y мяча, тряска через Impulse по событиям шины.
+  /// Тактическая камера: сдвиг влево-вправо за вратарём игрока, зум по Y мяча, тряска через Impulse.
+  /// Пинки — лёгкий шейк; стены и контакты — только когда мяч разогнан (≥ Fire Speed Threshold).
   /// </summary>
   public sealed class GameplayCameraController : MonoBehaviour
   {
@@ -32,9 +33,9 @@ namespace Futboloid.Gameplay.Camera
     [SerializeField] private float zoomSmoothTime = 0.45f;
 
     [Header("Impulse")]
-    [SerializeField] private float wallImpulseForce = 0.008f;
-    [SerializeField] private float keeperImpulseForce = 0.01f;
-    [SerializeField] private float defenderContactImpulseForce = 0.01f;
+    [SerializeField] private float kickImpulseForce = 0.005f;
+    [SerializeField] private float wallImpulseForce = 0.015f;
+    [SerializeField] private float defenderContactImpulseForce = 0.008f;
     [SerializeField] private float defenderHitImpulseForce = 0.012f;
     [SerializeField] private float goalImpulseForce = 0.018f;
     [SerializeField] private float maxSpeedForImpulse = 20f;
@@ -68,6 +69,7 @@ namespace Futboloid.Gameplay.Camera
       ConfigureFramingTransposer();
 
       _subscriptions.Add(bus.Subscribe<BallContactEvent>(OnBallContact));
+      _subscriptions.Add(bus.Subscribe<BallServedEvent>(OnBallServed));
       _subscriptions.Add(bus.Subscribe<DefenderHitEvent>(OnDefenderHit));
       _subscriptions.Add(bus.Subscribe<GoalScoredEvent>(OnGoalScored));
       _subscriptions.Add(bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged));
@@ -137,27 +139,45 @@ namespace Futboloid.Gameplay.Camera
 
     private void OnBallContact(BallContactEvent e)
     {
-      if (!_onField || impulseSource == null)
+      if (!_onField || impulseSource == null || _ball == null)
         return;
 
-      var force = e.Kind switch
+      switch (e.Kind)
       {
-        BallContactKind.Wall => wallImpulseForce,
-        BallContactKind.PlayerKeeper => keeperImpulseForce,
-        BallContactKind.Defender => defenderContactImpulseForce,
-        _ => wallImpulseForce
-      };
+        case BallContactKind.PlayerKeeper:
+          FireImpulse(kickImpulseForce, e.Point);
+          return;
 
-      force *= SpeedImpulseScale(e.Speed);
-      FireImpulse(force, e.Point);
+        case BallContactKind.Wall:
+          if (!WasAcceleratedAtContact(e))
+            return;
+
+          FireImpulse(wallImpulseForce * SpeedImpulseScale(ImpactSpeed(e)), e.Point);
+          return;
+
+        case BallContactKind.Defender:
+          if (!WasAcceleratedAtContact(e))
+            return;
+
+          FireImpulse(defenderContactImpulseForce * SpeedImpulseScale(ImpactSpeed(e)), e.Point);
+          return;
+      }
     }
 
-    private void OnDefenderHit(DefenderHitEvent _)
+    private void OnBallServed(BallServedEvent _)
     {
       if (!_onField || impulseSource == null || _ball == null)
         return;
 
-      FireImpulse(defenderHitImpulseForce, _ball.Position);
+      FireImpulse(kickImpulseForce, _ball.Position);
+    }
+
+    private void OnDefenderHit(DefenderHitEvent _)
+    {
+      if (!_onField || impulseSource == null || _ball == null || !_ball.IsOnFire)
+        return;
+
+      FireImpulse(defenderHitImpulseForce * SpeedImpulseScale(_ball.Speed), _ball.Position);
     }
 
     private void OnGoalScored(GoalScoredEvent _)
@@ -171,12 +191,28 @@ namespace Futboloid.Gameplay.Camera
     private void OnNavigationChanged(NavigationChangedEvent e) =>
       _onField = e.Current == NavigationState.OnField;
 
+    private bool WasAcceleratedAtContact(BallContactEvent e) =>
+      ImpactSpeed(e) >= _ball.Settings.FireSpeedThreshold;
+
+    private float ImpactSpeed(BallContactEvent e)
+    {
+      var settings = _ball.Settings;
+
+      return e.Kind switch
+      {
+        BallContactKind.Wall => e.Speed + settings.WallSpeedPenalty,
+        BallContactKind.Defender => Mathf.Max(0f, e.Speed - settings.DefenderHitBoost),
+        BallContactKind.PlayerKeeper => Mathf.Max(0f, e.Speed - settings.KeeperBoost),
+        _ => e.Speed
+      };
+    }
+
     private float SpeedImpulseScale(float speed)
     {
       if (maxSpeedForImpulse <= 0.001f)
         return 1f;
 
-      return Mathf.Lerp(0.85f, 1.15f, Mathf.Clamp01(speed / maxSpeedForImpulse));
+      return Mathf.Lerp(0.9f, 1.25f, Mathf.Clamp01(speed / maxSpeedForImpulse));
     }
 
     private void FireImpulse(float force, Vector2 worldPoint)

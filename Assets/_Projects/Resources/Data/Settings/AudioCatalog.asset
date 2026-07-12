@@ -277,6 +277,22 @@ MonoBehaviour:
     stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0.6
+  - id: BonusPickCardFocus
+    channel: 2
+    clips:
+    - {fileID: 8300000, guid: 4a167eeb684afff499ea39c27f70a47c, type: 3}
+    mixerGroup: {fileID: 6924800920253028459, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 22
+    allowOverlap: 1
+    cooldown: 0.05
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
+    basePitch: 1
+    pitchRandomRange: 0.15
   - id: LevelUp
     channel: 2
     clips:

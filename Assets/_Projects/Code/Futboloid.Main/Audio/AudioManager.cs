@@ -72,17 +72,22 @@ namespace Futboloid.Main.Audio
             if (definition.Clips == null || definition.Clips.Length == 0)
                 return;
 
+            var playClock = GetPlayClock(definition.Channel);
+
             if (definition.Cooldown > 0f
                 && _lastPlayTimes.TryGetValue(soundId, out var lastTime)
-                && Time.time - lastTime < definition.Cooldown)
+                && playClock - lastTime < definition.Cooldown)
                 return;
 
             if (!definition.AllowOverlap && IsPlaying(soundId))
                 return;
 
             PlayDefinition(definition, pitch, pitchRandomRange);
-            _lastPlayTimes[soundId] = Time.time;
+            _lastPlayTimes[soundId] = playClock;
         }
+
+        private static float GetPlayClock(AudioChannel channel) =>
+            channel == AudioChannel.UiSfx ? Time.unscaledTime : Time.time;
 
         public void Stop(string soundId)
         {
@@ -344,6 +349,8 @@ namespace Futboloid.Main.Audio
 
         private static SfxVoice FindFreeVoice(List<SfxVoice> pool, SoundDefinition sound)
         {
+            SfxVoice fallback = null;
+
             foreach (var voice in pool)
             {
                 if (!voice.Source.isPlaying)
@@ -351,9 +358,11 @@ namespace Futboloid.Main.Audio
 
                 if (voice.SoundId == sound.Id && !sound.AllowOverlap)
                     return null;
+
+                fallback = voice;
             }
 
-            return null;
+            return sound.AllowOverlap ? fallback : null;
         }
 
         private void PlayOnVoice(SfxVoice voice, SoundDefinition sound, float? pitch, float? pitchRandomRange)

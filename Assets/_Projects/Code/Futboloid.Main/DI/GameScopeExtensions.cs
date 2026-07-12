@@ -7,6 +7,7 @@ using Futboloid.Gameplay.Input;
 using Futboloid.Gameplay.Keeper;
 using Futboloid.Gameplay.Match;
 using Futboloid.Gameplay.Tribune;
+using Futboloid.UI.Views.StatusEffects;
 using Futboloid.UI.Views.Tournament;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -38,6 +39,7 @@ namespace Futboloid.Main.DI
             builder.RegisterComponentInScene<BallView>(gameScene);
             builder.RegisterComponentInScene<GoalkeeperView>(gameScene);
             RegisterOptionalComponentInScene<TribuneSpawner>(builder, gameScene);
+            RegisterOptionalComponentInScene<StatusEffectRevealWidget>(builder, gameScene);
             RegisterOptionalComponentInScene<FirstTimeGuideWidget>(builder, gameScene);
             RegisterOptionalComponentInScene<GameplayCameraController>(builder, gameScene);
 

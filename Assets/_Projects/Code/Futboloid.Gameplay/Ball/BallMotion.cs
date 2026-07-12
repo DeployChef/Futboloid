@@ -21,6 +21,9 @@ namespace Futboloid.Gameplay.Ball
         public Vector2 Direction { get; private set; }
         public float Speed { get; private set; }
 
+        public bool IsOnFire => Speed >= _settings.FireSpeedThreshold;
+        public int HitDamage => IsOnFire ? 1 + _settings.FireExtraDamage : 1;
+
         public bool InPlay => Speed > 0.01f;
         public bool IsHeld => _holdAnchor != null;
 
@@ -123,9 +126,35 @@ namespace Futboloid.Gameplay.Ball
             Direction = ClampMinAngle(Reflect(Direction, hit.normal));
         }
 
+        private void ReflectFromKeeperHit(RaycastHit2D hit)
+        {
+            var reflected = Reflect(Direction, hit.normal);
+            var spread = _settings.KeeperReflectionSpread;
+
+            if (spread > 0f)
+            {
+                var angle = Mathf.Atan2(reflected.y, reflected.x) * Mathf.Rad2Deg;
+                angle += Random.Range(-spread, spread);
+                var radians = angle * Mathf.Deg2Rad;
+                reflected = new Vector2(Mathf.Cos(radians), Mathf.Sin(radians));
+            }
+
+            Direction = ClampMinAngle(reflected);
+        }
+
         public void ApplyKeeperBoost()
         {
             Speed = Mathf.Min(Speed + _settings.KeeperBoost, _settings.MaxSpeed);
+        }
+
+        public void ApplyDefenderHitBoost()
+        {
+            Speed = Mathf.Min(Speed + _settings.DefenderHitBoost, _settings.MaxSpeed);
+        }
+
+        public void ApplyWallSpeedPenalty()
+        {
+            Speed = Mathf.Max(_settings.BaseSpeed, Speed - _settings.WallSpeedPenalty);
         }
 
         public void LaunchDirected(Vector2 direction, float speed)
@@ -148,7 +177,7 @@ namespace Futboloid.Gameplay.Ball
             var layer = hitCollider.gameObject.layer;
             if (layer == PhysicsLayers.KeeperId)
             {
-                ReflectFromHit(hit);
+                ReflectFromKeeperHit(hit);
                 ApplyKeeperBoost();
                 _bus.Publish(new BallReturnedToKeeperEvent());
                 _bus.Publish(new BallContactEvent(BallContactKind.PlayerKeeper, hit.point, hit.normal, Speed));
@@ -166,6 +195,7 @@ namespace Futboloid.Gameplay.Ball
             }
 
             ReflectFromHit(hit);
+            ApplyWallSpeedPenalty();
             _bus.Publish(new BallContactEvent(BallContactKind.Wall, hit.point, hit.normal, Speed));
         }
 
