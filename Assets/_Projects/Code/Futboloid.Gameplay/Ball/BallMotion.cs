@@ -128,6 +128,16 @@ namespace Futboloid.Gameplay.Ball
             Speed = Mathf.Min(Speed + _settings.KeeperBoost, _settings.MaxSpeed);
         }
 
+        public void ApplyDefenderHitBoost()
+        {
+            Speed = Mathf.Min(Speed + _settings.DefenderHitBoost, _settings.MaxSpeed);
+        }
+
+        public void ApplyWallSpeedPenalty()
+        {
+            Speed = Mathf.Max(_settings.BaseSpeed, Speed - _settings.WallSpeedPenalty);
+        }
+
         public void LaunchDirected(Vector2 direction, float speed)
         {
             if (direction.sqrMagnitude < 0.0001f)
@@ -166,6 +176,7 @@ namespace Futboloid.Gameplay.Ball
             }
 
             ReflectFromHit(hit);
+            ApplyWallSpeedPenalty();
             _bus.Publish(new BallContactEvent(BallContactKind.Wall, hit.point, hit.normal, Speed));
         }
 

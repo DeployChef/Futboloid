@@ -12,6 +12,8 @@ namespace Futboloid.Gameplay.Ball
         [SerializeField] private float maxSpeed = 20f;
         [SerializeField] private float deceleration = 3f;
         [SerializeField] private float keeperBoost = 2f;
+        [SerializeField] private float defenderHitBoost = 3f;
+        [SerializeField] private float wallSpeedPenalty = 1.5f;
         [SerializeField] private float skin = 0.02f;
         [SerializeField] private float minVerticalComponent = 0.15f;
 
@@ -21,6 +23,8 @@ namespace Futboloid.Gameplay.Ball
         public float MaxSpeed => maxSpeed;
         public float Deceleration => deceleration;
         public float KeeperBoost => keeperBoost;
+        public float DefenderHitBoost => Mathf.Max(0f, defenderHitBoost);
+        public float WallSpeedPenalty => Mathf.Max(0f, wallSpeedPenalty);
         public float Skin => skin;
         public float MinVerticalComponent => minVerticalComponent;
     }
