@@ -193,18 +193,29 @@ namespace Futboloid.Core.Audio
             _onField = e.Current == NavigationState.OnField;
 
             if (ShouldPauseMusic(e))
+            {
                 _audio.PauseMusic();
+            }
             else if (e.Current == NavigationState.OnField)
+            {
                 HandleFieldMusic(e);
+            }
+
+            // Восстановить музыку при выходе из паузы
+            if (e.Current != NavigationState.Pause && e.Previous == NavigationState.Pause && _onField)
+            {
+                _audio.ResumeMusic();
+            }
 
             switch (e.Current)
             {
                 case NavigationState.MainMenu when e.Previous != NavigationState.MainMenu:
                     _audio.Play(AudioCatalog.Ids.UiMenuOpen);
                     break;
-                case NavigationState.Pause when e.Previous != NavigationState.Pause:
-                    _audio.Play(AudioCatalog.Ids.UiPauseOpen);
-                    break;
+                // Трек паузы запускается автоматически в PauseMusic() через _pauseSource
+                // case NavigationState.Pause when e.Previous != NavigationState.Pause:
+                //     _audio.Play(AudioCatalog.Ids.UiPauseOpen);
+                //     break;
                 case NavigationState.Tournament when e.Previous != NavigationState.Tournament:
                     _audio.Play(AudioCatalog.Ids.UiTournamentOpen);
                     break;
