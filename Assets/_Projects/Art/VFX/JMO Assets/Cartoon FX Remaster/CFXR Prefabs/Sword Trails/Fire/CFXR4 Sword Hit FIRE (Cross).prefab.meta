@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: b18b93d4b5d00384ba417df18aeac5a3
-DefaultImporter:
+guid: 1fd2749f2a4056446881dce86ed70c39
+PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
@@ -10,5 +10,6 @@ AssetOrigin:
   productId: 109565
   packageName: Cartoon FX Remaster Free
   packageVersion: R 1.5.0
-  assetPath: Assets/_Projects/Art/VFX/JMO Assets/Cartoon FX FREE (old legacy effects).unitypackage
+  assetPath: Assets/_Projects/Art/VFX/JMO Assets/Cartoon FX Remaster/CFXR Prefabs/Sword
+    Trails/Fire/CFXR4 Sword Hit FIRE (Cross).prefab
   uploadId: 836238

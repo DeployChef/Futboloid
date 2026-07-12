@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: b18b93d4b5d00384ba417df18aeac5a3
-DefaultImporter:
+guid: 95b8d3d65b5d7f1409c4ed1723887826
+PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
@@ -10,5 +10,6 @@ AssetOrigin:
   productId: 109565
   packageName: Cartoon FX Remaster Free
   packageVersion: R 1.5.0
-  assetPath: Assets/_Projects/Art/VFX/JMO Assets/Cartoon FX FREE (old legacy effects).unitypackage
+  assetPath: Assets/_Projects/Art/VFX/JMO Assets/Cartoon FX Remaster/CFXR Prefabs/Sword
+    Trails/Plain/CFXR4 Sword Trail PLAIN (360 Spiral).prefab
   uploadId: 836238
