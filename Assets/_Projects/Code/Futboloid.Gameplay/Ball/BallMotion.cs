@@ -21,6 +21,9 @@ namespace Futboloid.Gameplay.Ball
         public Vector2 Direction { get; private set; }
         public float Speed { get; private set; }
 
+        public bool IsOnFire => Speed >= _settings.FireSpeedThreshold;
+        public int HitDamage => IsOnFire ? 1 + _settings.FireExtraDamage : 1;
+
         public bool InPlay => Speed > 0.01f;
         public bool IsHeld => _holdAnchor != null;
 

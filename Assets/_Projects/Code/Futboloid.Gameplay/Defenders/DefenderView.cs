@@ -426,7 +426,8 @@ namespace Futboloid.Gameplay.Defenders
 
             _lastInteractionTime = Time.time;
             _logic.ResolveBallHit(motion, hit, this);
-            health.ApplyDamage(1, slotId, transform.position);
+            var damage = _ball != null ? _ball.HitDamage : 1;
+            health.ApplyDamage(damage, slotId, transform.position);
             _bus?.Publish(new DefenderHitEvent(slotId, pointValue));
         }
     }

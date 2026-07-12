@@ -17,6 +17,11 @@ namespace Futboloid.Gameplay.Ball
         [SerializeField] private float skin = 0.02f;
         [SerializeField] private float minVerticalComponent = 0.15f;
 
+        [Header("Fire stage")]
+        [SerializeField] private float fireSpeedThreshold = 14f;
+        [SerializeField] private int fireExtraDamage = 1;
+        [SerializeField] private float fireVfxFadeSpeed = 3.5f;
+
         public float Radius => radius;
         public float BaseSpeed => baseSpeed;
         public float ServeSpeed => serveSpeed;
@@ -27,5 +32,8 @@ namespace Futboloid.Gameplay.Ball
         public float WallSpeedPenalty => Mathf.Max(0f, wallSpeedPenalty);
         public float Skin => skin;
         public float MinVerticalComponent => minVerticalComponent;
+        public float FireSpeedThreshold => fireSpeedThreshold;
+        public int FireExtraDamage => Mathf.Max(0, fireExtraDamage);
+        public float FireVfxFadeSpeed => Mathf.Max(0.1f, fireVfxFadeSpeed);
     }
 }

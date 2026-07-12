@@ -35,6 +35,15 @@ namespace Futboloid.Gameplay.Ball
         private Tween _reshuffleTween;
 
         public Vector2 Position => _motion != null ? _motion.Position : (Vector2)transform.position;
+        public float Speed => _motion != null ? _motion.Speed : 0f;
+        public bool IsOnFire => _motion != null && _motion.IsOnFire;
+        public int HitDamage => _motion != null ? _motion.HitDamage : 1;
+        public bool InPlay => _motion != null && _motion.InPlay;
+        public BallSettings Settings => settings;
+
+        public bool IsSimulating => _simulating;
+
+        public event System.Action<PitchPhase> PhaseChanged;
 
         [Inject]
         public void Construct(
@@ -147,6 +156,7 @@ namespace Futboloid.Gameplay.Ball
         {
             _phase = phase;
             _simulating = phase == PitchPhase.Simulating;
+            PhaseChanged?.Invoke(phase);
 
             if (phase == PitchPhase.KickoffWait && !_reshuffleAnimating)
                 ResetAtKickoff();
