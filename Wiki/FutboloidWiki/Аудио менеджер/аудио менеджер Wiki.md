@@ -14,7 +14,7 @@ aliases:
 ← [[Home|Главная]] | [[Архитектура/Индекс архитектуры|Архитектура]] | [[Архитектура/DI и LifetimeScope|DI]]
 
 > [!date] Обновлено
-> **08.07.2026** — `AudioManager`, конфиг на менеджере, музыка на `OnField`, fade pause/resume, комбо и баффы.
+> **12.07.2026** — трек паузы (`_pauseSource`), раздельный fade in/out, `stopOnPause`, точный таймер fade.
 
 ---
 
@@ -51,6 +51,7 @@ BallMotion → bus.Publish(BallContactEvent)
 | Канал | AudioSource | Для чего |
 |-------|-------------|----------|
 | `Music` | 1 источник | Loop, fade in/out, fade pause/resume |
+| `Pause` | 1 источник | Трек паузы (`UiPauseOpen`), fade in при входе, pause при выходе |
 | `GameplaySfx` | Пул (8, `sfxPoolSize`) | Удары, голы, комбо, баффы |
 | `UiSfx` | Пул (3, `uiPoolSize`) | UI |
 
@@ -64,13 +65,26 @@ BallMotion → bus.Publish(BallContactEvent)
 |-------|----------|
 | Вход в `OnField` (`NavigationChanged`) | `Play(MusicMatch)` — случайный трек из каталога |
 | `MatchStartedEvent` (подача мяча) | только свисток `MatchStart`, **без музыки** |
-| `OnField → Pause` / `OnField → MainMenu` / `Pause → MainMenu` | fade out + `Pause()` — позиция в треке сохраняется |
-| `Pause → OnField` / возврат из меню с паузой матча | fade in + `UnPause()` — **с того же места** |
+| `OnField → Pause` / `OnField → MainMenu` / `Pause → MainMenu` | fade out музыки + `Pause()` + `PlayPauseSound` (fade in трека паузы) |
+| `Pause → OnField` / возврат из меню с паузой матча | `Pause()` трека паузы + `UnPause()` музыки + fade in музыки |
 | `MatchEndedEvent` | `MatchEnd` + `StopMusic` (fade out) |
-| `PitchResetRequestedEvent` на поле | `StopMusic` + новый `MusicMatch` (рестарт турнира) |
+| `PitchResetRequestedEvent` на поле | `StopMusic` + `StopPauseSound` + новый `MusicMatch` (рестарт турнира) |
 | `PitchResetRequestedEvent` не на поле | только `StopMusic`; старт при следующем `OnField` |
 
 `MusicMatch` в каталоге: `loop: true` — выбранный трек зацикливается. Автосмена на другой трек после окончания **не реализована**.
+
+### Трек паузы
+
+| Параметр | Значение |
+|----------|----------|
+| Sound ID | `UiPauseOpen` (настраивается через `pauseSoundId`) |
+| AudioSource | `_pauseSource` (отдельный от музыки) |
+| Fade in | `fadeDuration` при входе в паузу |
+| Fade out | `fadeOutDuration` при полном выходе из паузы на поле |
+| Пауза | `Pause()` / `UnPause()` — синхронно с музыкой |
+| Loop | `true` — зацикливается при входе в паузу |
+
+> [!note] **Важно:** Трек паузы запускается **только** через `_pauseSource` из `PauseMusic()`. Прямой вызов `Play("UiPauseOpen")` из `AudioService` **убран** во избежание дублирования.
 
 ---
 

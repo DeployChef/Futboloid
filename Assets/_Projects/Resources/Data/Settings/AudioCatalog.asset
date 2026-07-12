@@ -30,6 +30,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0.08
   - id: BallHitMan
@@ -47,6 +50,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0.11
   - id: GoalScored
@@ -62,6 +68,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 1
     fadeDuration: 0.3
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: GoalConceded
@@ -77,6 +86,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 1
     fadeDuration: 0.3
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: MatchStart
@@ -92,6 +104,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: MatchEnd
@@ -106,6 +121,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: MusicMatch
@@ -123,6 +141,9 @@ MonoBehaviour:
     loop: 1
     enableFade: 1
     fadeDuration: 1.5
+    fadeInDuration: 0
+    fadeOutDuration: 1.5
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: PerkPick
@@ -136,6 +157,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: DefenderHit
@@ -148,6 +172,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: DefenderDestroyed
@@ -169,6 +196,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 1
     fadeDuration: 0.3
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: PromotionStarted
@@ -181,6 +211,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: PromotionCompleted
@@ -193,6 +226,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: DefenderReturned
@@ -205,6 +241,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: DefenderRoleChanged
@@ -217,6 +256,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: BonusPickOpen
@@ -230,6 +272,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0.6
   - id: LevelUp
@@ -243,6 +288,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 1
     fadeDuration: 0.3
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: ScorePoints
@@ -255,6 +303,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0.05
   - id: ComboMultiplierUp
@@ -267,6 +318,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: ComboMultiplierDown
@@ -279,6 +333,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: BuffApplied
@@ -291,6 +348,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: DebuffApplied
@@ -303,6 +363,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: BuffConsumed
@@ -315,6 +378,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: ReshuffleStart
@@ -327,6 +393,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: TimeBonus
@@ -339,6 +408,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: TimePenalty
@@ -351,6 +423,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: UiMenuOpen
@@ -363,6 +438,9 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 4
+    fadeOutDuration: 1
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: UiPauseOpen
@@ -376,6 +454,9 @@ MonoBehaviour:
     loop: 1
     enableFade: 1
     fadeDuration: 2
+    fadeInDuration: 4
+    fadeOutDuration: 1.5
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
   - id: UiTournamentOpen
@@ -388,5 +469,8 @@ MonoBehaviour:
     loop: 0
     enableFade: 0
     fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
     basePitch: 1
     pitchRandomRange: 0
