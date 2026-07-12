@@ -20,7 +20,7 @@ namespace Futboloid.Gameplay.Ball
         [Header("Fire stage")]
         [SerializeField] private float fireSpeedThreshold = 14f;
         [SerializeField] private int fireExtraDamage = 1;
-        [SerializeField] private float fireVfxFadeSpeed = 3.5f;
+        [SerializeField] private float fireVfxFadeSpeed = 1.2f;
 
         public float Radius => radius;
         public float BaseSpeed => baseSpeed;

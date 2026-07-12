@@ -1,104 +1,194 @@
-using Futboloid.Core;
 using UnityEngine;
 
 namespace Futboloid.Gameplay.Ball
 {
     /// <summary>
-    /// Огненная стадия мяча: включает дочерние ParticleSystem при высокой скорости, плавно гасит при замедлении.
+    /// Визуал огненной стадии: плавно включает CFXR Fire и разворачивает его против направления полёта.
+    /// Состояние приходит извне через Sync — компонент не знает о BallView.
     /// </summary>
     public class BallFireVfxView : MonoBehaviour
     {
-        [SerializeField] private BallView ballView;
-        [SerializeField] private ParticleSystem[] fireParticles = System.Array.Empty<ParticleSystem>();
+        [SerializeField] private GameObject fireVfxRoot;
+        [SerializeField] private float directionRotationOffset = -90f;
+        [SerializeField] private float rotationSmoothTime = 0.12f;
 
-        private float[] _baseEmissionRates = System.Array.Empty<float>();
-        private float _displayedIntensity;
-        private bool _simulating;
+        private ParticleSystem[] _particles;
+        private float[] _baseEmissionRates;
+        private float _intensity;
+        private float _currentAngle;
+        private float _rotationVelocity;
 
         private void Awake()
         {
-            if (ballView == null)
-                ballView = GetComponentInParent<BallView>();
+            if (fireVfxRoot == null)
+                fireVfxRoot = FindFireRoot(transform);
 
-            CacheBaseEmissionRates();
-            ApplyIntensity(0f);
+            CacheParticles();
+            ExtinguishImmediate();
         }
 
-        private void OnEnable()
+        private void OnDisable() => ExtinguishImmediate();
+
+        public void Sync(bool shouldBurn, Vector2 direction, float fadeSpeed)
         {
-            if (ballView == null)
+            var target = shouldBurn ? 1f : 0f;
+            _intensity = Mathf.MoveTowards(_intensity, target, fadeSpeed * Time.deltaTime);
+            ApplyIntensity();
+
+            if (_intensity > 0.001f)
+                UpdateVfxRotation(direction);
+        }
+
+        public void ExtinguishImmediate()
+        {
+            _intensity = 0f;
+            _currentAngle = 0f;
+            _rotationVelocity = 0f;
+
+            if (fireVfxRoot == null)
                 return;
 
-            ballView.PhaseChanged += OnPhaseChanged;
-            _simulating = ballView.IsSimulating;
-        }
+            SetEmissionEnabled(false);
 
-        private void OnDisable()
-        {
-            if (ballView != null)
-                ballView.PhaseChanged -= OnPhaseChanged;
-
-            _displayedIntensity = 0f;
-            ApplyIntensity(0f);
-        }
-
-        private void OnPhaseChanged(PitchPhase phase) => _simulating = phase == PitchPhase.Simulating;
-
-        private void Update()
-        {
-            if (ballView == null)
-                return;
-
-            var targetIntensity = _simulating && ballView.InPlay && ballView.IsOnFire ? 1f : 0f;
-            var fadeSpeed = ballView.Settings.FireVfxFadeSpeed;
-            _displayedIntensity = targetIntensity > _displayedIntensity
-                ? Mathf.MoveTowards(_displayedIntensity, targetIntensity, fadeSpeed * Time.deltaTime)
-                : Mathf.MoveTowards(_displayedIntensity, targetIntensity, fadeSpeed * 0.65f * Time.deltaTime);
-
-            ApplyIntensity(_displayedIntensity);
-        }
-
-        private void CacheBaseEmissionRates()
-        {
-            if (fireParticles == null || fireParticles.Length == 0)
+            for (var i = 0; i < _particles.Length; i++)
             {
+                var particle = _particles[i];
+                if (particle == null)
+                    continue;
+
+                particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                particle.Clear(true);
+            }
+
+            fireVfxRoot.transform.localRotation = Quaternion.identity;
+            fireVfxRoot.SetActive(false);
+        }
+
+        private void UpdateVfxRotation(Vector2 direction)
+        {
+            if (fireVfxRoot == null)
+                return;
+
+            if (direction.sqrMagnitude < 0.0001f)
+                return;
+
+            var targetAngle = Mathf.Atan2(-direction.y, -direction.x) * Mathf.Rad2Deg + directionRotationOffset;
+            _currentAngle = Mathf.SmoothDampAngle(
+                _currentAngle,
+                targetAngle,
+                ref _rotationVelocity,
+                rotationSmoothTime);
+
+            fireVfxRoot.transform.localRotation = Quaternion.Euler(0f, 0f, _currentAngle);
+        }
+
+        private void ApplyIntensity()
+        {
+            if (fireVfxRoot == null)
+                return;
+
+            var visible = _intensity > 0.001f;
+
+            if (visible)
+            {
+                if (!fireVfxRoot.activeSelf)
+                {
+                    fireVfxRoot.SetActive(true);
+                    PlayParticles();
+                }
+
+                SetEmissionEnabled(true);
+                SetEmissionRates(_intensity);
+                return;
+            }
+
+            SetEmissionRates(0f);
+            SetEmissionEnabled(false);
+
+            for (var i = 0; i < _particles.Length; i++)
+            {
+                if (_particles[i] != null)
+                    _particles[i].Stop(true, ParticleSystemStopBehavior.StopEmitting);
+            }
+
+            if (_intensity > 0f)
+                return;
+
+            fireVfxRoot.SetActive(false);
+            _currentAngle = 0f;
+            _rotationVelocity = 0f;
+            fireVfxRoot.transform.localRotation = Quaternion.identity;
+        }
+
+        private void CacheParticles()
+        {
+            if (fireVfxRoot == null)
+            {
+                _particles = System.Array.Empty<ParticleSystem>();
                 _baseEmissionRates = System.Array.Empty<float>();
                 return;
             }
 
-            _baseEmissionRates = new float[fireParticles.Length];
-            for (var i = 0; i < fireParticles.Length; i++)
-            {
-                if (fireParticles[i] == null)
-                    continue;
+            _particles = fireVfxRoot.GetComponentsInChildren<ParticleSystem>(true);
+            _baseEmissionRates = new float[_particles.Length];
 
-                _baseEmissionRates[i] = fireParticles[i].emission.rateOverTime.constant;
+            for (var i = 0; i < _particles.Length; i++)
+            {
+                var emission = _particles[i].emission;
+                _baseEmissionRates[i] = emission.rateOverTime.constantMax > 0f
+                    ? emission.rateOverTime.constantMax
+                    : emission.rateOverTime.constant;
             }
         }
 
-        private void ApplyIntensity(float intensity)
+        private void SetEmissionEnabled(bool enabled)
         {
-            if (fireParticles == null)
-                return;
-
-            for (var i = 0; i < fireParticles.Length; i++)
+            for (var i = 0; i < _particles.Length; i++)
             {
-                var particles = fireParticles[i];
-                if (particles == null)
+                var particle = _particles[i];
+                if (particle == null)
                     continue;
 
-                var emission = particles.emission;
-                var active = intensity > 0.01f;
-                emission.enabled = active;
-
-                if (_baseEmissionRates.Length > i)
-                    emission.rateOverTime = _baseEmissionRates[i] * intensity;
-
-                if (active && !particles.isPlaying)
-                    particles.Play(true);
-                else if (!active && particles.isPlaying)
-                    particles.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+                var emission = particle.emission;
+                emission.enabled = enabled;
             }
+        }
+
+        private void SetEmissionRates(float intensity)
+        {
+            for (var i = 0; i < _particles.Length; i++)
+            {
+                var particle = _particles[i];
+                if (particle == null)
+                    continue;
+
+                var emission = particle.emission;
+                var rate = emission.rateOverTime;
+                rate.constant = _baseEmissionRates[i] * intensity;
+                rate.constantMax = _baseEmissionRates[i] * intensity;
+                emission.rateOverTime = rate;
+            }
+        }
+
+        private void PlayParticles()
+        {
+            for (var i = 0; i < _particles.Length; i++)
+            {
+                if (_particles[i] != null && !_particles[i].isPlaying)
+                    _particles[i].Play(true);
+            }
+        }
+
+        private static GameObject FindFireRoot(Transform ballRoot)
+        {
+            for (var i = 0; i < ballRoot.childCount; i++)
+            {
+                var child = ballRoot.GetChild(i);
+                if (child.name.Contains("CFXR Fire"))
+                    return child.gameObject;
+            }
+
+            return null;
         }
     }
 }

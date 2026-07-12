@@ -17,6 +17,7 @@ namespace Futboloid.Gameplay.Ball
     {
         [SerializeField] private BallSettings settings = new();
         [SerializeField] private BallKickoffAnchor kickoffAnchor;
+        [SerializeField] private BallFireVfxView fireVfx;
 
         [Header("Reshuffle tween")]
         [SerializeField] private float reshuffleShrinkDuration = 0.15f;
@@ -35,15 +36,12 @@ namespace Futboloid.Gameplay.Ball
         private Tween _reshuffleTween;
 
         public Vector2 Position => _motion != null ? _motion.Position : (Vector2)transform.position;
+        public Vector2 Direction => _motion != null ? _motion.Direction : Vector2.zero;
         public float Speed => _motion != null ? _motion.Speed : 0f;
         public bool IsOnFire => _motion != null && _motion.IsOnFire;
         public int HitDamage => _motion != null ? _motion.HitDamage : 1;
         public bool InPlay => _motion != null && _motion.InPlay;
         public BallSettings Settings => settings;
-
-        public bool IsSimulating => _simulating;
-
-        public event System.Action<PitchPhase> PhaseChanged;
 
         [Inject]
         public void Construct(
@@ -61,8 +59,12 @@ namespace Futboloid.Gameplay.Ball
 
             _subscriptions.Add(bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged));
             _subscriptions.Add(bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged));
+            _subscriptions.Add(bus.Subscribe<GoalScoredEvent>(OnGoalScored));
 
             _defaultLocalScale = transform.localScale;
+            if (fireVfx == null)
+                fireVfx = GetComponent<BallFireVfxView>();
+
             SyncPitchState(pitch.Current);
             _onField = matchFlow.IsOnField;
             ResetAtKickoff();
@@ -79,6 +81,9 @@ namespace Futboloid.Gameplay.Ball
 
         public async UniTask PlayReshuffleToKickoffAsync(CancellationToken ct)
         {
+            if (this == null)
+                return;
+
             CancelReshuffleTween();
 
             if (kickoffAnchor == null)
@@ -88,6 +93,7 @@ namespace Futboloid.Gameplay.Ball
             }
 
             _reshuffleAnimating = true;
+            SyncFireVfx();
 
             try
             {
@@ -97,6 +103,9 @@ namespace Futboloid.Gameplay.Ball
                     .SetEase(Ease.InQuad)
                     .SetLink(gameObject);
                 await TweenAsync.Await(shrinkTween, ct);
+
+                if (this == null)
+                    return;
 
                 _motion.ResetAt(target);
                 transform.position = new Vector3(target.x, target.y, transform.position.z);
@@ -110,10 +119,13 @@ namespace Futboloid.Gameplay.Ball
             }
             finally
             {
-                _reshuffleAnimating = false;
-                _reshuffleTween = null;
-                transform.localScale = _defaultLocalScale;
-                ApplyTransform();
+                if (this != null)
+                {
+                    _reshuffleAnimating = false;
+                    _reshuffleTween = null;
+                    transform.localScale = _defaultLocalScale;
+                    ApplyTransform();
+                }
             }
         }
 
@@ -152,11 +164,15 @@ namespace Futboloid.Gameplay.Ball
             SyncPitchState(e.Phase);
         }
 
+        private void OnGoalScored(GoalScoredEvent _) => ExtinguishFire();
+
         private void SyncPitchState(PitchPhase phase)
         {
             _phase = phase;
             _simulating = phase == PitchPhase.Simulating;
-            PhaseChanged?.Invoke(phase);
+
+            if (phase != PitchPhase.Simulating)
+                ExtinguishFire();
 
             if (phase == PitchPhase.KickoffWait && !_reshuffleAnimating)
                 ResetAtKickoff();
@@ -183,6 +199,36 @@ namespace Futboloid.Gameplay.Ball
         {
             var position = _motion.Position;
             transform.position = new Vector3(position.x, position.y, transform.position.z);
+            SyncFireVfx();
+        }
+
+        private void SyncFireVfx()
+        {
+            if (_motion == null)
+                return;
+
+            if (fireVfx == null)
+                fireVfx = GetComponent<BallFireVfxView>();
+
+            if (fireVfx == null)
+                return;
+
+            if (!_motion.InPlay || !_simulating)
+            {
+                fireVfx.ExtinguishImmediate();
+                return;
+            }
+
+            var shouldBurn = !_reshuffleAnimating && _motion.IsOnFire;
+            fireVfx.Sync(shouldBurn, _motion.Direction, settings.FireVfxFadeSpeed);
+        }
+
+        private void ExtinguishFire()
+        {
+            if (fireVfx == null)
+                fireVfx = GetComponent<BallFireVfxView>();
+
+            fireVfx?.ExtinguishImmediate();
         }
 
         private void OnDestroy()
