@@ -14,7 +14,11 @@ aliases:
 ← [[Home|Главная]] | [[Архитектура/Индекс архитектуры|Архитектура]] | [[Архитектура/DI и LifetimeScope|DI]]
 
 > [!date] Обновлено
+<<<<<<< HEAD
 > **12.07.2026** — трек паузы (`_pauseSource`), раздельный fade in/out, `stopOnPause`, точный таймер fade.
+=======
+> **08.07.2026** — `AudioManager`, конфиг на менеджере, музыка на `OnField`, fade pause/resume, комбо и баффы.
+>>>>>>> origin/develop
 
 ---
 
@@ -51,7 +55,10 @@ BallMotion → bus.Publish(BallContactEvent)
 | Канал | AudioSource | Для чего |
 |-------|-------------|----------|
 | `Music` | 1 источник | Loop, fade in/out, fade pause/resume |
+<<<<<<< HEAD
 | `Pause` | 1 источник | Трек паузы (`UiPauseOpen`), fade in при входе, pause при выходе |
+=======
+>>>>>>> origin/develop
 | `GameplaySfx` | Пул (8, `sfxPoolSize`) | Удары, голы, комбо, баффы |
 | `UiSfx` | Пул (3, `uiPoolSize`) | UI |
 
@@ -65,6 +72,7 @@ BallMotion → bus.Publish(BallContactEvent)
 |-------|----------|
 | Вход в `OnField` (`NavigationChanged`) | `Play(MusicMatch)` — случайный трек из каталога |
 | `MatchStartedEvent` (подача мяча) | только свисток `MatchStart`, **без музыки** |
+<<<<<<< HEAD
 | `OnField → Pause` / `OnField → MainMenu` / `Pause → MainMenu` | fade out музыки + `Pause()` + `PlayPauseSound` (fade in трека паузы) |
 | `Pause → OnField` / возврат из меню с паузой матча | `Pause()` трека паузы + `UnPause()` музыки + fade in музыки |
 | `MatchEndedEvent` | `MatchEnd` + `StopMusic` (fade out) |
@@ -85,6 +93,15 @@ BallMotion → bus.Publish(BallContactEvent)
 | Loop | `true` — зацикливается при входе в паузу |
 
 > [!note] **Важно:** Трек паузы запускается **только** через `_pauseSource` из `PauseMusic()`. Прямой вызов `Play("UiPauseOpen")` из `AudioService` **убран** во избежание дублирования.
+=======
+| `OnField → Pause` / `OnField → MainMenu` / `Pause → MainMenu` | fade out + `Pause()` — позиция в треке сохраняется |
+| `Pause → OnField` / возврат из меню с паузой матча | fade in + `UnPause()` — **с того же места** |
+| `MatchEndedEvent` | `MatchEnd` + `StopMusic` (fade out) |
+| `PitchResetRequestedEvent` на поле | `StopMusic` + новый `MusicMatch` (рестарт турнира) |
+| `PitchResetRequestedEvent` не на поле | только `StopMusic`; старт при следующем `OnField` |
+
+`MusicMatch` в каталоге: `loop: true` — выбранный трек зацикливается. Автосмена на другой трек после окончания **не реализована**.
+>>>>>>> origin/develop
 
 ---
 
