@@ -15,5 +15,14 @@ namespace Futboloid.Core.Audio
         bool HasMusicClip { get; }
         System.Collections.Generic.IEnumerable<AudioClip> EnumerateClips();
         void WarmupClip(AudioClip clip);
+
+        /// <summary>Установить громкость музыки (0..1). Сохраняется в PlayerPrefs.</summary>
+        void SetMusicVolume(float volume);
+        /// <summary>Установить громкость SFX (0..1). Сохраняется в PlayerPrefs.</summary>
+        void SetSfxVolume(float volume);
+        /// <summary>Текущая громкость музыки (0..1).</summary>
+        float GetMusicVolume();
+        /// <summary>Текущая громкость SFX (0..1).</summary>
+        float GetSfxVolume();
     }
 }
