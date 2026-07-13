@@ -1,7 +1,9 @@
 {
     "name": "Futboloid.Core",
     "rootNamespace": "Futboloid.Core",
-    "references": [],
+    "references": [
+        "UniTask"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

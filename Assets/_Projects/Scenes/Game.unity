@@ -4185,6 +4185,7 @@ MonoBehaviour:
   restartButton: {fileID: 701525217}
   mainMenuButton: {fileID: 1933042305}
   firstTimeGuide: {fileID: 0}
+  nicknameControl: {fileID: 0}
 --- !u!1 &1655040488
 GameObject:
   m_ObjectHideFlags: 0

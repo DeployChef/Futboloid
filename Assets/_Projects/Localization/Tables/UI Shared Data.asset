@@ -83,6 +83,50 @@ MonoBehaviour:
     m_Key: continue_hint
     m_Metadata:
       m_Items: []
+  - m_Id: 30100000018
+    m_Key: leaderboard_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000019
+    m_Key: leaderboard_save_nick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000020
+    m_Key: leaderboard_player_place
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000021
+    m_Key: leaderboard_player_score
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000022
+    m_Key: leaderboard_no_score
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000023
+    m_Key: leaderboard_offline
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000024
+    m_Key: leaderboard_loading
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000025
+    m_Key: leaderboard_error
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000026
+    m_Key: leaderboard_refresh
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000027
+    m_Key: leaderboard_top_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000028
+    m_Key: leaderboard_table_row
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

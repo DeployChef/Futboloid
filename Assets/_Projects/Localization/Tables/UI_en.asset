@@ -86,6 +86,50 @@ MonoBehaviour:
     m_Localized: Space to continue
     m_Metadata:
       m_Items: []
+  - m_Id: 30100000018
+    m_Localized: Leaderboard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000019
+    m_Localized: Save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000020
+    m_Localized: 'You are #{0} of {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000021
+    m_Localized: '{0} points'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000022
+    m_Localized: Play a run to get ranked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000023
+    m_Localized: No network connection
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000024
+    m_Localized: Loading…
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000025
+    m_Localized: Failed to load leaderboard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000026
+    m_Localized: Refresh
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000027
+    m_Localized: Top 10
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000028
+    m_Localized: '#{0}  {1}  {2}'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

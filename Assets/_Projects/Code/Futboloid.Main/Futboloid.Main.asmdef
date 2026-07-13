@@ -9,6 +9,9 @@
         "Unity.InputSystem",
         "Unity.Localization",
         "Unity.ResourceManager",
+        "Unity.Services.Authentication",
+        "Unity.Services.Core",
+        "Unity.Services.Leaderboards",
         "VContainer"
     ],
     "includePlatforms": [],
