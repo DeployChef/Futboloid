@@ -10,7 +10,7 @@ using VContainer;
 
 namespace Futboloid.UI.Views.BonusPick
 {
-    /// <summary>Карточка BonusPick: frame + icon + тексты из PerkDefinition.</summary>
+    /// <summary>Карточка BonusPick: frame + icon + локализованные тексты по perk.Id.</summary>
     public class PerkCardView : MonoBehaviour
     {
         [SerializeField] private Button button;

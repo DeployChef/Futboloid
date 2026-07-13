@@ -279,9 +279,7 @@ namespace Futboloid.Core.Run
                 _perkHudBuffer.Add(new RunPerkHudEntry(
                     perkId,
                     level,
-                    def.Icon,
-                    def.DisplayName,
-                    def.Description));
+                    def.Icon));
             }
 
             _bus.Publish(new RunProgressionUpdatedEvent(

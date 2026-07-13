@@ -71,8 +71,6 @@ namespace Futboloid.Core.StatusEffects
             _bus.Publish(new StatusEffectAppliedEvent(
                 instance.InstanceId,
                 definition.Id,
-                definition.DisplayName,
-                definition.Description,
                 definition.Icon,
                 definition.IsDebuff,
                 duration,
