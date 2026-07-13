@@ -67,6 +67,22 @@ MonoBehaviour:
     m_Key: btn_main_menu
     m_Metadata:
       m_Items: []
+  - m_Id: 30100000014
+    m_Key: guide_start
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000015
+    m_Key: guide_move_left
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000016
+    m_Key: guide_move_right
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000017
+    m_Key: continue_hint
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

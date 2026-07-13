@@ -70,6 +70,22 @@ MonoBehaviour:
     m_Localized: Main menu
     m_Metadata:
       m_Items: []
+  - m_Id: 30100000014
+    m_Localized: "<size=150%><color=yellow>SPACE</color></size> \n to start"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000015
+    m_Localized: <size=150%><color=yellow>A</color></size> - Move left
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000016
+    m_Localized: <size=150%><color=yellow>D</color></size> - Move right
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000017
+    m_Localized: Space to continue
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

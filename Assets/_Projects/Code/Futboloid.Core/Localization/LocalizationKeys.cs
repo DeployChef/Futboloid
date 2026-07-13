@@ -17,6 +17,11 @@ namespace Futboloid.Core.Localization
         public const string BtnNewRun = "btn_new_run";
         public const string BtnMainMenu = "btn_main_menu";
 
+        public const string GuideStart = "guide_start";
+        public const string GuideMoveLeft = "guide_move_left";
+        public const string GuideMoveRight = "guide_move_right";
+        public const string ContinueHint = "continue_hint";
+
         public const string RoundFinalCompleted = "round_final_completed";
         public const string RoundMatch = "round_match";
         public const string RoundMatchOf = "round_match_of";
