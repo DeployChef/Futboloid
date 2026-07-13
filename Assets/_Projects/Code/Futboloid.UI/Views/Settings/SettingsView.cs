@@ -1,3 +1,4 @@
+using Futboloid.Core.Audio;
 using Futboloid.Core.Localization;
 using Futboloid.UI;
 using TMPro;
@@ -14,12 +15,18 @@ namespace Futboloid.UI.Views.Settings
         [SerializeField] private Button russianButton;
         [SerializeField] private TextMeshProUGUI currentLanguageLabel;
 
+        [Header("Volume")]
+        [SerializeField] private Slider musicVolumeSlider;
+        [SerializeField] private Slider sfxVolumeSlider;
+
         private ILocalizationService _localization;
+        private IAudioManager _audio;
 
         [Inject]
-        public void Construct(ILocalizationService localization)
+        public void Construct(ILocalizationService localization, IAudioManager audio)
         {
             _localization = localization;
+            _audio = audio;
         }
 
         private void Awake()
@@ -34,6 +41,12 @@ namespace Futboloid.UI.Views.Settings
 
             if (russianButton != null)
                 russianButton.onClick.AddListener(() => SelectLocale(LocaleCodes.Russian));
+
+            if (musicVolumeSlider != null)
+                musicVolumeSlider.onValueChanged.AddListener(OnMusicVolumeChanged);
+
+            if (sfxVolumeSlider != null)
+                sfxVolumeSlider.onValueChanged.AddListener(OnSfxVolumeChanged);
         }
 
         private void OnEnable()
@@ -58,6 +71,12 @@ namespace Futboloid.UI.Views.Settings
 
             if (russianButton != null)
                 russianButton.onClick.RemoveAllListeners();
+
+            if (musicVolumeSlider != null)
+                musicVolumeSlider.onValueChanged.RemoveListener(OnMusicVolumeChanged);
+
+            if (sfxVolumeSlider != null)
+                sfxVolumeSlider.onValueChanged.RemoveListener(OnSfxVolumeChanged);
         }
 
         public void Open()
@@ -75,6 +94,12 @@ namespace Futboloid.UI.Views.Settings
         }
 
         private void Refresh()
+        {
+            RefreshLanguage();
+            RefreshVolumeSliders();
+        }
+
+        private void RefreshLanguage()
         {
             if (_localization == null)
                 return;
@@ -96,6 +121,28 @@ namespace Futboloid.UI.Views.Settings
             }
 
             currentLanguageLabel.text = currentCode;
+        }
+
+        private void RefreshVolumeSliders()
+        {
+            if (_audio == null)
+                return;
+
+            if (musicVolumeSlider != null)
+                musicVolumeSlider.SetValueWithoutNotify(_audio.GetMusicVolume());
+
+            if (sfxVolumeSlider != null)
+                sfxVolumeSlider.SetValueWithoutNotify(_audio.GetSfxVolume());
+        }
+
+        private void OnMusicVolumeChanged(float value)
+        {
+            _audio?.SetMusicVolume(value);
+        }
+
+        private void OnSfxVolumeChanged(float value)
+        {
+            _audio?.SetSfxVolume(value);
         }
 
         private static void SetSelected(Button button, bool selected)
