@@ -17,7 +17,59 @@ MonoBehaviour:
   m_SharedData: {fileID: 11400000, guid: f75bdd79ee4b5e64aabd362d8b5a2792, type: 2}
   m_Metadata:
     m_Items: []
-  m_TableData: []
+  m_TableData:
+  - m_Id: 30100000001
+    m_Localized: Lv. {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000002
+    m_Localized: Lv. {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000003
+    m_Localized: Level {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000004
+    m_Localized: Buff
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000005
+    m_Localized: Debuff
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000006
+    m_Localized: Play
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000007
+    m_Localized: Continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000008
+    m_Localized: Restart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000009
+    m_Localized: Settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000010
+    m_Localized: Back to menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000011
+    m_Localized: Play
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000012
+    m_Localized: New run
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000013
+    m_Localized: Main menu
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -4,6 +4,7 @@ using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
 using Futboloid.Core.Run;
+using Futboloid.Core.Localization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,6 +28,7 @@ namespace Futboloid.UI.Views.RunXp
         private readonly List<RunPerkIconWidget> _iconPool = new();
 
         private IRunProgressionService _progression;
+        private ILocalizationService _localization;
 
         private void Awake()
         {
@@ -35,9 +37,13 @@ namespace Futboloid.UI.Views.RunXp
         }
 
         [Inject]
-        public void Construct(IGameEventBus bus, IRunProgressionService progression)
+        public void Construct(
+            IGameEventBus bus,
+            IRunProgressionService progression,
+            ILocalizationService localization)
         {
             _progression = progression;
+            _localization = localization;
 
             foreach (var subscription in _subscriptions)
                 subscription.Dispose();
@@ -47,15 +53,21 @@ namespace Futboloid.UI.Views.RunXp
             _subscriptions.Add(bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged));
             _subscriptions.Add(bus.Subscribe<RunProgressionUpdatedEvent>(OnProgressionUpdated));
 
+            _localization.LocaleChanged += OnLocaleChanged;
             _progression.NotifyHud();
             gameObject.SetActive(true);
         }
 
         private void OnDestroy()
         {
+            if (_localization != null)
+                _localization.LocaleChanged -= OnLocaleChanged;
+
             foreach (var subscription in _subscriptions)
                 subscription.Dispose();
         }
+
+        private void OnLocaleChanged() => _progression?.NotifyHud();
 
         private void OnNavigationChanged(NavigationChangedEvent e) =>
             gameObject.SetActive(e.Current != NavigationState.Tournament);
@@ -63,7 +75,12 @@ namespace Futboloid.UI.Views.RunXp
         private void OnProgressionUpdated(RunProgressionUpdatedEvent e)
         {
             if (runLevelText != null)
-                runLevelText.text = $"Ур. {e.RunLevel}";
+            {
+                runLevelText.text = _localization.Get(
+                    LocalizationTables.UI,
+                    LocalizationKeys.RunLevelShort,
+                    e.RunLevel);
+            }
 
             if (xpSlider != null)
                 xpSlider.value = e.Fill01;

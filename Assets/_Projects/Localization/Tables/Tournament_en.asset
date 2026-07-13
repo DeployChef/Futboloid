@@ -17,7 +17,43 @@ MonoBehaviour:
   m_SharedData: {fileID: 11400000, guid: fb8a3c8b5f13a264a9cfb6e639aea6e7, type: 2}
   m_Metadata:
     m_Items: []
-  m_TableData: []
+  m_TableData:
+  - m_Id: 30200000001
+    m_Localized: Final cleared
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30200000002
+    m_Localized: Match {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30200000003
+    m_Localized: Match {0} of {1}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30200000004
+    m_Localized: Run champion!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30200000005
+    m_Localized: Ready for the first match
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30200000006
+    m_Localized: 'Score
+
+      <color=red><size=150%>{0}:{1}</size></color>
+
+      eliminated from the tournament'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30200000007
+    m_Localized: 'Score
+
+      <color=red><size=150%>{0}:{1}</size></color>
+
+      victory!'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

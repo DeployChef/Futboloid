@@ -14,7 +14,47 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.SharedTableData
   m_TableCollectionName: Perks
   m_TableCollectionNameGuidString: 39cf1079ada5d2345aeb32305c76afb5
-  m_Entries: []
+  m_Entries:
+  - m_Id: 30300000001
+    m_Key: perk.gk_speed.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30300000002
+    m_Key: perk.gk_speed.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30300000003
+    m_Key: perk.ball_damage.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30300000004
+    m_Key: perk.ball_damage.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30300000005
+    m_Key: perk.combo_floor.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30300000006
+    m_Key: perk.combo_floor.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30300000007
+    m_Key: perk.combo_decay_slow.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30300000008
+    m_Key: perk.combo_decay_slow.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30300000009
+    m_Key: perk.enemy_hp.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30300000010
+    m_Key: perk.enemy_hp.description
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

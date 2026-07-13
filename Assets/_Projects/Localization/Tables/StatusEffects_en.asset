@@ -17,7 +17,31 @@ MonoBehaviour:
   m_SharedData: {fileID: 11400000, guid: 7940d7234d5ed874790d45875b256906, type: 2}
   m_Metadata:
     m_Items: []
-  m_TableData: []
+  m_TableData:
+  - m_Id: 30400000001
+    m_Localized: Energy Drink
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30400000002
+    m_Localized: +keeper speed for 8s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30400000003
+    m_Localized: Beer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30400000004
+    m_Localized: Keeper moves slower -30% speed for 8s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30400000005
+    m_Localized: Combo Boost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30400000006
+    m_Localized: +points from hits for 10s
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
