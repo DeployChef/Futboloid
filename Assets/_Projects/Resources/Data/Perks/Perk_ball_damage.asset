@@ -13,9 +13,7 @@ MonoBehaviour:
   m_Name: Perk_ball_damage
   m_EditorClassIdentifier: Futboloid.Core::Futboloid.Core.Run.PerkDefinition
   id: ball_damage
-  displayName: "\u0421\u0438\u043B\u044C\u043D\u044B\u0439 \u0443\u0434\u0430\u0440"
-  description: "+\u0443\u0440\u043E\u043D \u043C\u044F\u0447\u0430 (\u0441\u043A\u043E\u0440\u043E)"
-  cardFrame: {fileID: 2478617757778665662, guid: 0609a62d6c3e7e04188bd0a00e17b242, type: 3}
-  icon: {fileID: 21300000, guid: 10cbdd9d10249274c9f62c28f34f6840, type: 3}
+  cardFrame: {fileID: 2644187960349470963, guid: c513bae76822c574a9bf1f29ee13c164, type: 3}
+  icon: {fileID: 21300000, guid: cb2302dd46a6ff64da075e3917359fa0, type: 3}
   maxLevel: 5
   valuePerLevel: 1
