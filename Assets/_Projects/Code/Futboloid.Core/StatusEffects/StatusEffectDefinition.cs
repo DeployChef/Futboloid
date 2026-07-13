@@ -1,3 +1,4 @@
+using Futboloid.Core.Localization;
 using UnityEngine;
 
 namespace Futboloid.Core.StatusEffects
@@ -6,9 +7,6 @@ namespace Futboloid.Core.StatusEffects
     public class StatusEffectDefinition : ScriptableObject
     {
         [SerializeField] private string id;
-        [SerializeField] private string displayName;
-        [TextArea(2, 4)]
-        [SerializeField] private string description;
         [SerializeField] private Sprite icon;
         [SerializeField] private bool isDebuff;
         [SerializeField] private float durationSeconds = 8f;
@@ -16,8 +14,8 @@ namespace Futboloid.Core.StatusEffects
         [SerializeField] private float multiplier = 1f;
 
         public string Id => id;
-        public string DisplayName => displayName;
-        public string Description => description;
+        public string NameLocalizationKey => LocalizationKeys.StatusEffectName(id);
+        public string DescriptionLocalizationKey => LocalizationKeys.StatusEffectDescription(id);
         public Sprite Icon => icon;
         public bool IsDebuff => isDebuff;
         public float DurationSeconds => Mathf.Max(0f, durationSeconds);

@@ -1,14 +1,16 @@
 using System;
 using DG.Tweening;
+using Futboloid.Core.Localization;
 using Futboloid.Core.Run;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using VContainer;
 
 namespace Futboloid.UI.Views.BonusPick
 {
-    /// <summary>Карточка BonusPick: frame + icon + тексты из PerkDefinition.</summary>
+    /// <summary>Карточка BonusPick: frame + icon + локализованные тексты по perk.Id.</summary>
     public class PerkCardView : MonoBehaviour
     {
         [SerializeField] private Button button;
@@ -38,6 +40,13 @@ namespace Futboloid.UI.Views.BonusPick
         private Tween _selectTween;
         private Vector3 _defaultScale;
         private bool _selected;
+        private ILocalizationService _localization;
+
+        [Inject]
+        public void Construct(ILocalizationService localization)
+        {
+            _localization = localization;
+        }
 
         private void Awake()
         {
@@ -80,14 +89,19 @@ namespace Futboloid.UI.Views.BonusPick
 
             // Показываем только имя
             if (titleText != null)
-                titleText.text = perk.DisplayName;
+                titleText.text = _localization.GetPerkName(perk.Id);
             
             // Показываем уровень отдельно
             if (PerkLevelText != null)
-                PerkLevelText.text = $"Ур. {levelAfterPick}";
+            {
+                PerkLevelText.text = _localization.Get(
+                    LocalizationTables.UI,
+                    LocalizationKeys.PerkLevelShort,
+                    levelAfterPick);
+            }
 
             if (descriptionText != null)
-                descriptionText.text = perk.Description;
+                descriptionText.text = _localization.GetPerkDescription(perk.Id);
 
             PlayAppearAnimation();
         }

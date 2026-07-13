@@ -27,8 +27,7 @@ namespace Futboloid.UI.Views.StatusEffects
             _tooltip = tooltip;
             _entry = new StatusEffectHudEntry(
                 applied.InstanceId,
-                applied.Title,
-                applied.Description,
+                applied.EffectId,
                 applied.IsDebuff);
 
             if (iconImage != null)

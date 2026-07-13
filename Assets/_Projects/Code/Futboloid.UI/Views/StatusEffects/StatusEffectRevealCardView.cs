@@ -1,8 +1,10 @@
 using DG.Tweening;
 using Futboloid.Core.Bus.Events;
+using Futboloid.Core.Localization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using VContainer;
 
 namespace Futboloid.UI.Views.StatusEffects
 {
@@ -21,6 +23,13 @@ namespace Futboloid.UI.Views.StatusEffects
 
         private Tween _appearTween;
         private Vector3 _defaultScale;
+        private ILocalizationService _localization;
+
+        [Inject]
+        public void Construct(ILocalizationService localization)
+        {
+            _localization = localization;
+        }
 
         private void Awake() => _defaultScale = transform.localScale;
 
@@ -30,13 +39,17 @@ namespace Futboloid.UI.Views.StatusEffects
                 frameImage.color = applied.IsDebuff ? debuffFrameColor : buffFrameColor;
 
             if (kindText != null)
-                kindText.text = applied.IsDebuff ? "Debuff" : "Buff";
+            {
+                kindText.text = applied.IsDebuff
+                    ? _localization.Get(LocalizationTables.UI, LocalizationKeys.DebuffLabel)
+                    : _localization.Get(LocalizationTables.UI, LocalizationKeys.BuffLabel);
+            }
 
             if (titleText != null)
-                titleText.text = applied.Title;
+                titleText.text = _localization.GetStatusEffectName(applied.EffectId);
 
             if (descriptionText != null)
-                descriptionText.text = applied.Description;
+                descriptionText.text = _localization.GetStatusEffectDescription(applied.EffectId);
 
             SetSprite(iconImage, applied.Icon);
             PlayAppearAnimation();

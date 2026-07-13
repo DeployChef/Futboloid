@@ -6,8 +6,6 @@ namespace Futboloid.Core.Bus.Events
     {
         public int InstanceId { get; }
         public string EffectId { get; }
-        public string Title { get; }
-        public string Description { get; }
         public Sprite Icon { get; }
         public bool IsDebuff { get; }
         public float DurationSeconds { get; }
@@ -16,8 +14,6 @@ namespace Futboloid.Core.Bus.Events
         public StatusEffectAppliedEvent(
             int instanceId,
             string effectId,
-            string title,
-            string description,
             Sprite icon,
             bool isDebuff,
             float durationSeconds,
@@ -25,8 +21,6 @@ namespace Futboloid.Core.Bus.Events
         {
             InstanceId = instanceId;
             EffectId = effectId;
-            Title = title;
-            Description = description;
             Icon = icon;
             IsDebuff = isDebuff;
             DurationSeconds = durationSeconds;

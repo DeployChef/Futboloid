@@ -1,4 +1,5 @@
 using Futboloid.Core;
+using Futboloid.Core.Localization;
 using Futboloid.Gameplay.Match;
 using UnityEngine;
 
@@ -10,6 +11,7 @@ namespace Futboloid.Main.Session
     public class TournamentRunService : ITournamentRunService
     {
         private readonly GameplaySettings _settings;
+        private readonly ILocalizationService _localization;
         private readonly int _matchesToWin;
 
         private int _matchesCompleted;
@@ -30,9 +32,10 @@ namespace Futboloid.Main.Session
         public string RoundLabel => GetRoundLabel();
         public string StatusLine => GetStatusLine();
 
-        public TournamentRunService(GameplaySettings settings)
+        public TournamentRunService(GameplaySettings settings, ILocalizationService localization)
         {
             _settings = settings;
+            _localization = localization;
             _matchesToWin = settings.MatchesToWin;
             _runSeed = Random.Range(1, int.MaxValue);
         }
@@ -77,11 +80,20 @@ namespace Futboloid.Main.Session
             switch (RunState)
             {
                 case TournamentRunState.Completed:
-                    return "Финал пройден";
+                    return _localization.Get(
+                        LocalizationTables.Tournament,
+                        LocalizationKeys.RoundFinalCompleted);
                 case TournamentRunState.Eliminated:
-                    return $"Матч {CurrentMatchNumber}";
+                    return _localization.Get(
+                        LocalizationTables.Tournament,
+                        LocalizationKeys.RoundMatch,
+                        CurrentMatchNumber);
                 default:
-                    return $"Матч {CurrentMatchNumber} из {_matchesToWin}";
+                    return _localization.Get(
+                        LocalizationTables.Tournament,
+                        LocalizationKeys.RoundMatchOf,
+                        CurrentMatchNumber,
+                        _matchesToWin);
             }
         }
 
@@ -90,13 +102,28 @@ namespace Futboloid.Main.Session
             switch (RunState)
             {
                 case TournamentRunState.Completed:
-                    return "Чемпион забега!";
+                    return _localization.Get(
+                        LocalizationTables.Tournament,
+                        LocalizationKeys.StatusChampion);
                 case TournamentRunState.Eliminated:
-                    return $"Счёт\n <color=red><size=150%>{_lastPlayerScore}:{_lastOpponentScore}</size></color> \n вылет из турнира";
+                    return _localization.Get(
+                        LocalizationTables.Tournament,
+                        LocalizationKeys.StatusEliminated,
+                        _lastPlayerScore,
+                        _lastOpponentScore);
                 default:
                     if (_matchesCompleted == 0)
-                        return "Готов к первому матчу";
-                    return $"Счёт\n<color=red><size=150%>{_lastPlayerScore}:{_lastOpponentScore}</size></color>\n победа!";
+                    {
+                        return _localization.Get(
+                            LocalizationTables.Tournament,
+                            LocalizationKeys.StatusReadyFirstMatch);
+                    }
+
+                    return _localization.Get(
+                        LocalizationTables.Tournament,
+                        LocalizationKeys.StatusVictory,
+                        _lastPlayerScore,
+                        _lastOpponentScore);
             }
         }
     }

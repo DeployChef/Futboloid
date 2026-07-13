@@ -1,6 +1,6 @@
 ﻿<Solution>
-  <Project Path="Futboloid.UI.csproj" />
   <Project Path="Futboloid.Core.csproj" />
+  <Project Path="Futboloid.UI.csproj" />
   <Project Path="CFXREditor.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
   <Project Path="CFXRRuntime.csproj" />

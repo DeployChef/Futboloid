@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Futboloid.Core;
 using Futboloid.UI.Views.MainMenu;
 using Futboloid.UI.Views.PauseMenu;
+using Futboloid.UI.Views.Settings;
 using UnityEngine;
 
 namespace Futboloid.UI
@@ -14,6 +15,14 @@ namespace Futboloid.UI
         public void Register<T>(T widget) where T : class, IWidget
         {
             _widgets[typeof(T)] = widget;
+        }
+
+        public bool IsOpen<T>() where T : class, IWidget
+        {
+            if (!_widgets.TryGetValue(typeof(T), out var widget))
+                return false;
+
+            return widget is Component component && component.gameObject.activeSelf;
         }
 
         public void Show<T>() where T : class, IWidget
@@ -43,16 +52,19 @@ namespace Futboloid.UI
             switch (state)
             {
                 case NavigationState.MainMenu:
+                    Close<SettingsView>();
                     Close<PauseMenuView>();
                     ShowMainMenu(isMatchPausedInMenu);
                     break;
 
                 case NavigationState.OnField:
+                    Close<SettingsView>();
                     Close<MainMenuWidget>();
                     Close<PauseMenuView>();
                     break;
 
                 case NavigationState.Tournament:
+                    Close<SettingsView>();
                     Close<MainMenuWidget>();
                     Close<PauseMenuView>();
                     break;
