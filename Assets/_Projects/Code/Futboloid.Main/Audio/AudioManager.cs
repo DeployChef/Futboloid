@@ -9,7 +9,14 @@ namespace Futboloid.Main.Audio
 {
     public sealed class AudioManager : MonoBehaviour, IAudioManager
     {
+        private const string PrefsMusicVolume = "futboloid.audio.music_volume";
+        private const string PrefsSfxVolume = "futboloid.audio.sfx_volume";
+        private const string ExposedMusicParam = "MusicVolume";
+        private const string ExposedSfxParam = "SfxVolume";
+        private const float DefaultVolume = 0.8f;
+
         [SerializeField] private AudioCatalog config;
+        [SerializeField] private AudioMixer mixer;
         [SerializeField] private int sfxPoolSize = 8;
         [SerializeField] private int uiPoolSize = 3;
         [SerializeField] private bool enableFade = true;
@@ -50,6 +57,17 @@ namespace Futboloid.Main.Audio
 
             for (var i = 0; i < uiPoolSize; i++)
                 _uiVoices.Add(new SfxVoice(CreateSource($"Ui_{i}", transform)));
+
+            // Восстанавливаем сохранённую громкость
+            ApplyVolumeFromPrefs();
+        }
+
+        private void ApplyVolumeFromPrefs()
+        {
+            var musicVol = PlayerPrefs.GetFloat(PrefsMusicVolume, DefaultVolume);
+            var sfxVol = PlayerPrefs.GetFloat(PrefsSfxVolume, DefaultVolume);
+            ApplyMusicVolume(musicVol);
+            ApplySfxVolume(sfxVol);
         }
 
         private void OnDestroy()
@@ -517,6 +535,53 @@ namespace Futboloid.Main.Audio
             source.playOnAwake = false;
             source.spatialBlend = 0f;
             return source;
+        }
+
+        // ===== Volume control =====
+
+        public void SetMusicVolume(float volume)
+        {
+            volume = Mathf.Clamp01(volume);
+            PlayerPrefs.SetFloat(PrefsMusicVolume, volume);
+            PlayerPrefs.Save();
+            ApplyMusicVolume(volume);
+        }
+
+        public void SetSfxVolume(float volume)
+        {
+            volume = Mathf.Clamp01(volume);
+            PlayerPrefs.SetFloat(PrefsSfxVolume, volume);
+            PlayerPrefs.Save();
+            ApplySfxVolume(volume);
+        }
+
+        public float GetMusicVolume() =>
+            PlayerPrefs.GetFloat(PrefsMusicVolume, DefaultVolume);
+
+        public float GetSfxVolume() =>
+            PlayerPrefs.GetFloat(PrefsSfxVolume, DefaultVolume);
+
+        private void ApplyMusicVolume(float volume)
+        {
+            if (mixer == null)
+                return;
+
+            // AudioMixer работает в dB: 0..1 → -80..0 dB
+            mixer.SetFloat(ExposedMusicParam, VolumeToDb(volume));
+        }
+
+        private void ApplySfxVolume(float volume)
+        {
+            if (mixer == null)
+                return;
+
+            mixer.SetFloat(ExposedSfxParam, VolumeToDb(volume));
+        }
+
+        private static float VolumeToDb(float linear)
+        {
+            // linear 0 → -80 dB (тишина), linear > 0 → dB
+            return linear > 0.0001f ? Mathf.Log10(linear) * 20f : -80f;
         }
 
         private sealed class SfxVoice

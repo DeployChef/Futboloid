@@ -463,7 +463,7 @@ MonoBehaviour:
     channel: 2
     clips:
     - {fileID: 8300000, guid: 2043bfe25d1c7ef4192fbe7b457925bc, type: 3}
-    mixerGroup: {fileID: 8847932704200365196, guid: 105f75300e131314d9fe0498b0ab8428, type: 2}
+    mixerGroup: {fileID: 6570628444785268977, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
     priority: 25
     allowOverlap: 0
     cooldown: 0.3

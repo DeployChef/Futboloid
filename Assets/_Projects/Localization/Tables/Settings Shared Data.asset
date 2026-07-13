@@ -27,6 +27,14 @@ MonoBehaviour:
     m_Key: close
     m_Metadata:
       m_Items: []
+  - m_Id: 81319794913280
+    m_Key: Music
+    m_Metadata:
+      m_Items: []
+  - m_Id: 81382185185280
+    m_Key: SFX
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
