@@ -4,6 +4,7 @@ using Futboloid.Core;
 using Futboloid.Core.Localization;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
+using Futboloid.UI.Views.Leaderboards;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,6 +23,7 @@ namespace Futboloid.UI.Views.Tournament
         [SerializeField] private Button restartButton;
         [SerializeField] private Button mainMenuButton;
         [SerializeField] private FirstTimeGuideWidget firstTimeGuide;
+        [SerializeField] private PlayerNicknameControl nicknameControl;
 
         private readonly List<IDisposable> _subscriptions = new();
         private IGameDirector _director;
@@ -114,6 +116,15 @@ namespace Futboloid.UI.Views.Tournament
 
             if (mainMenuButton != null)
                 mainMenuButton.gameObject.SetActive(!inProgress);
+
+            var runEnded = !inProgress;
+
+            if (nicknameControl != null)
+            {
+                nicknameControl.gameObject.SetActive(runEnded);
+                if (runEnded)
+                    nicknameControl.LoadFromStore();
+            }
 
             firstTimeGuide?.Refresh();
         }

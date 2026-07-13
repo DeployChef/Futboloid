@@ -7,6 +7,7 @@ using Futboloid.Gameplay.Input;
 using Futboloid.Gameplay.Keeper;
 using Futboloid.Gameplay.Match;
 using Futboloid.Gameplay.Tribune;
+using Futboloid.Main.Leaderboards;
 using Futboloid.UI.Views.StatusEffects;
 using Futboloid.UI.Views.Tournament;
 using UnityEngine;
@@ -27,6 +28,7 @@ namespace Futboloid.Main.DI
             builder.Register<DefenderPromotionService>(Lifetime.Singleton);
             builder.Register<DefenderReshuffleService>(Lifetime.Singleton);
             builder.Register<DefenderLogic>(Lifetime.Transient);
+            builder.Register<LeaderboardRunScoreSubmitter>(Lifetime.Singleton);
 
             builder.Register<IStatusEffectService, StatusEffectService>(Lifetime.Singleton);
 
@@ -97,6 +99,7 @@ namespace Futboloid.Main.DI
             resolver.Resolve<BonusPickCoordinator>();
             resolver.Resolve<DefenderPromotionService>();
             resolver.Resolve<DefenderReshuffleService>();
+            resolver.Resolve<LeaderboardRunScoreSubmitter>();
             resolver.Resolve<IStatusEffectService>();
 
             if (!gameScene.IsValid() || !gameScene.isLoaded)

@@ -83,6 +83,7 @@ providers = {
 objectSelectors = {
 }
 recentSearches = [
+	"st: leaderboard_table_row"
 ]
 searchItemFavorites = [
 ]

@@ -22,6 +22,18 @@ namespace Futboloid.Core.Localization
         public const string GuideMoveRight = "guide_move_right";
         public const string ContinueHint = "continue_hint";
 
+        public const string LeaderboardTitle = "leaderboard_title";
+        public const string LeaderboardSaveNick = "leaderboard_save_nick";
+        public const string LeaderboardPlayerPlace = "leaderboard_player_place";
+        public const string LeaderboardPlayerScore = "leaderboard_player_score";
+        public const string LeaderboardNoScore = "leaderboard_no_score";
+        public const string LeaderboardOffline = "leaderboard_offline";
+        public const string LeaderboardLoading = "leaderboard_loading";
+        public const string LeaderboardError = "leaderboard_error";
+        public const string LeaderboardRefresh = "leaderboard_refresh";
+        public const string LeaderboardTopTitle = "leaderboard_top_title";
+        public const string LeaderboardTableRow = "leaderboard_table_row";
+
         public const string RoundFinalCompleted = "round_final_completed";
         public const string RoundMatch = "round_match";
         public const string RoundMatchOf = "round_match_of";
