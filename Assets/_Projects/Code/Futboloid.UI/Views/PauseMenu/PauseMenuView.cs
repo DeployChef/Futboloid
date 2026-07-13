@@ -1,5 +1,6 @@
 using Futboloid.Core;
 using Futboloid.UI;
+using Futboloid.UI.Views.Settings;
 using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
@@ -14,11 +15,13 @@ namespace Futboloid.UI.Views.PauseMenu
         [SerializeField] private Button backToMenuButton;
 
         private IGameDirector _director;
+        private UIService _ui;
 
         [Inject]
-        public void Construct(IGameDirector director)
+        public void Construct(IGameDirector director, UIService ui)
         {
             _director = director;
+            _ui = ui;
         }
 
         private void Awake()
@@ -47,10 +50,7 @@ namespace Futboloid.UI.Views.PauseMenu
 
         private void OnRestartClicked() => _director.RestartTournament();
 
-        private void OnSettingsClicked()
-        {
-            // TODO: открыть настройки
-        }
+        private void OnSettingsClicked() => _ui.Show<SettingsView>();
 
         private void OnBackToMenuClicked() => _director.ReturnToMainMenu();
     }

@@ -7,6 +7,8 @@
         "Futboloid.UI",
         "UniTask",
         "Unity.InputSystem",
+        "Unity.Localization",
+        "Unity.ResourceManager",
         "VContainer"
     ],
     "includePlatforms": [],
