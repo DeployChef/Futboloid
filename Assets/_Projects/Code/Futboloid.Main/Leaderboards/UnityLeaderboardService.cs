@@ -75,7 +75,7 @@ namespace Futboloid.Main.Leaderboards
 
             try
             {
-                await LeaderboardsService.Instance.AddPlayerScoreAsync(
+                await GetLeaderboards().AddPlayerScoreAsync(
                     LeaderboardIds.ArcadeScore,
                     score);
             }
@@ -108,7 +108,7 @@ namespace Futboloid.Main.Leaderboards
             try
             {
                 var limit = Mathf.Clamp(topCount, 1, 25);
-                var scoresPage = await LeaderboardsService.Instance.GetScoresAsync(
+                var scoresPage = await GetLeaderboards().GetScoresAsync(
                     LeaderboardIds.ArcadeScore,
                     new GetScoresOptions { Limit = limit });
 
@@ -118,7 +118,7 @@ namespace Futboloid.Main.Leaderboards
 
                 try
                 {
-                    var playerScore = await LeaderboardsService.Instance.GetPlayerScoreAsync(
+                    var playerScore = await GetLeaderboards().GetPlayerScoreAsync(
                         LeaderboardIds.ArcadeScore);
                     playerEntry = MapEntry(playerScore);
                     hasPlayerEntry = true;
@@ -207,6 +207,9 @@ namespace Futboloid.Main.Leaderboards
 
         private static bool IsNetworkAvailable() =>
             Application.internetReachability != NetworkReachability.NotReachable;
+
+        private static ILeaderboardsService GetLeaderboards() =>
+            UnityServices.Instance.GetLeaderboardsService();
 
         private static IReadOnlyList<LeaderboardEntryDto> MapEntries(IReadOnlyList<LeaderboardEntry> entries)
         {
