@@ -8,6 +8,7 @@ using Futboloid.Gameplay.Match;
 using Futboloid.Main.Navigation;
 using Futboloid.Main.Session;
 using VContainer;
+
 namespace Futboloid.Main.DI
 {
     public static class AppScopeExtensions
@@ -29,6 +30,8 @@ namespace Futboloid.Main.DI
 
             builder.Register<AudioService>(Lifetime.Singleton);
             builder.RegisterBuildCallback(resolver => resolver.Resolve<AudioService>());
+
+            builder.RegisterAnalytics();
 
             var runProgressionSettings = RunProgressionSettings.Load();
             var perkCatalog = PerkCatalog.Load();
