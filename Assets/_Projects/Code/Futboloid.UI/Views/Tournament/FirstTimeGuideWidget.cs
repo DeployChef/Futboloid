@@ -3,7 +3,9 @@ using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
 using UnityEngine;
+using UnityEngine.UI;
 using VContainer;
+
 namespace Futboloid.UI.Views.Tournament
 {
     /// <summary>
@@ -24,6 +26,7 @@ namespace Futboloid.UI.Views.Tournament
                 guidePanel = gameObject;
 
             guidePanel.SetActive(false);
+            DisableGuideRaycasts();
         }
 
         private void OnDestroy()
@@ -54,6 +57,25 @@ namespace Futboloid.UI.Views.Tournament
             var isFirstLaunch = _tournamentRun != null && !_tournamentRun.HasPlayedBefore;
 
             guidePanel.SetActive(isFirstMatch && isFirstLaunch);
+            if (guidePanel.activeSelf)
+                DisableGuideRaycasts();
+        }
+
+        private void DisableGuideRaycasts()
+        {
+            if (guidePanel == null)
+                return;
+
+            var group = guidePanel.GetComponent<CanvasGroup>();
+            if (group == null)
+                group = guidePanel.AddComponent<CanvasGroup>();
+
+            group.blocksRaycasts = false;
+            group.interactable = false;
+
+            var graphics = guidePanel.GetComponentsInChildren<Graphic>(true);
+            for (var i = 0; i < graphics.Length; i++)
+                graphics[i].raycastTarget = false;
         }
     }
 }
