@@ -22,10 +22,13 @@ namespace Futboloid.UI.Views.StatusEffects
         private readonly List<IDisposable> _subscriptions = new();
         private readonly Queue<StatusEffectAppliedEvent> _pendingReveals = new();
 
+        private const float InputGraceSeconds = 0.15f;
+
         private IStatusEffectRevealMemory _revealMemory;
         private PauseCoordinator _pause;
         private bool _pausedForReveal;
         private bool _isShowing;
+        private float _shownAtUnscaledTime;
 
         private void Awake() => SetVisible(false);
 
@@ -53,11 +56,12 @@ namespace Futboloid.UI.Views.StatusEffects
             if (!_isShowing)
                 return;
 
-            var keyboard = Keyboard.current;
-            if (keyboard == null || !keyboard.spaceKey.wasPressedThisFrame)
+            // Avoid instantly closing from the same finger that triggered the buff.
+            if (Time.unscaledTime - _shownAtUnscaledTime < InputGraceSeconds)
                 return;
 
-            DismissCurrent();
+            if (WasContinuePressedThisFrame())
+                DismissCurrent();
         }
 
         private void OnDestroy()
@@ -85,6 +89,7 @@ namespace Futboloid.UI.Views.StatusEffects
 
             var reveal = _pendingReveals.Dequeue();
             _isShowing = true;
+            _shownAtUnscaledTime = Time.unscaledTime;
             RequestPause();
             SetVisible(true);
             card?.Show(reveal);
@@ -141,6 +146,21 @@ namespace Futboloid.UI.Views.StatusEffects
 
             if (!visible && continueHintRoot != null)
                 continueHintRoot.SetActive(false);
+        }
+
+        private static bool WasContinuePressedThisFrame()
+        {
+            var keyboard = Keyboard.current;
+            if (keyboard != null && keyboard.spaceKey.wasPressedThisFrame)
+                return true;
+
+            var touchscreen = Touchscreen.current;
+            if (touchscreen != null && touchscreen.primaryTouch.press.wasPressedThisFrame)
+                return true;
+
+            // WebGL often delivers finger input as mouse clicks.
+            var mouse = Mouse.current;
+            return mouse != null && mouse.leftButton.wasPressedThisFrame;
         }
     }
 }

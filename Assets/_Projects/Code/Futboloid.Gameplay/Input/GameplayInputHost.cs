@@ -14,18 +14,46 @@ namespace Futboloid.Gameplay.Input
         private const string ServeActionName = "Serve";
 
         [SerializeField] private InputActionAsset inputActions;
+        [SerializeField] private MobileGameplayControls mobileControls;
 
         private InputActionMap _gameplayMap;
         private InputAction _moveAction;
         private InputAction _serveAction;
 
-        public float MoveX => _moveAction?.ReadValue<Vector2>().x ?? 0f;
+        public float MoveX
+        {
+            get
+            {
+                var keyboardX = _moveAction?.ReadValue<Vector2>().x ?? 0f;
+                var touchX = mobileControls != null && mobileControls.IsActive
+                    ? mobileControls.MoveX
+                    : 0f;
 
-        public bool WasServePressedThisFrame =>
-            _serveAction != null && _serveAction.WasPressedThisFrame();
+                if (Mathf.Abs(keyboardX) > 0.01f)
+                    return Mathf.Clamp(keyboardX, -1f, 1f);
+
+                return touchX;
+            }
+        }
+
+        public bool WasServePressedThisFrame
+        {
+            get
+            {
+                var keyboardServe = _serveAction != null && _serveAction.WasPressedThisFrame();
+                var touchServe = mobileControls != null && mobileControls.ConsumeServePressed();
+                return keyboardServe || touchServe;
+            }
+        }
 
         private void Awake()
         {
+            if (mobileControls == null)
+                mobileControls = GetComponent<MobileGameplayControls>();
+
+            if (mobileControls == null)
+                mobileControls = gameObject.AddComponent<MobileGameplayControls>();
+
             if (inputActions == null)
             {
                 Debug.LogError("[GameplayInputHost] InputActionAsset is not assigned.", this);
