@@ -1,0 +1,4 @@
+# Published WebGL player for GitHub Pages / Telegram Mini App.
+# Do not commit Unity debug leftovers.
+webgl/**/Futboloid_BurstDebugInformation_DoNotShip/
+webgl/**/*_BurstDebugInformation_DoNotShip/
