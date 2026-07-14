@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
+using Futboloid.Core.Pause;
 using Futboloid.Core.Run;
 using Futboloid.UI;
 using UnityEngine;
@@ -14,6 +15,7 @@ namespace Futboloid.Main.Navigation
         private readonly UIService _uiService;
         private readonly ITournamentRunService _tournamentRun;
         private readonly IRunProgressionService _runProgression;
+        private readonly PauseCoordinator _pause;
 
         private bool _initialized;
 
@@ -24,12 +26,14 @@ namespace Futboloid.Main.Navigation
             IGameEventBus bus,
             UIService uiService,
             ITournamentRunService tournamentRun,
-            IRunProgressionService runProgression)
+            IRunProgressionService runProgression,
+            PauseCoordinator pause)
         {
             _bus = bus;
             _uiService = uiService;
             _tournamentRun = tournamentRun;
             _runProgression = runProgression;
+            _pause = pause;
         }
 
         public UniTask SetState(NavigationState next)
@@ -63,14 +67,11 @@ namespace Futboloid.Main.Navigation
 
         private void ApplyState(NavigationState next, NavigationState previous, bool isColdStart)
         {
+            SyncNavigationPause(next);
+
             switch (next)
             {
-                case NavigationState.MainMenu:
-                    Time.timeScale = 0f;
-                    break;
-
                 case NavigationState.OnField:
-                    Time.timeScale = 1f;
                     var resumingFromPause = previous == NavigationState.Pause;
                     var resumingFromMenu = previous == NavigationState.MainMenu && IsMatchPausedInMenu;
                     var newRunFromMenu = previous == NavigationState.MainMenu && !IsMatchPausedInMenu;
@@ -86,13 +87,21 @@ namespace Futboloid.Main.Navigation
                     else if (resumingFromMenu)
                         IsMatchPausedInMenu = false;
                     break;
+            }
+        }
 
-                case NavigationState.Tournament:
-                    Time.timeScale = 1f;
+        private void SyncNavigationPause(NavigationState state)
+        {
+            _pause.Release(PauseReasons.MainMenu);
+            _pause.Release(PauseReasons.EscapePause);
+
+            switch (state)
+            {
+                case NavigationState.MainMenu:
+                    _pause.Request(PauseReasons.MainMenu);
                     break;
-
                 case NavigationState.Pause:
-                    Time.timeScale = 0f;
+                    _pause.Request(PauseReasons.EscapePause);
                     break;
             }
         }

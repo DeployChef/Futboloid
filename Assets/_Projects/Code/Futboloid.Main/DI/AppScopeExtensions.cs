@@ -1,7 +1,9 @@
 using Futboloid.Core;
 using Futboloid.Core.Audio;
 using Futboloid.Core.Bus;
+using Futboloid.Core.Pause;
 using Futboloid.Core.Run;
+using Futboloid.Core.StatusEffects;
 using Futboloid.Gameplay.Match;
 using Futboloid.Main.Navigation;
 using Futboloid.Main.Session;
@@ -15,6 +17,9 @@ namespace Futboloid.Main.DI
             var gameplaySettings = GameplaySettings.Load();
             builder.RegisterInstance(gameplaySettings);
             builder.RegisterInstance(gameplaySettings.DefenderGeneration);
+            builder.RegisterInstance(gameplaySettings.DefenderMatch);
+            builder.Register<PauseCoordinator>(Lifetime.Singleton);
+            builder.Register<IStatusEffectRevealMemory, StatusEffectRevealMemory>(Lifetime.Singleton);
             builder.Register<IGameEventBus, GameEventBus>(Lifetime.Singleton);
             builder.Register<TournamentRunService>(Lifetime.Singleton)
                 .As<ITournamentRunService>()
@@ -22,8 +27,6 @@ namespace Futboloid.Main.DI
             builder.Register<OverlayStateController>(Lifetime.Singleton);
             builder.Register<MatchEndHandler>(Lifetime.Singleton);
 
-            var audioCatalog = AudioCatalog.Load();
-            builder.RegisterInstance(audioCatalog);
             builder.Register<AudioService>(Lifetime.Singleton);
             builder.RegisterBuildCallback(resolver => resolver.Resolve<AudioService>());
 

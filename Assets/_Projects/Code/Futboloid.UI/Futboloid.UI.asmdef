@@ -3,14 +3,18 @@
     "rootNamespace": "Futboloid.UI",
     "references": [
         "Futboloid.Core",
+        "UniTask",
         "Unity.TextMeshPro",
-        "VContainer"
+        "VContainer",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
-    "precompiledReferences": [],
+    "precompiledReferences": [
+        "DOTween.dll"
+    ],
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],

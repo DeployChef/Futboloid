@@ -8,7 +8,7 @@ namespace Futboloid.Core.Run
 {
     public class RunStateService : IRunProgressionService, IDisposable
     {
-        private const string GoalkeeperSpeedPerkId = "gk_speed";
+        private const string GoalkeeperSpeedPerkId = PerkIds.GoalkeeperSpeed;
 
         private readonly IGameEventBus _bus;
         private readonly RunProgressionSettings _settings;
@@ -66,6 +66,28 @@ namespace Futboloid.Core.Run
 
             var def = FindPerk(GoalkeeperSpeedPerkId);
             var perLevel = def != null ? def.ValuePerLevel : 0.15f;
+            return 1f + perLevel * level;
+        }
+
+        public int GetComboMinMultiplier()
+        {
+            var level = GetPerkLevel(PerkIds.ComboFloor);
+            if (level <= 0)
+                return 1;
+
+            var def = FindPerk(PerkIds.ComboFloor);
+            var perLevel = def != null ? def.ValuePerLevel : 1f;
+            return 1 + Mathf.RoundToInt(perLevel * level);
+        }
+
+        public float GetComboDecayIntervalMultiplier()
+        {
+            var level = GetPerkLevel(PerkIds.ComboDecaySlow);
+            if (level <= 0)
+                return 1f;
+
+            var def = FindPerk(PerkIds.ComboDecaySlow);
+            var perLevel = def != null ? def.ValuePerLevel : 0.25f;
             return 1f + perLevel * level;
         }
 
@@ -143,6 +165,7 @@ namespace Futboloid.Core.Run
                 RunLevel++;
                 _pendingPerkPicks++;
                 RecalculateXpThreshold();
+                _bus.Publish(new LevelUpEvent(RunLevel));
             }
 
             if (_pendingPerkPicks > 0 && !_bonusPickActive)
@@ -256,9 +279,7 @@ namespace Futboloid.Core.Run
                 _perkHudBuffer.Add(new RunPerkHudEntry(
                     perkId,
                     level,
-                    def.Icon,
-                    def.DisplayName,
-                    def.Description));
+                    def.Icon));
             }
 
             _bus.Publish(new RunProgressionUpdatedEvent(

@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Futboloid.Core;
+using Futboloid.Core.Localization;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
+using Futboloid.UI.Views.Leaderboards;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,9 +22,12 @@ namespace Futboloid.UI.Views.Tournament
         [SerializeField] private Button matchButton;
         [SerializeField] private Button restartButton;
         [SerializeField] private Button mainMenuButton;
+        [SerializeField] private FirstTimeGuideWidget firstTimeGuide;
+        [SerializeField] private PlayerNicknameControl nicknameControl;
 
         private readonly List<IDisposable> _subscriptions = new();
         private IGameDirector _director;
+        private ILocalizationService _localization;
 
         private void Awake()
         {
@@ -37,9 +42,10 @@ namespace Futboloid.UI.Views.Tournament
         }
 
         [Inject]
-        public void Construct(IGameEventBus bus, IGameDirector director)
+        public void Construct(IGameEventBus bus, IGameDirector director, ILocalizationService localization)
         {
             _director = director;
+            _localization = localization;
 
             foreach (var subscription in _subscriptions)
                 subscription.Dispose();
@@ -47,11 +53,21 @@ namespace Futboloid.UI.Views.Tournament
             _subscriptions.Clear();
             _subscriptions.Add(bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged));
 
+            _localization.LocaleChanged += OnLocaleChanged;
             gameObject.SetActive(false);
+        }
+
+        private void OnLocaleChanged()
+        {
+            if (gameObject.activeSelf)
+                Refresh();
         }
 
         private void OnDestroy()
         {
+            if (_localization != null)
+                _localization.LocaleChanged -= OnLocaleChanged;
+
             foreach (var subscription in _subscriptions)
                 subscription.Dispose();
 
@@ -100,6 +116,17 @@ namespace Futboloid.UI.Views.Tournament
 
             if (mainMenuButton != null)
                 mainMenuButton.gameObject.SetActive(!inProgress);
+
+            var runEnded = !inProgress;
+
+            if (nicknameControl != null)
+            {
+                nicknameControl.gameObject.SetActive(runEnded);
+                if (runEnded)
+                    nicknameControl.LoadFromStore();
+            }
+
+            firstTimeGuide?.Refresh();
         }
 
         private void OnMatchClicked() => _director?.GoOnField();

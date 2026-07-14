@@ -18,66 +18,38 @@ aliases:
 
 ```
 ┌─────────────────────────────────────────────┐
-│  RootScene (создаётся в runtime)            │
-│  ├─ [DI] Root LifetimeScope                 │
-│  ├─ AudioService                            │
+│  Root.unity (единственная сцена в Build)    │
+│  ├─ Startup + RootLifetimeScope             │
+│  ├─ AudioManager                            │
 │  ├─ EventSystem                             │
-│  ├─ SceneTransition (DontDestroyOnLoad UI)  │
-│  ├─ UIService / Canvas overlay root         │
-│  └─ GameDirector                            │
+│  ├─ UIService / Canvas (меню, пауза)        │
+│  └─ GameDirector (DI)                       │
 ├─────────────────────────────────────────────┤
-│  GameScene (additive, всегда после startup) │
-│  ├─ Поле, ворота, мяч                       │
-│  ├─ Вратарь игрока                          │
-│  ├─ Боты (фоновая симуляция)                │
-│  ├─ View на поле (Ball, Goalkeeper, Defenders) │
-│  └─ [DI] Game LifetimeScope (child)         │
+│  Game.unity (additive из AppGameState)      │
+│  ├─ Поле, ворота, мяч, защитники            │
+│  ├─ Match HUD, Run XP, BonusPick, Tournament│
+│  └─ Game LifetimeScope (child)              │
 └─────────────────────────────────────────────┘
 ```
 
-## Build Settings (целевые)
+## Build Settings (актуально)
 
 | # | Сцена | Назначение |
 |---|-------|------------|
-| 0 | `Startup.unity` | **Единственная** стартовая сцена в билде |
-| — | `Game.unity` | Загружается **аддитивно** из кода (не в build index обязательно, но можно для превью) |
+| 0 | `Root.unity` | **Единственная** сцена в билде |
+| — | `Game.unity` | Загружается **аддитивно** из `AppGameState` |
 
-> Сейчас в проекте: `MainMenu.unity` + `SampleScene.unity`. При миграции `MainMenu` **убираем из билда** — UI переезжает в оверлей. См. [[Миграция с текущего кода]].
+## Root.unity / Startup
 
-## Startup.unity
-
-Минимальная сцена. Один объект с компонентом `Startup`:
+Сцена `Root.unity` — не создаётся в runtime. Один объект с `Startup` + `RootLifetimeScope`:
 
 ```csharp
-// Псевдокод — целевая форма
-public class Startup : MonoBehaviour
-{
-    void Awake() => GameStartupHandler.OnGameStart();
-}
+// Startup.Awake — актуально
+rootScope.Build();
+rootScope.Container.Resolve<IGameDirector>().InitializeGame();
 ```
 
-Дублирование защиты: `[RuntimeInitializeOnLoadMethod]` + `Startup.Awake` с guard «уже инициализировано».
-
-## RootScene (runtime)
-
-Создаётся в `AppRootState.Enter()`:
-
-1. `SceneManager.CreateScene("RootScene")`
-2. `SetActiveScene(RootScene)` — активная сцена для создания новых объектов
-3. Перенос / создание persistent-объектов
-4. Создание `Root LifetimeScope`
-
-### Что живёт в Root
-
-| Объект / сервис | Зачем глобально |
-|-----------------|-----------------|
-| `LifetimeScope` (root) | DI-контейнер на всё приложение |
-| `AudioService` | Музыка между «режимами» |
-| `EventSystem` | UI input |
-| `UIService` + overlay canvas | Меню, пауза, HUD, турнир |
-| `SceneTransitionView` | Шторки + мяч |
-| `GameDirector` | FSM приложения |
-| `ISaveStorage` | Сохранения / лидерборд |
+Guard от двойного init: статический флаг `_started` в `Startup`.
 
 ## GameScene (additive)
 

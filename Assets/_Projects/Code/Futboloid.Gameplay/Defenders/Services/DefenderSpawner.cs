@@ -15,10 +15,10 @@ namespace Futboloid.Gameplay.Defenders
         [SerializeField] private DefenderView defenderPrefab;
         [SerializeField] private Transform spawnRoot;
         [SerializeField] private DefenderSlotLayout slotLayout;
-        [SerializeField] private Transform goalAnchor;
         [SerializeField] private DefenderGenerationSettings generationSettingsOverride;
 
         private IObjectResolver _resolver;
+        private GoalAnchor _goalAnchor;
         private ITournamentBracketReadModel _tournament;
         private DefenderGenerationSettings _generationSettings;
         private readonly List<DefenderView> _spawned = new();
@@ -29,9 +29,11 @@ namespace Futboloid.Gameplay.Defenders
             IGameEventBus bus,
             IObjectResolver resolver,
             ITournamentBracketReadModel tournament,
-            DefenderGenerationSettings generationSettings)
+            DefenderGenerationSettings generationSettings,
+            GoalAnchor goalAnchor)
         {
             _resolver = resolver;
+            _goalAnchor = goalAnchor;
             _tournament = tournament;
             _generationSettings = generationSettingsOverride != null
                 ? generationSettingsOverride
@@ -62,25 +64,17 @@ namespace Futboloid.Gameplay.Defenders
             ClearSpawned();
 
             var matchNumber = _tournament?.CurrentMatchNumber ?? 1;
-            var context = new DefenderGenerationContext(matchNumber);
+            var totalMatches = _tournament?.MatchesToWin ?? 9;
+            var runSeed = _tournament?.RunSeed ?? 0;
+            var context = new DefenderGenerationContext(matchNumber, totalMatches, runSeed: runSeed);
             var generation = DefenderMatchGenerator.Generate(_generationSettings, context);
 
             SpawnGoalkeeper(generation.Goalkeeper);
             SpawnFieldDefenders(generation.Field);
         }
 
-        private void SpawnGoalkeeper(in DefenderBuild build)
-        {
-            if (goalAnchor == null)
-            {
-                Debug.LogWarning("[DefenderSpawner] Goal anchor is not assigned.", this);
-                return;
-            }
-
-            var zone = goalAnchor.GetComponent<GoalAnchor>();
-            var home = zone != null ? zone.PositionOnParabola(0f) : (Vector2)goalAnchor.position;
-            SpawnDefender(build, home, goalAnchor);
-        }
+        private void SpawnGoalkeeper(in DefenderBuild build) =>
+            SpawnDefender(build, _goalAnchor.PositionOnParabola(0f));
 
         private void SpawnFieldDefenders(IReadOnlyList<DefenderBuild> builds)
         {
@@ -101,11 +95,11 @@ namespace Futboloid.Gameplay.Defenders
                     continue;
                 }
 
-                SpawnDefender(build, home, goalAnchor);
+                SpawnDefender(build, home);
             }
         }
 
-        private void SpawnDefender(in DefenderBuild build, Vector2 home, Transform anchor)
+        private void SpawnDefender(in DefenderBuild build, Vector2 home)
         {
             var parent = spawnRoot != null ? spawnRoot : transform;
             var instance = Instantiate(
@@ -114,7 +108,7 @@ namespace Futboloid.Gameplay.Defenders
                 Quaternion.identity,
                 parent);
 
-            instance.ApplySpawnSetup(build, home, anchor);
+            instance.ApplySpawnSetup(build, home);
             _resolver.InjectGameObject(instance.gameObject);
             _spawned.Add(instance);
         }
@@ -129,16 +123,6 @@ namespace Futboloid.Gameplay.Defenders
             }
 
             _spawned.Clear();
-
-            if (spawnRoot == null)
-                return;
-
-            for (var i = spawnRoot.childCount - 1; i >= 0; i--)
-            {
-                var child = spawnRoot.GetChild(i);
-                if (child.GetComponent<DefenderView>() != null)
-                    Destroy(child.gameObject);
-            }
         }
     }
 }

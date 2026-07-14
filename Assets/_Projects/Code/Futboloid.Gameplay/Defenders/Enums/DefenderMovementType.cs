@@ -5,6 +5,6 @@ namespace Futboloid.Gameplay.Defenders
         Idle = 0,
         PatrolGenerated = 1,
         WanderInRadius = 2,
-        ChaseBallInRadius = 3
+        ChaseBall = 3
     }
 }

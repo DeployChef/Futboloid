@@ -14,11 +14,15 @@ namespace Futboloid.Gameplay.Ball
         private readonly IGameEventBus _bus;
         private readonly DefenderGridRegistry _defenderRegistry;
         private readonly PitchBounds _pitchBounds;
-        private readonly LayerMask _goalMask;
+        private readonly ContactFilter2D _ballContactFilter;
+        private readonly RaycastHit2D[] _castHits = new RaycastHit2D[1];
 
         public Vector2 Position { get; private set; }
         public Vector2 Direction { get; private set; }
         public float Speed { get; private set; }
+
+        public bool IsOnFire => Speed >= _settings.FireSpeedThreshold;
+        public int HitDamage => IsOnFire ? 1 + _settings.FireExtraDamage : 1;
 
         public bool InPlay => Speed > 0.01f;
         public bool IsHeld => _holdAnchor != null;
@@ -35,7 +39,9 @@ namespace Futboloid.Gameplay.Ball
             _bus = bus;
             _defenderRegistry = defenderRegistry;
             _pitchBounds = pitchBounds;
-            _goalMask = PhysicsLayers.GoalMask;
+
+            _ballContactFilter = ContactFilter2D.noFilter;
+            _ballContactFilter.SetLayerMask(PhysicsLayers.BallContactMask);
         }
 
         public void ResetAt(Vector2 position)
@@ -82,15 +88,16 @@ namespace Futboloid.Gameplay.Ball
 
             var distance = Speed * deltaTime;
             var castDistance = distance + _settings.Skin;
-            var hit = Physics2D.CircleCast(
+            var hitCount = Physics2D.CircleCast(
                 Position,
                 _settings.Radius,
                 Direction,
-                castDistance,
-                PhysicsLayers.BallContactMask);
+                _ballContactFilter,
+                _castHits,
+                castDistance);
 
-            if (hit.collider != null)
-                ResolveHit(hit);
+            if (hitCount > 0)
+                ResolveHit(_castHits[0]);
             else
                 Position += Direction * distance;
 
@@ -119,9 +126,35 @@ namespace Futboloid.Gameplay.Ball
             Direction = ClampMinAngle(Reflect(Direction, hit.normal));
         }
 
+        private void ReflectFromKeeperHit(RaycastHit2D hit)
+        {
+            var reflected = Reflect(Direction, hit.normal);
+            var spread = _settings.KeeperReflectionSpread;
+
+            if (spread > 0f)
+            {
+                var angle = Mathf.Atan2(reflected.y, reflected.x) * Mathf.Rad2Deg;
+                angle += Random.Range(-spread, spread);
+                var radians = angle * Mathf.Deg2Rad;
+                reflected = new Vector2(Mathf.Cos(radians), Mathf.Sin(radians));
+            }
+
+            Direction = ClampMinAngle(reflected);
+        }
+
         public void ApplyKeeperBoost()
         {
             Speed = Mathf.Min(Speed + _settings.KeeperBoost, _settings.MaxSpeed);
+        }
+
+        public void ApplyDefenderHitBoost()
+        {
+            Speed = Mathf.Min(Speed + _settings.DefenderHitBoost, _settings.MaxSpeed);
+        }
+
+        public void ApplyWallSpeedPenalty()
+        {
+            Speed = Mathf.Max(_settings.BaseSpeed, Speed - _settings.WallSpeedPenalty);
         }
 
         public void LaunchDirected(Vector2 direction, float speed)
@@ -144,7 +177,7 @@ namespace Futboloid.Gameplay.Ball
             var layer = hitCollider.gameObject.layer;
             if (layer == PhysicsLayers.KeeperId)
             {
-                ReflectFromHit(hit);
+                ReflectFromKeeperHit(hit);
                 ApplyKeeperBoost();
                 _bus.Publish(new BallReturnedToKeeperEvent());
                 _bus.Publish(new BallContactEvent(BallContactKind.PlayerKeeper, hit.point, hit.normal, Speed));
@@ -162,31 +195,24 @@ namespace Futboloid.Gameplay.Ball
             }
 
             ReflectFromHit(hit);
+            ApplyWallSpeedPenalty();
             _bus.Publish(new BallContactEvent(BallContactKind.Wall, hit.point, hit.normal, Speed));
         }
 
         private bool TryScoreGoal()
         {
-            var hits = Physics2D.OverlapCircleAll(Position, _settings.Radius, _goalMask);
-            foreach (var overlap in hits)
+            if (Physics2D.OverlapCircle(Position, _settings.Radius, PhysicsLayers.GoalEnemyMask) != null)
             {
-                if (overlap == null)
-                    continue;
+                Stop();
+                _bus.Publish(new GoalScoredEvent(isPlayerGoal: true));
+                return true;
+            }
 
-                var layer = overlap.gameObject.layer;
-                if (layer == PhysicsLayers.GoalEnemyId)
-                {
-                    Stop();
-                    _bus.Publish(new GoalScoredEvent(isPlayerGoal: true));
-                    return true;
-                }
-
-                if (layer == PhysicsLayers.GoalPlayerId)
-                {
-                    Stop();
-                    _bus.Publish(new GoalScoredEvent(isPlayerGoal: false));
-                    return true;
-                }
+            if (Physics2D.OverlapCircle(Position, _settings.Radius, PhysicsLayers.GoalPlayerMask) != null)
+            {
+                Stop();
+                _bus.Publish(new GoalScoredEvent(isPlayerGoal: false));
+                return true;
             }
 
             return false;

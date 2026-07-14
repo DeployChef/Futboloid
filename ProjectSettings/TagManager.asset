@@ -54,6 +54,9 @@ TagManager:
   - name: FX
     uniqueID: 1230648873
     locked: 0
+  - name: UI
+    uniqueID: 1924101363
+    locked: 0
   m_RenderingLayers:
   - Default
   m_MigratedRenderPipelines: []

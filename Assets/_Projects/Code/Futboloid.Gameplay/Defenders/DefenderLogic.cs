@@ -41,12 +41,11 @@ namespace Futboloid.Gameplay.Defenders
             _patrolIndex = 0;
         }
 
-        public Vector2 TickFieldMovement(
+        public DefenderMoveResult TickFieldMovement(
             Vector2 current,
             DefenderMovementType movementType,
             Vector2 home,
             float wanderRadius,
-            float chaseRadius,
             Vector2? ballPosition,
             float moveSpeed,
             float acceleration,
@@ -55,26 +54,30 @@ namespace Futboloid.Gameplay.Defenders
             IReadOnlyList<Vector2> neighborPositions,
             float deltaTime)
         {
+            Vector2 next;
             if (movementType == DefenderMovementType.Idle)
             {
                 var idle = MoveTowards(current, ClampToPitch(home), moveSpeed, acceleration, arriveThreshold, deltaTime, ref _fieldVelocity);
-                return ClampToPitch(ApplySeparation(idle, neighborPositions, separationRadius, moveSpeed, deltaTime));
+                next = ClampToPitch(ApplySeparation(idle, neighborPositions, separationRadius, moveSpeed, deltaTime));
+            }
+            else
+            {
+                var target = ResolveFieldTarget(
+                    movementType,
+                    home,
+                    wanderRadius,
+                    ballPosition,
+                    current,
+                    arriveThreshold);
+
+                var moved = MoveTowards(current, target, moveSpeed, acceleration, arriveThreshold, deltaTime, ref _fieldVelocity);
+                next = ClampToPitch(ApplySeparation(moved, neighborPositions, separationRadius, moveSpeed, deltaTime));
             }
 
-            var target = ResolveFieldTarget(
-                movementType,
-                home,
-                wanderRadius,
-                chaseRadius,
-                ballPosition,
-                current,
-                arriveThreshold);
-
-            var next = MoveTowards(current, target, moveSpeed, acceleration, arriveThreshold, deltaTime, ref _fieldVelocity);
-            return ClampToPitch(ApplySeparation(next, neighborPositions, separationRadius, moveSpeed, deltaTime));
+            return new DefenderMoveResult(next, _fieldVelocity);
         }
 
-        public Vector2 TickRunTowards(
+        public DefenderMoveResult TickRunTowards(
             Vector2 current,
             Vector2 target,
             float maxSpeed,
@@ -89,7 +92,7 @@ namespace Futboloid.Gameplay.Defenders
             {
                 arrived = true;
                 _runVelocity = Vector2.zero;
-                return ClampToPitch(target);
+                return new DefenderMoveResult(ClampToPitch(target), _runVelocity);
             }
 
             arrived = false;
@@ -103,25 +106,28 @@ namespace Futboloid.Gameplay.Defenders
             {
                 _runVelocity = Vector2.zero;
                 arrived = true;
-                return ClampToPitch(target);
+                return new DefenderMoveResult(ClampToPitch(target), _runVelocity);
             }
 
-            return ClampToPitch(next);
+            return new DefenderMoveResult(ClampToPitch(next), _runVelocity);
         }
 
-        public Vector2 TickGoalkeeperOnParabola(
+        public DefenderMoveResult TickGoalkeeperOnParabola(
+            Vector2 current,
             GoalAnchor zone,
             float ballWorldX,
             float trackSpeed,
             float deltaTime)
         {
             if (zone == null)
-                return Vector2.zero;
+                return new DefenderMoveResult(current, Vector2.zero);
 
             var targetT = zone.ParamFromWorldX(ballWorldX);
             var speed = Mathf.Max(0.01f, trackSpeed);
             _goalkeeperParam = Mathf.MoveTowards(_goalkeeperParam, targetT, speed * deltaTime);
-            return zone.PositionOnParabola(_goalkeeperParam);
+            var next = zone.PositionOnParabola(_goalkeeperParam);
+            var velocity = deltaTime > 0f ? (next - current) / deltaTime : Vector2.zero;
+            return new DefenderMoveResult(next, velocity);
         }
 
         public void ResetGoalkeeperParam(float startParam)
@@ -151,6 +157,8 @@ namespace Futboloid.Gameplay.Defenders
                     motion.ReflectFromHit(hit);
                     break;
             }
+
+            motion.ApplyDefenderHitBoost();
         }
 
         private void LaunchToPlayerGoal(BallMotion motion, RaycastHit2D hit, DefenderView view)
@@ -242,7 +250,6 @@ namespace Futboloid.Gameplay.Defenders
             DefenderMovementType movementType,
             Vector2 home,
             float wanderRadius,
-            float chaseRadius,
             Vector2? ballPosition,
             Vector2 current,
             float arriveThreshold)
@@ -255,12 +262,9 @@ namespace Futboloid.Gameplay.Defenders
                 case DefenderMovementType.WanderInRadius:
                     return ResolveWanderTarget(home, wanderRadius, current, arriveThreshold);
 
-                case DefenderMovementType.ChaseBallInRadius:
-                    if (ballPosition.HasValue
-                        && (ballPosition.Value - home).sqrMagnitude <= chaseRadius * chaseRadius)
-                    {
+                case DefenderMovementType.ChaseBall:
+                    if (ballPosition.HasValue)
                         return ClampToPitch(ballPosition.Value);
-                    }
 
                     return ResolveWanderTarget(home, wanderRadius, current, arriveThreshold);
 

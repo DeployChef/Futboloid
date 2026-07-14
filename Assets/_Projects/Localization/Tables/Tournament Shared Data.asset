@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: Tournament Shared Data
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.SharedTableData
+  m_TableCollectionName: Tournament
+  m_TableCollectionNameGuidString: fb8a3c8b5f13a264a9cfb6e639aea6e7
+  m_Entries:
+  - m_Id: 30200000001
+    m_Key: round_final_completed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30200000002
+    m_Key: round_match
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30200000003
+    m_Key: round_match_of
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30200000004
+    m_Key: status_champion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30200000005
+    m_Key: status_ready_first_match
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30200000006
+    m_Key: status_eliminated
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30200000007
+    m_Key: status_victory
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 3160865335955161198
+  references:
+    version: 2
+    RefIds:
+    - rid: 3160865335955161198
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1783936030401

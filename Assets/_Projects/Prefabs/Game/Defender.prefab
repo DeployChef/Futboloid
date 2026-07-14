@@ -1,5 +1,113 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2547711978061226024
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6173394461780291929}
+  - component: {fileID: 7579891155708267126}
+  - component: {fileID: 3164381573437883803}
+  - component: {fileID: 4803946836639967962}
+  m_Layer: 5
+  m_Name: TypeTint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &6173394461780291929
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2547711978061226024}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.27, y: 0.27, z: 0.27}
+  m_ConstrainProportionsScale: 1
+  m_Children:
+  - {fileID: 9106807716564350281}
+  m_Father: {fileID: 2532175341332586269}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0.01412, y: 0.58379}
+  m_SizeDelta: {x: 1.3, y: 1}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &7579891155708267126
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2547711978061226024}
+  m_CullTransparentMesh: 1
+--- !u!114 &3164381573437883803
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2547711978061226024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!114 &4803946836639967962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2547711978061226024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28b0cc8bcec741b5b11f78d9aae1e12f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.DefenderBehaviorVisual
+  typeImage: {fileID: 3164381573437883803}
+  goalkeeperColor: {r: 0.95, g: 0.85, b: 0.2, a: 1}
+  palette:
+  - Kind: 0
+    Color: {r: 0.65, g: 0.72, b: 0.85, a: 1}
+  - Kind: 1
+    Color: {r: 0.45, g: 0.82, b: 0.55, a: 1}
+  - Kind: 2
+    Color: {r: 0.25, g: 0.88, b: 0.95, a: 1}
+  - Kind: 3
+    Color: {r: 0.35, g: 0.72, b: 0.68, a: 1}
+  - Kind: 4
+    Color: {r: 0.95, g: 0.42, b: 0.32, a: 1}
+  - Kind: 5
+    Color: {r: 0.98, g: 0.72, b: 0.28, a: 1}
+  - Kind: 6
+    Color: {r: 0.92, g: 0.32, b: 0.58, a: 1}
+  - Kind: 7
+    Color: {r: 0.72, g: 0.42, b: 0.92, a: 1}
 --- !u!1 &4969127172605605462
 GameObject:
   m_ObjectHideFlags: 0
@@ -11,6 +119,8 @@ GameObject:
   - component: {fileID: 9216872615087905485}
   - component: {fileID: 1864416684892860211}
   - component: {fileID: 8128865829371798977}
+  - component: {fileID: 3152381632761037567}
+  - component: {fileID: 7692808108287274353}
   m_Layer: 10
   m_Name: Defender
   m_TagString: Untagged
@@ -28,11 +138,10 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 6301102691141668545}
-  - {fileID: 2532175341332586269}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &1864416684892860211
@@ -95,19 +204,57 @@ MonoBehaviour:
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.DefenderView
   slotId: 0
   role: 0
-  maxHp: 3
+  bodyCollider: {fileID: 1864416684892860211}
+  animationPresenter: {fileID: 7438566234465488061}
+  behaviorVisual: {fileID: 4803946836639967962}
+  health: {fileID: 3152381632761037567}
   hitType: 0
   launchSpeed: 12
   openGoalChancePercent: 70
+  interactionCooldown: 0.1
+  pointValue: 10
   movementType: 0
   patrolPointCount: 4
   patrolRadius: 1.5
   wanderRadius: 1.5
-  chaseRadius: 3
   separationRadius: 0.6
+  fieldMoveSpeed: 1.6
+  fieldAcceleration: 12
+  fieldArriveThreshold: 0.12
   trackSpeed: 1.25
-  bodyCollider: {fileID: 1864416684892860211}
+--- !u!114 &3152381632761037567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4969127172605605462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22254d755a2663a43887983f06e46a5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.DefenderHealth
+  maxHp: 3
   hpLabel: {fileID: 2968189813365401722}
+  defender: {fileID: 8128865829371798977}
+--- !u!114 &7692808108287274353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4969127172605605462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e9ed60b5b7757d47a252e1e202c70df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.DefenderViewGizmos
+  drawGizmos: 1
+  gizmoLabelHeight: 0.35
+  gizmoLabelPadding: 0.12
+  defender: {fileID: 8128865829371798977}
+  health: {fileID: 3152381632761037567}
+  bodyCollider: {fileID: 1864416684892860211}
 --- !u!1 &5333510178830016538
 GameObject:
   m_ObjectHideFlags: 0
@@ -136,11 +283,11 @@ RectTransform:
   m_GameObject: {fileID: 5333510178830016538}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.1904762, y: 0.1904762, z: 0.1904762}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 9106807716564350281}
-  m_Father: {fileID: 9216872615087905485}
+  - {fileID: 6173394461780291929}
+  m_Father: {fileID: 6301102691141668545}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -221,6 +368,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6301102691141668545}
   - component: {fileID: 3005694690385198493}
+  - component: {fileID: 696242960672357460}
+  - component: {fileID: 7438566234465488061}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -240,7 +389,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 5.25, y: 5.25, z: 5.25}
   m_ConstrainProportionsScale: 1
-  m_Children: []
+  m_Children:
+  - {fileID: 2532175341332586269}
   m_Father: {fileID: 9216872615087905485}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &3005694690385198493
@@ -292,7 +442,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 1768679433190182986, guid: 18c83dc9454fe174f80b2f0cb1a619b5, type: 3}
+  m_Sprite: {fileID: 4087957480514131411, guid: 6e54d984910514648b4bc090a4e926d9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -302,6 +452,43 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!95 &696242960672357460
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6797947194657875002}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 8a4d3280a55e011409cf30195c73410a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7438566234465488061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6797947194657875002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80ae2da49eae0fe4293f2495d3c07e10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Characters.CharacterAnimationPresenter
+  animator: {fileID: 696242960672357460}
+  facingRoot: {fileID: 0}
+  numbersFace: {fileID: 2532175341332586269}
 --- !u!1 &7680952560169528931
 GameObject:
   m_ObjectHideFlags: 0
@@ -327,17 +514,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7680952560169528931}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
+  m_LocalScale: {x: 0.037037034, y: 0.037037034, z: 0.037037034}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 2532175341332586269}
+  m_Father: {fileID: 6173394461780291929}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.222}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: 0.0000000037253, y: 0.000000067055}
+  m_SizeDelta: {x: 38.446, y: 18.755}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7810527546149913010
 CanvasRenderer:
@@ -394,15 +581,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 26
+  m_fontSizeBase: 26
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 256
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_characterHorizontalScale: 1

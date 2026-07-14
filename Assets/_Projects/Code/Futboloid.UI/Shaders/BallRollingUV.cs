@@ -3,8 +3,8 @@ using UnityEngine;
 namespace Futboloid.UI.Shaders
 {
     /// <summary>
-    ///     Computes the rolling UV rotation angle for a 2D ball based on its movement.
-    ///     Updates the material's "_RotationAngle" property used by BallShader.shadergraph.
+    ///     Сдвигает UV текстуры против движения мяча — иллюзия качения.
+    ///     Требует в шейдере свойство <c>_UVOffset</c> (Vector2) и Repeat на текстуре.
     /// </summary>
     [RequireComponent(typeof(SpriteRenderer))]
     public class BallRollingUV : MonoBehaviour
@@ -13,15 +13,18 @@ namespace Futboloid.UI.Shaders
         [SerializeField] private float ballRadius = 0.5f;
 
         [SerializeField]
-        [Tooltip("Множитель скорости вращения относительно пройденного расстояния. " +
-                 "1.0 = физически корректное вращение (длина окружности = 2πR).")]
+        [Tooltip("1.0 = один полный повтор текстуры на длину окружности (2πR).")]
         private float rollSpeed = 1f;
+
+        [SerializeField]
+        [Tooltip("Множитель знака по осям, если вертикаль/горизонталь едут не туда. По умолчанию (-1, -1).")]
+        private Vector2 rollSign = new(-1f, -1f);
 
         private Material _material;
         private Vector2 _lastPosition;
-        private float _totalAngle;
+        private Vector2 _uvOffset;
 
-        private static readonly int RotationAngle = Shader.PropertyToID("_RotationAngle");
+        private static readonly int UvOffsetId = Shader.PropertyToID("_UVOffset");
 
         private void Start()
         {
@@ -34,7 +37,8 @@ namespace Futboloid.UI.Shaders
             }
 
             _material = spriteRenderer.material;
-            _lastPosition = new Vector2(transform.position.x, transform.position.y);
+            _lastPosition = transform.position;
+            _material.SetVector(UvOffsetId, _uvOffset);
         }
 
         private void Update()
@@ -42,33 +46,28 @@ namespace Futboloid.UI.Shaders
             if (_material == null)
                 return;
 
-            Vector2 currentPosition = new Vector2(transform.position.x, transform.position.y);
+            Vector2 currentPosition = transform.position;
             Vector2 delta = currentPosition - _lastPosition;
 
             if (delta.sqrMagnitude > 0.0001f)
             {
-                float distance = delta.magnitude;
+                float circumference = 2f * Mathf.PI * ballRadius;
+                Vector2 scroll = delta / circumference * rollSpeed;
+                scroll.Scale(rollSign);
 
-                // Угол поворота на основе пройденного пути: angle = distance / radius (радианы)
-                float angleDelta = (distance / ballRadius) * Mathf.Rad2Deg * rollSpeed;
-
-                // Определение направления вращения через векторное произведение (cross product):
-                // Для 2D: cross(delta, up) = delta.x * 0 - delta.y * 0 ... 
-                // Используем псевдо-кросс: direction = sign(delta.x * forwardZ - delta.y * forwardX)
-                // В 2D плоскости (X-right, Y-up) вращение против часовой = положительное.
-                // При движении вправо (delta.x > 0) мяч должен крутиться по часовой => отрицательное направление.
-                float direction = -Mathf.Sign(delta.x);
-
-                angleDelta *= direction;
-                _totalAngle += angleDelta;
-
-                // Предотвращаем потерю точности float при бесконечном суммировании
-                _totalAngle = Mathf.Repeat(_totalAngle, 360f);
-
-                _material.SetFloat(RotationAngle, _totalAngle);
+                _uvOffset += scroll;
+                _material.SetVector(UvOffsetId, _uvOffset);
             }
 
             _lastPosition = currentPosition;
+        }
+
+        /// <summary>Сбросить сдвиг (например после телепорта мяча).</summary>
+        public void ResetOffset()
+        {
+            _uvOffset = Vector2.zero;
+            if (_material != null)
+                _material.SetVector(UvOffsetId, _uvOffset);
         }
     }
 }

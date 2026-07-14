@@ -1,4 +1,6 @@
 using Futboloid.Core;
+using Futboloid.UI;
+using Futboloid.UI.Views.Settings;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using VContainer;
@@ -18,11 +20,13 @@ namespace Futboloid.Main.Navigation
         private InputActionMap _uiMap;
         private InputAction _pauseAction;
         private IGameDirector _director;
+        private UIService _ui;
 
         [Inject]
-        public void Construct(IGameDirector director)
+        public void Construct(IGameDirector director, UIService ui)
         {
             _director = director;
+            _ui = ui;
         }
 
         private void Awake()
@@ -63,6 +67,12 @@ namespace Futboloid.Main.Navigation
 
             if (_director.CurrentNavigation == NavigationState.Pause)
             {
+                if (_ui != null && _ui.IsOpen<SettingsView>())
+                {
+                    _ui.Close<SettingsView>();
+                    return;
+                }
+
                 _director.GoOnField();
                 return;
             }

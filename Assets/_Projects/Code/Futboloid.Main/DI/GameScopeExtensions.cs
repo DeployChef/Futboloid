@@ -1,9 +1,15 @@
 using Futboloid.Core;
+using Futboloid.Core.StatusEffects;
 using Futboloid.Gameplay.Ball;
+using Futboloid.Gameplay.Camera;
 using Futboloid.Gameplay.Defenders;
 using Futboloid.Gameplay.Input;
 using Futboloid.Gameplay.Keeper;
 using Futboloid.Gameplay.Match;
+using Futboloid.Gameplay.Tribune;
+using Futboloid.Main.Leaderboards;
+using Futboloid.UI.Views.StatusEffects;
+using Futboloid.UI.Views.Tournament;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer;
@@ -16,19 +22,28 @@ namespace Futboloid.Main.DI
         public static IContainerBuilder RegisterGameScope(this IContainerBuilder builder, Scene gameScene)
         {
             builder.Register<MatchFlow>(Lifetime.Singleton);
+            builder.Register<ComboScoreService>(Lifetime.Singleton);
             builder.Register<PitchStateMachine>(Lifetime.Singleton);
             builder.Register<BonusPickCoordinator>(Lifetime.Singleton);
             builder.Register<DefenderPromotionService>(Lifetime.Singleton);
             builder.Register<DefenderReshuffleService>(Lifetime.Singleton);
             builder.Register<DefenderLogic>(Lifetime.Transient);
+            builder.Register<LeaderboardRunScoreSubmitter>(Lifetime.Singleton);
+
+            builder.Register<IStatusEffectService, StatusEffectService>(Lifetime.Singleton);
 
             builder.RegisterComponentInScene<GameplayInputHost>(gameScene).As<IGameplayInput>();
             builder.RegisterComponentInScene<DefenderGridRegistry>(gameScene);
             builder.RegisterComponentInScene<DefenderSpawner>(gameScene);
             builder.RegisterComponentInScene<DefenderSlotLayout>(gameScene);
             builder.RegisterComponentInScene<PitchBounds>(gameScene);
+            builder.RegisterComponentInScene<GoalAnchor>(gameScene);
             builder.RegisterComponentInScene<BallView>(gameScene);
             builder.RegisterComponentInScene<GoalkeeperView>(gameScene);
+            RegisterOptionalComponentInScene<TribuneSpawner>(builder, gameScene);
+            RegisterOptionalComponentInScene<StatusEffectRevealWidget>(builder, gameScene);
+            RegisterOptionalComponentInScene<FirstTimeGuideWidget>(builder, gameScene);
+            RegisterOptionalComponentInScene<GameplayCameraController>(builder, gameScene);
 
             builder.RegisterBuildCallback(resolver => OnGameScopeBuilt(resolver, gameScene));
 
@@ -44,6 +59,22 @@ namespace Futboloid.Main.DI
                 Debug.LogError($"[GameScope] {typeof(T).Name} not found in scene '{scene.name}'.");
 
             return builder.RegisterComponent(component);
+        }
+
+        private static void RegisterOptionalComponentInScene<T>(
+            IContainerBuilder builder,
+            Scene scene) where T : Component
+        {
+            var component = FindInScene<T>(scene);
+            if (component == null)
+            {
+                Debug.LogWarning(
+                    $"[GameScope] {typeof(T).Name} not found in scene '{scene.name}'. " +
+                    "Add it when setting up tribune pickups.");
+                return;
+            }
+
+            builder.RegisterComponent(component);
         }
 
         private static T FindInScene<T>(Scene scene) where T : Component
@@ -64,9 +95,12 @@ namespace Futboloid.Main.DI
         private static void OnGameScopeBuilt(IObjectResolver resolver, Scene gameScene)
         {
             resolver.Resolve<PitchStateMachine>();
+            resolver.Resolve<ComboScoreService>();
             resolver.Resolve<BonusPickCoordinator>();
             resolver.Resolve<DefenderPromotionService>();
             resolver.Resolve<DefenderReshuffleService>();
+            resolver.Resolve<LeaderboardRunScoreSubmitter>();
+            resolver.Resolve<IStatusEffectService>();
 
             if (!gameScene.IsValid() || !gameScene.isLoaded)
                 return;

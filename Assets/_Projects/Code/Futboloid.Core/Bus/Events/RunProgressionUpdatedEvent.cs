@@ -7,21 +7,12 @@ namespace Futboloid.Core.Bus.Events
         public string PerkId { get; }
         public int Level { get; }
         public Sprite Icon { get; }
-        public string Title { get; }
-        public string Description { get; }
 
-        public RunPerkHudEntry(
-            string perkId,
-            int level,
-            Sprite icon,
-            string title,
-            string description)
+        public RunPerkHudEntry(string perkId, int level, Sprite icon)
         {
             PerkId = perkId;
             Level = level;
             Icon = icon;
-            Title = title;
-            Description = description;
         }
     }
 

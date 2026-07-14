@@ -12,14 +12,22 @@ namespace Futboloid.Gameplay.Defenders
     {
         private readonly IGameEventBus _bus;
         private readonly DefenderGridRegistry _registry;
+        private readonly GoalAnchor _goalAnchor;
+        private readonly DefenderMatchSettings _matchSettings;
         private readonly List<IDisposable> _subscriptions = new();
 
         private DefenderView _activeCandidate;
 
-        public DefenderPromotionService(IGameEventBus bus, DefenderGridRegistry registry)
+        public DefenderPromotionService(
+            IGameEventBus bus,
+            DefenderGridRegistry registry,
+            GoalAnchor goalAnchor,
+            DefenderMatchSettings matchSettings)
         {
             _bus = bus;
             _registry = registry;
+            _goalAnchor = goalAnchor;
+            _matchSettings = matchSettings;
             _subscriptions.Add(bus.Subscribe<DefenderDestroyedEvent>(OnDefenderDestroyed));
             _subscriptions.Add(bus.Subscribe<DefenderPromotionCompletedEvent>(OnPromotionCompleted));
         }
@@ -53,14 +61,7 @@ namespace Futboloid.Gameplay.Defenders
 
             _activeCandidate = null;
 
-            var anchor = _registry.ResolveGoalAnchor();
-            if (anchor == null)
-            {
-                Debug.LogWarning("[DefenderPromotionService] Goal anchor not found — cannot promote field player.");
-                return;
-            }
-
-            var candidate = _registry.FindNearestLivingField(anchor.position, excludeRunning: true);
+            var candidate = _registry.FindNearestLivingField(_goalAnchor.Center, excludeRunning: true);
             if (candidate == null)
             {
                 Debug.Log("[DefenderPromotionService] No living field player to replace goalkeeper.");
@@ -69,10 +70,9 @@ namespace Futboloid.Gameplay.Defenders
 
             _activeCandidate = candidate;
             candidate.BeginRunToGoal(
-                anchor,
-                _registry.RunToGoalSpeed,
-                _registry.RunToGoalAcceleration,
-                _registry.ArriveThreshold);
+                _matchSettings.RunToGoalSpeed,
+                _matchSettings.RunToGoalAcceleration,
+                _matchSettings.ArriveThreshold);
             _bus.Publish(new DefenderPromotionStartedEvent(candidate.SlotId));
             Debug.Log($"[DefenderPromotionService] Slot {candidate.SlotId} running to goal.");
         }

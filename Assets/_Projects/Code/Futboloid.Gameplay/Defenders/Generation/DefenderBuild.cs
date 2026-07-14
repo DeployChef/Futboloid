@@ -13,7 +13,6 @@ namespace Futboloid.Gameplay.Defenders
         public int PatrolPointCount;
         public float PatrolRadius;
         public float WanderRadius;
-        public float ChaseRadius;
         public float SeparationRadius;
         public float FieldMoveSpeed;
         public float FieldAcceleration;
@@ -22,5 +21,6 @@ namespace Futboloid.Gameplay.Defenders
         public int OpenGoalChancePercent;
         public float InteractionCooldown;
         public float TrackSpeed;
+        public int PointValue;
     }
 }

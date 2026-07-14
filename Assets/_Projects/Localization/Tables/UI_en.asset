@@ -1,0 +1,135 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: UI_en
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: f75bdd79ee4b5e64aabd362d8b5a2792, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 30100000001
+    m_Localized: Lv. {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000002
+    m_Localized: Lv. {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000003
+    m_Localized: Level {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000004
+    m_Localized: Buff
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000005
+    m_Localized: Debuff
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000006
+    m_Localized: Play
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000007
+    m_Localized: Continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000008
+    m_Localized: Restart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000009
+    m_Localized: Settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000010
+    m_Localized: Back to menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000011
+    m_Localized: Play
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000012
+    m_Localized: New run
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000013
+    m_Localized: Main menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000014
+    m_Localized: "<size=150%><color=yellow>SPACE</color></size> \n to start"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000015
+    m_Localized: <size=150%><color=yellow>A</color></size> - Move left
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000016
+    m_Localized: <size=150%><color=yellow>D</color></size> - Move right
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000017
+    m_Localized: Space to continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000018
+    m_Localized: Leaderboard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000019
+    m_Localized: Save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000020
+    m_Localized: 'You are #{0} of {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000021
+    m_Localized: '{0} points'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000022
+    m_Localized: Play a run to get ranked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000023
+    m_Localized: No network connection
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000024
+    m_Localized: Loading…
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000025
+    m_Localized: Failed to load leaderboard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000026
+    m_Localized: Refresh
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000027
+    m_Localized: Top 10
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30100000028
+    m_Localized: '#{0}  {1}  {2}'
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []
