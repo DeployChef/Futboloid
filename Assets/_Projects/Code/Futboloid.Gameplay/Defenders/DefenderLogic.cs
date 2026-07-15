@@ -223,16 +223,15 @@ namespace Futboloid.Gameplay.Defenders
                 : goalMinX;
             var oppositeCorner = new Vector2(oppositeCornerX, goalBounds.center.y);
 
-            // Меньше «идеальных» углов: частый удар ближе к вратарю, дальний — не всегда в самый край.
+            // Удары злее лёгкого режима, но всё ещё не идеальный угол каждый раз.
             var aimFar = UnityEngine.Random.Range(0, 100) < view.OpenGoalChancePercent;
             var distanceFromKeeper = aimFar
-                ? UnityEngine.Random.Range(0.45f, 0.85f)
-                : UnityEngine.Random.Range(0.0f, 0.45f);
+                ? UnityEngine.Random.Range(0.55f, 0.92f)
+                : UnityEngine.Random.Range(0.05f, 0.4f);
 
             var target = Vector2.Lerp(keeperPos, oppositeCorner, distanceFromKeeper);
 
-            // Шум по ширине ворот — удар не сидит в одной точке.
-            var aimJitter = UnityEngine.Random.Range(-1.1f, 1.1f);
+            var aimJitter = UnityEngine.Random.Range(-0.7f, 0.7f);
             target.x = Mathf.Clamp(target.x + aimJitter, goalMinX, goalMaxX);
             target.y = goalBounds.center.y;
 

@@ -196,14 +196,14 @@ MonoBehaviour:
     PointValue: 12
   - Id: Sniper
     MinTier: 1
-    Weight: 1
+    Weight: 1.4
     Hp: 2
     HitType: 1
     MovementType: 0
     WanderRadius: 2.5
     FieldMoveSpeed: 1.3
     LaunchSpeed: 13
-    OpenGoalChancePercent: 45
+    OpenGoalChancePercent: 60
     PointValue: 15
   - Id: Tank
     MinTier: 2
@@ -218,25 +218,25 @@ MonoBehaviour:
     PointValue: 25
   - Id: Striker
     MinTier: 2
-    Weight: 1
+    Weight: 1.4
     Hp: 3
     HitType: 1
     MovementType: 3
     WanderRadius: 3
     FieldMoveSpeed: 1.65
     LaunchSpeed: 12.5
-    OpenGoalChancePercent: 40
+    OpenGoalChancePercent: 55
     PointValue: 14
   - Id: Presser
     MinTier: 3
-    Weight: 0.8
+    Weight: 1.1
     Hp: 3
     HitType: 1
     MovementType: 3
     WanderRadius: 3
     FieldMoveSpeed: 1.8
     LaunchSpeed: 13
-    OpenGoalChancePercent: 45
+    OpenGoalChancePercent: 58
     PointValue: 18
   tiers:
   - MinMatchNumber: 1
