@@ -13,26 +13,21 @@ namespace Futboloid.Main.Leaderboards
     public sealed class UnityLeaderboardService : ILeaderboardService
     {
         private readonly IPlayerNicknameStore _nicknameStore;
-        private UniTask? _initializeTask;
+        private readonly AsyncLazy _initializeLazy;
         private bool _isInitialized;
         private bool _isSignedIn;
 
         public UnityLeaderboardService(IPlayerNicknameStore nicknameStore)
         {
             _nicknameStore = nicknameStore;
+            // UniTask нельзя await'ить дважды — AsyncLazy даёт общий результат многим ждущим.
+            _initializeLazy = new AsyncLazy(InitializeInternalAsync);
         }
 
         public bool IsInitialized => _isInitialized;
         public bool IsSignedIn => _isSignedIn;
 
-        public UniTask InitializeAsync()
-        {
-            if (_isInitialized)
-                return UniTask.CompletedTask;
-
-            _initializeTask ??= InitializeInternalAsync();
-            return _initializeTask.Value;
-        }
+        public UniTask InitializeAsync() => _initializeLazy.Task;
 
         public async UniTask SetNicknameAsync(string nickname)
         {
