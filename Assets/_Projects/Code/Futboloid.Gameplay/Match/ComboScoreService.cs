@@ -47,6 +47,7 @@ namespace Futboloid.Gameplay.Match
             _subscriptions.Add(bus.Subscribe<DefenderHitEvent>(OnDefenderHit));
             _subscriptions.Add(bus.Subscribe<GoalScoredEvent>(OnGoalScored));
             _subscriptions.Add(bus.Subscribe<BallReturnedToKeeperEvent>(OnBallReturnedToKeeper));
+            _subscriptions.Add(bus.Subscribe<TournamentRunStartedEvent>(OnRunStarted));
             _subscriptions.Add(bus.Subscribe<PitchResetRequestedEvent>(OnPitchReset));
             _subscriptions.Add(bus.Subscribe<PitchPhaseChangedEvent>(e => _phase = e.Phase));
             _subscriptions.Add(bus.Subscribe<MatchEndedEvent>(_ => _matchEnded = true));
@@ -67,11 +68,14 @@ namespace Futboloid.Gameplay.Match
             _decayCts?.Dispose();
         }
 
+        private void OnRunStarted(TournamentRunStartedEvent _)
+        {
+            TotalScore = 0;
+            PublishChanged(0, Multiplier);
+        }
+
         private void OnPitchReset(PitchResetRequestedEvent _)
         {
-            if (_tournament.CurrentMatchNumber == 1)
-                TotalScore = 0;
-
             _matchEnded = false;
             var previous = Multiplier;
             Multiplier = ResolveMinMultiplier();
@@ -101,11 +105,12 @@ namespace Futboloid.Gameplay.Match
                 return;
 
             var bonus = _settings.GoalBonusPoints;
-            if (bonus > 0)
-            {
-                var comboGainMul = _statusEffects?.GetMultiplier(StatId.ComboGain) ?? 1f;
-                AddPoints(Mathf.RoundToInt(bonus * Multiplier * comboGainMul));
-            }
+            if (bonus <= 0)
+                return;
+
+            var matchNumber = Mathf.Max(1, _tournament.CurrentMatchNumber);
+            var comboGainMul = _statusEffects?.GetMultiplier(StatId.ComboGain) ?? 1f;
+            AddPoints(Mathf.RoundToInt(bonus * Multiplier * matchNumber * comboGainMul));
         }
 
         private void OnBallReturnedToKeeper(BallReturnedToKeeperEvent _) =>

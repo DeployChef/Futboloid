@@ -433,7 +433,7 @@ namespace Futboloid.Gameplay.Defenders
             {
                 Id = "Sniper",
                 MinTier = 1,
-                Weight = 2f,
+                Weight = 1f,
                 Hp = 2,
                 PointValue = 15,
                 HitType = DefenderHitType.ToPlayerGoal,
@@ -441,7 +441,7 @@ namespace Futboloid.Gameplay.Defenders
                 WanderRadius = 2.5f,
                 FieldMoveSpeed = 1.3f,
                 LaunchSpeed = 13f,
-                OpenGoalChancePercent = 85
+                OpenGoalChancePercent = 45
             },
             new DefenderArchetypeDefinition
             {
@@ -461,7 +461,7 @@ namespace Futboloid.Gameplay.Defenders
             {
                 Id = "Striker",
                 MinTier = 2,
-                Weight = 2f,
+                Weight = 1f,
                 Hp = 3,
                 PointValue = 14,
                 HitType = DefenderHitType.ToPlayerGoal,
@@ -469,13 +469,13 @@ namespace Futboloid.Gameplay.Defenders
                 WanderRadius = 3f,
                 FieldMoveSpeed = 1.65f,
                 LaunchSpeed = 12.5f,
-                OpenGoalChancePercent = 72
+                OpenGoalChancePercent = 40
             },
             new DefenderArchetypeDefinition
             {
                 Id = "Presser",
                 MinTier = 3,
-                Weight = 1.5f,
+                Weight = 0.8f,
                 Hp = 3,
                 PointValue = 18,
                 HitType = DefenderHitType.ToPlayerGoal,
@@ -483,7 +483,7 @@ namespace Futboloid.Gameplay.Defenders
                 WanderRadius = 3f,
                 FieldMoveSpeed = 1.8f,
                 LaunchSpeed = 13f,
-                OpenGoalChancePercent = 75
+                OpenGoalChancePercent = 45
             }
         };
     }
