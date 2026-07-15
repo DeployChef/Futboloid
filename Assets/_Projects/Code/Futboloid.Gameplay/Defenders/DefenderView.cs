@@ -426,6 +426,27 @@ namespace Futboloid.Gameplay.Defenders
 
             _lastInteractionTime = Time.time;
             _logic.ResolveBallHit(motion, hit, this);
+            ApplyHitDamage();
+        }
+
+        /// <summary>
+        /// Призрачный проход: урон без рикошета. GK не принимает.
+        /// </summary>
+        public bool TryApplyGhostPassHit()
+        {
+            if (role == DefenderRole.Goalkeeper)
+                return false;
+
+            if (Time.time - _lastInteractionTime < interactionCooldown)
+                return false;
+
+            _lastInteractionTime = Time.time;
+            ApplyHitDamage();
+            return true;
+        }
+
+        private void ApplyHitDamage()
+        {
             var damage = _ball != null ? _ball.HitDamage : 1;
             health.ApplyDamage(damage, slotId, transform.position);
             _bus?.Publish(new DefenderHitEvent(slotId, pointValue));

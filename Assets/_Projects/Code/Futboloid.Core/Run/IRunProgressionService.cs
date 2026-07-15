@@ -17,6 +17,8 @@ namespace Futboloid.Core.Run
 
         int GetBallDamageBonus();
 
+        int GetGhostBallCharges();
+
         float GetEnemyHpMultiplier();
 
         int GetComboMinMultiplier();

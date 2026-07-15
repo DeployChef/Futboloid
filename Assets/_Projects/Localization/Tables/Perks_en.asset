@@ -74,6 +74,14 @@ MonoBehaviour:
     m_Localized: +25% kick power per level
     m_Metadata:
       m_Items: []
+  - m_Id: 30300000015
+    m_Localized: Ghost Ball
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30300000016
+    m_Localized: Pass through +1 field defender per level (damage kept)
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

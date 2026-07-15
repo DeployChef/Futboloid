@@ -30,6 +30,7 @@ namespace Futboloid.Gameplay.Ball
         public bool IsHeld => _holdAnchor != null;
 
         private IBallAnchor _holdAnchor;
+        private int _ghostChargesRemaining;
 
         public BallMotion(
             BallSettings settings,
@@ -54,6 +55,7 @@ namespace Futboloid.Gameplay.Ball
             Position = position;
             Direction = Vector2.zero;
             Speed = 0f;
+            _ghostChargesRemaining = 0;
         }
 
         public void AttachToAnchor(IBallAnchor anchor)
@@ -77,6 +79,7 @@ namespace Futboloid.Gameplay.Ball
             var kickMul = _runProgression?.GetGoalkeeperKickMultiplier() ?? 1f;
             Speed = _settings.ServeSpeed * kickMul;
             Direction = ClampMinAngle(Direction);
+            RefillGhostCharges();
             _bus.Publish(new BallServedEvent());
         }
 
@@ -174,8 +177,6 @@ namespace Futboloid.Gameplay.Ball
 
         private void ResolveHit(RaycastHit2D hit)
         {
-            Position = hit.point + hit.normal * (_settings.Radius + _settings.Skin);
-
             var hitCollider = hit.collider;
             if (hitCollider == null)
                 return;
@@ -183,8 +184,10 @@ namespace Futboloid.Gameplay.Ball
             var layer = hitCollider.gameObject.layer;
             if (layer == PhysicsLayers.KeeperId)
             {
+                Position = hit.point + hit.normal * (_settings.Radius + _settings.Skin);
                 ReflectFromKeeperHit(hit);
                 ApplyKeeperBoost();
+                RefillGhostCharges();
                 _bus.Publish(new BallReturnedToKeeperEvent());
                 _bus.Publish(new BallContactEvent(BallContactKind.PlayerKeeper, hit.point, hit.normal, Speed));
                 return;
@@ -194,16 +197,56 @@ namespace Futboloid.Gameplay.Ball
                 && _defenderRegistry != null
                 && _defenderRegistry.TryGetDefender(hitCollider, out var defender))
             {
+                if (TryGhostPass(defender, hit))
+                    return;
+
+                Position = hit.point + hit.normal * (_settings.Radius + _settings.Skin);
                 defender.HandleBallContact(this, hit);
                 _bus.Publish(new BallContactEvent(
                     BallContactKind.Defender, hit.point, hit.normal, Speed, defender.SlotId));
                 return;
             }
 
+            Position = hit.point + hit.normal * (_settings.Radius + _settings.Skin);
             ReflectFromHit(hit);
             ApplyWallSpeedPenalty();
             _bus.Publish(new BallContactEvent(BallContactKind.Wall, hit.point, hit.normal, Speed));
         }
+
+        private bool TryGhostPass(DefenderView defender, RaycastHit2D hit)
+        {
+            if (defender == null
+                || defender.Role == DefenderRole.Goalkeeper
+                || _ghostChargesRemaining <= 0)
+                return false;
+
+            if (!defender.TryApplyGhostPassHit())
+                return false;
+
+            _ghostChargesRemaining--;
+            PassThroughCollider(hit);
+            _bus.Publish(new BallContactEvent(
+                BallContactKind.Defender, hit.point, hit.normal, Speed, defender.SlotId));
+            return true;
+        }
+
+        private void PassThroughCollider(RaycastHit2D hit)
+        {
+            if (hit.collider == null || Direction.sqrMagnitude < 0.0001f)
+            {
+                Position = hit.point + hit.normal * (_settings.Radius + _settings.Skin);
+                return;
+            }
+
+            var bounds = hit.collider.bounds;
+            var dir = Direction.normalized;
+            var halfAlong = Mathf.Abs(bounds.extents.x * dir.x) + Mathf.Abs(bounds.extents.y * dir.y);
+            Position = (Vector2)bounds.center
+                + dir * (halfAlong + _settings.Radius + _settings.Skin + 0.05f);
+        }
+
+        private void RefillGhostCharges() =>
+            _ghostChargesRemaining = _runProgression?.GetGhostBallCharges() ?? 0;
 
         private bool TryScoreGoal()
         {

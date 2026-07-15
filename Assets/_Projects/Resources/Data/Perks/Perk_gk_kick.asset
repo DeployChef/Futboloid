@@ -17,3 +17,4 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: cb2302dd46a6ff64da075e3917359fa0, type: 3}
   maxLevel: 5
   valuePerLevel: 0.25
+  offerWeight: 6
