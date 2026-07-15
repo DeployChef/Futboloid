@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+
 namespace Futboloid.Core
 {
     public interface IGameDirector
@@ -6,7 +8,7 @@ namespace Futboloid.Core
         bool IsMatchPausedInMenu { get; }
         ITournamentBracketReadModel TournamentBracket { get; }
 
-        void InitializeGame();
+        UniTask InitializeGameAsync();
         void GoOnField();
         void ReturnToPause();
         void RestartTournament();

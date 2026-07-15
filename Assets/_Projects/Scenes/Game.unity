@@ -722,6 +722,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Input.GameplayInputHost
   inputActions: {fileID: -944628639613478452, guid: c978e8b3363f7f24b857c6021694129a, type: 3}
+  mobileControls: {fileID: 0}
 --- !u!4 &391308740
 Transform:
   m_ObjectHideFlags: 0
