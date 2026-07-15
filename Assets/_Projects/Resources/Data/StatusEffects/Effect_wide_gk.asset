@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Effect_wide_gk
   m_EditorClassIdentifier: Futboloid.Core::Futboloid.Core.StatusEffects.StatusEffectDefinition
   id: wide_gk
-  icon: {fileID: 21300000, guid: 4c6e01ea7a9e22f4c800e15db1294161, type: 3}
+  icon: {fileID: 21300000, guid: cf36bfc4f22bd1045a1f85913c9ad93c, type: 3}
   isDebuff: 0
   durationSeconds: 8
   affectedStat: 6
   multiplier: 1.4
+  additiveValue: 0

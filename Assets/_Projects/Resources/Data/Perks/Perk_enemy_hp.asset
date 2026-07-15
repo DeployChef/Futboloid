@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Futboloid.Core::Futboloid.Core.Run.PerkDefinition
   id: enemy_hp
   cardFrame: {fileID: 2644187960349470963, guid: c513bae76822c574a9bf1f29ee13c164, type: 3}
-  icon: {fileID: 21300000, guid: 85d0b3e45a9e10a46a80182d58a9317a, type: 3}
+  icon: {fileID: 21300000, guid: 12d0e09f438d6ac43b9e94719d1fe691, type: 3}
   maxLevel: 5
   valuePerLevel: 0.1
   offerWeight: 10

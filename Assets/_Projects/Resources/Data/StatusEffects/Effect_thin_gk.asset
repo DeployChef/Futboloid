@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Effect_thin_gk
   m_EditorClassIdentifier: Futboloid.Core::Futboloid.Core.StatusEffects.StatusEffectDefinition
   id: thin_gk
-  icon: {fileID: 21300000, guid: 290ddc1e481e29447bb8593d67519982, type: 3}
+  icon: {fileID: 21300000, guid: dbbe59ef9c8434244bafa8a8412526d3, type: 3}
   isDebuff: 1
   durationSeconds: 8
   affectedStat: 6
   multiplier: 0.65
+  additiveValue: 0

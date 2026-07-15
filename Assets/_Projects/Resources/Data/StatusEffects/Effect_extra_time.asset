@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Effect_extra_time
   m_EditorClassIdentifier: Futboloid.Core::Futboloid.Core.StatusEffects.StatusEffectDefinition
   id: extra_time
-  icon: {fileID: 1528225844555991761, guid: e2794a4fbad63b74a9c06be20de35198, type: 3}
+  icon: {fileID: 21300000, guid: 8548989fec55abf418b6cca5909772a5, type: 3}
   isDebuff: 0
   durationSeconds: 2
   affectedStat: 8

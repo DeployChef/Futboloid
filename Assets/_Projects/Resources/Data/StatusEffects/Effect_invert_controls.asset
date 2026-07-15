@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Effect_invert_controls
   m_EditorClassIdentifier: Futboloid.Core::Futboloid.Core.StatusEffects.StatusEffectDefinition
   id: invert_controls
-  icon: {fileID: 21300000, guid: 290ddc1e481e29447bb8593d67519982, type: 3}
+  icon: {fileID: 21300000, guid: aa2ec2d61e0ad704dad87818a089c60d, type: 3}
   isDebuff: 1
   durationSeconds: 8
   affectedStat: 7
   multiplier: -1
+  additiveValue: 0

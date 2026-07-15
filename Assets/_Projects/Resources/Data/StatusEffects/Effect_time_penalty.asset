@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Effect_time_penalty
   m_EditorClassIdentifier: Futboloid.Core::Futboloid.Core.StatusEffects.StatusEffectDefinition
   id: time_penalty
-  icon: {fileID: 21300000, guid: 290ddc1e481e29447bb8593d67519982, type: 3}
+  icon: {fileID: 21300000, guid: 514d5fa0f9e652448aad48d8e6c75ce3, type: 3}
   isDebuff: 1
   durationSeconds: 2
   affectedStat: 8
