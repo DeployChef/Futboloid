@@ -119,7 +119,7 @@ ScriptableObject: **Assets → Create → Futboloid → Gameplay Settings**.
 | Поле | По умолчанию | Кто читает |
 |------|--------------|------------|
 | `matchDurationSeconds` | 90 | `MatchFlow` |
-| `matchesToWin` | 3 | `TournamentRunService` |
+| `matchesToWin` | 9 | `TournamentRunService` |
 
 Регистрация в **App scope**; Game scope наследует через VContainer.
 
@@ -145,7 +145,8 @@ public readonly struct MatchEndedEvent
     public int PlayerScore { get; }
     public int OpponentScore { get; }
     public bool PlayerWon { get; }  // вайп → true; по таймеру → PlayerScore > OpponentScore
-    // public int WipeBonusPoints { get; }  // TBD при ComboScoreService
+    public MatchEndReason Reason { get; }  // Timer | Wipe
+    public float DurationSeconds { get; }
 }
 
 /// <summary>+N доп. время, −N штраф. Публикует любой геймплейный код.</summary>
