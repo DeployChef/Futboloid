@@ -13,7 +13,7 @@ namespace Futboloid.UI.Views.Leaderboards
         [SerializeField] private PlayerLeaderboardSummaryView summaryView;
         [SerializeField] private LeaderboardTopTenView topTenView;
         [SerializeField] private PlayerNicknameControl nicknameControl;
-        [SerializeField] private int topCount = 10;
+        [SerializeField] private int topCount = 5;
 
         private readonly List<ILeaderboardSnapshotView> _views = new();
         private ILeaderboardService _leaderboard;
