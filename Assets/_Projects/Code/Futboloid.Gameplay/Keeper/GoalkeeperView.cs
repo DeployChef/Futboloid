@@ -138,7 +138,8 @@ namespace Futboloid.Gameplay.Keeper
 
         private void TickMovement(float minX, float maxX)
         {
-            var moveInput = _input?.MoveX ?? 0f;
+            var moveInput = (_input?.MoveX ?? 0f)
+                * (_statusEffects?.GetMultiplier(StatId.GoalkeeperMoveInput) ?? 1f);
             var speedMultiplier =
                 (_runProgression?.GetGoalkeeperMoveSpeedMultiplier() ?? 1f)
                 * (_statusEffects?.GetMultiplier(StatId.GoalkeeperMoveSpeed) ?? 1f);

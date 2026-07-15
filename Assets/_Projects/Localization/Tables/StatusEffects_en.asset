@@ -58,6 +58,30 @@ MonoBehaviour:
     m_Localized: -35% keeper width for 8s
     m_Metadata:
       m_Items: []
+  - m_Id: 30400000011
+    m_Localized: Dizzy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30400000012
+    m_Localized: Controls inverted for 8s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30400000013
+    m_Localized: Extra Time
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30400000014
+    m_Localized: +10 seconds on the clock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30400000015
+    m_Localized: Time Drain
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30400000016
+    m_Localized: -8 seconds on the clock
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
