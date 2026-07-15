@@ -42,6 +42,22 @@ MonoBehaviour:
     m_Localized: +points from hits for 10s
     m_Metadata:
       m_Items: []
+  - m_Id: 30400000007
+    m_Localized: Stretch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30400000008
+    m_Localized: +40% keeper width for 8s
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30400000009
+    m_Localized: Shrink
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30400000010
+    m_Localized: -35% keeper width for 8s
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

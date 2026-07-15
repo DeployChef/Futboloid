@@ -72,6 +72,10 @@ namespace Futboloid.Gameplay.Keeper
             _subscriptions.Add(bus.Subscribe<PerkPickedEvent>(_ => ApplyWidthScale()));
             _subscriptions.Add(bus.Subscribe<RunProgressionUpdatedEvent>(_ => ApplyWidthScale()));
             _subscriptions.Add(bus.Subscribe<TournamentRunStartedEvent>(_ => ApplyWidthScale()));
+            _subscriptions.Add(bus.Subscribe<PitchResetRequestedEvent>(_ => ApplyWidthScale()));
+            _subscriptions.Add(bus.Subscribe<StatusEffectAppliedEvent>(_ => ApplyWidthScale()));
+            _subscriptions.Add(bus.Subscribe<StatusEffectRemovedEvent>(_ => ApplyWidthScale()));
+            _subscriptions.Add(bus.Subscribe<StatusEffectRefreshedEvent>(_ => ApplyWidthScale()));
 
             _phase = pitch.Current;
             _onField = matchFlow.IsOnField;
@@ -156,9 +160,10 @@ namespace Futboloid.Gameplay.Keeper
 
         private void ApplyWidthScale()
         {
-            var widthMul = _runProgression?.GetGoalkeeperWidthMultiplier() ?? 1f;
+            var perkMul = _runProgression?.GetGoalkeeperWidthMultiplier() ?? 1f;
+            var statusMul = _statusEffects?.GetMultiplier(StatId.GoalkeeperWidth) ?? 1f;
             var scale = _baseLocalScale;
-            scale.x = _baseLocalScale.x * widthMul;
+            scale.x = _baseLocalScale.x * perkMul * statusMul;
             transform.localScale = scale;
         }
 

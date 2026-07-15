@@ -39,6 +39,22 @@ MonoBehaviour:
     m_Key: effect.combo_boost.description
     m_Metadata:
       m_Items: []
+  - m_Id: 30400000007
+    m_Key: effect.wide_gk.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30400000008
+    m_Key: effect.wide_gk.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30400000009
+    m_Key: effect.thin_gk.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30400000010
+    m_Key: effect.thin_gk.description
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
