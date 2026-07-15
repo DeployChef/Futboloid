@@ -38,6 +38,8 @@ namespace Futboloid.Gameplay.Keeper
         private PitchBounds _pitchBounds;
         private IRunProgressionService _runProgression;
         private IStatusEffectService _statusEffects;
+        private Vector3 _baseLocalScale = Vector3.one;
+        private bool _baseScaleCaptured;
 
         [Inject]
         public void Construct(
@@ -56,14 +58,24 @@ namespace Futboloid.Gameplay.Keeper
             _runProgression = runProgression;
             _statusEffects = statusEffects;
 
+            if (!_baseScaleCaptured)
+            {
+                _baseLocalScale = transform.localScale;
+                _baseScaleCaptured = true;
+            }
+
             if (kickoffAnchor == null)
                 Debug.LogWarning("[GoalkeeperView] BallKickoffAnchor is not assigned.", this);
 
             _subscriptions.Add(bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged));
             _subscriptions.Add(bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged));
+            _subscriptions.Add(bus.Subscribe<PerkPickedEvent>(_ => ApplyWidthScale()));
+            _subscriptions.Add(bus.Subscribe<RunProgressionUpdatedEvent>(_ => ApplyWidthScale()));
+            _subscriptions.Add(bus.Subscribe<TournamentRunStartedEvent>(_ => ApplyWidthScale()));
 
             _phase = pitch.Current;
             _onField = matchFlow.IsOnField;
+            ApplyWidthScale();
         }
 
         public UniTask PlayReshuffleToCenterAsync(float moveDuration, CancellationToken ct)
@@ -140,6 +152,14 @@ namespace Futboloid.Gameplay.Keeper
 
             transform.position = result.Position;
             animationPresenter?.SetLocomotion(result.IsMoving, result.VelocityX);
+        }
+
+        private void ApplyWidthScale()
+        {
+            var widthMul = _runProgression?.GetGoalkeeperWidthMultiplier() ?? 1f;
+            var scale = _baseLocalScale;
+            scale.x = _baseLocalScale.x * widthMul;
+            transform.localScale = scale;
         }
 
         private void UpdateKickoffAim()

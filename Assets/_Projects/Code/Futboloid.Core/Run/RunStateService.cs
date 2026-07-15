@@ -69,6 +69,28 @@ namespace Futboloid.Core.Run
             return 1f + perLevel * level;
         }
 
+        public float GetGoalkeeperWidthMultiplier()
+        {
+            var level = GetPerkLevel(PerkIds.GoalkeeperWidth);
+            if (level <= 0)
+                return 1f;
+
+            var def = FindPerk(PerkIds.GoalkeeperWidth);
+            var perLevel = def != null ? def.ValuePerLevel : 0.25f;
+            return 1f + perLevel * level;
+        }
+
+        public float GetGoalkeeperKickMultiplier()
+        {
+            var level = GetPerkLevel(PerkIds.GoalkeeperKick);
+            if (level <= 0)
+                return 1f;
+
+            var def = FindPerk(PerkIds.GoalkeeperKick);
+            var perLevel = def != null ? def.ValuePerLevel : 0.25f;
+            return 1f + perLevel * level;
+        }
+
         public int GetBallDamageBonus()
         {
             var level = GetPerkLevel(PerkIds.BallDamage);

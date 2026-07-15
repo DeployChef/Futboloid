@@ -1,6 +1,7 @@
 using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
+using Futboloid.Core.Run;
 using Futboloid.Gameplay.Defenders;
 using Futboloid.Gameplay.Match;
 using Futboloid.Gameplay.Physics;
@@ -14,6 +15,7 @@ namespace Futboloid.Gameplay.Ball
         private readonly IGameEventBus _bus;
         private readonly DefenderGridRegistry _defenderRegistry;
         private readonly PitchBounds _pitchBounds;
+        private readonly IRunProgressionService _runProgression;
         private readonly ContactFilter2D _ballContactFilter;
         private readonly RaycastHit2D[] _castHits = new RaycastHit2D[1];
 
@@ -33,12 +35,14 @@ namespace Futboloid.Gameplay.Ball
             BallSettings settings,
             IGameEventBus bus,
             DefenderGridRegistry defenderRegistry,
-            PitchBounds pitchBounds)
+            PitchBounds pitchBounds,
+            IRunProgressionService runProgression = null)
         {
             _settings = settings;
             _bus = bus;
             _defenderRegistry = defenderRegistry;
             _pitchBounds = pitchBounds;
+            _runProgression = runProgression;
 
             _ballContactFilter = ContactFilter2D.noFilter;
             _ballContactFilter.SetLayerMask(PhysicsLayers.BallContactMask);
@@ -70,7 +74,8 @@ namespace Futboloid.Gameplay.Ball
             _holdAnchor = null;
             Position = position;
             Direction = direction.sqrMagnitude > 0.0001f ? direction.normalized : Vector2.up;
-            Speed = _settings.ServeSpeed;
+            var kickMul = _runProgression?.GetGoalkeeperKickMultiplier() ?? 1f;
+            Speed = _settings.ServeSpeed * kickMul;
             Direction = ClampMinAngle(Direction);
             _bus.Publish(new BallServedEvent());
         }
@@ -144,7 +149,8 @@ namespace Futboloid.Gameplay.Ball
 
         public void ApplyKeeperBoost()
         {
-            Speed = Mathf.Min(Speed + _settings.KeeperBoost, _settings.MaxSpeed);
+            var kickMul = _runProgression?.GetGoalkeeperKickMultiplier() ?? 1f;
+            Speed = Mathf.Min(Speed + _settings.KeeperBoost * kickMul, _settings.MaxSpeed);
         }
 
         public void ApplyDefenderHitBoost()

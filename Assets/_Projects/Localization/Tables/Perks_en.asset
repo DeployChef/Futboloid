@@ -58,6 +58,22 @@ MonoBehaviour:
     m_Localized: -10% enemy HP per level
     m_Metadata:
       m_Items: []
+  - m_Id: 30300000011
+    m_Localized: Big Reach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30300000012
+    m_Localized: +25% keeper width per level
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30300000013
+    m_Localized: Power Kick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30300000014
+    m_Localized: +25% kick power per level
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

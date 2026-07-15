@@ -50,11 +50,11 @@ namespace Futboloid.Main
 
             var container = _appGameState.LifetimeScope.Container;
             
-            // Сбрасываем прогресс забега
+            // Сначала перки/XP, потом забег — чтобы TournamentRunStarted уже видел сброс.
             var run = container.Resolve<ITournamentRunService>();
             var progression = container.Resolve<IRunProgressionService>();
-            run.ResetRun();
             progression.Reset();
+            run.ResetRun();
 
             // Явно сбрасываем поле и таймер
             var bus = container.Resolve<IGameEventBus>();

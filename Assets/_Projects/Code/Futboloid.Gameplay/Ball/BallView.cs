@@ -64,7 +64,7 @@ namespace Futboloid.Gameplay.Ball
         {
             _bus = bus;
             _runProgression = runProgression;
-            _motion = new BallMotion(settings, bus, defenderRegistry, pitchBounds);
+            _motion = new BallMotion(settings, bus, defenderRegistry, pitchBounds, runProgression);
 
             if (kickoffAnchor == null)
                 Debug.LogWarning("[BallView] BallKickoffAnchor is not assigned.", this);

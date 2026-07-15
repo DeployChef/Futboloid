@@ -55,6 +55,22 @@ MonoBehaviour:
     m_Key: perk.enemy_hp.description
     m_Metadata:
       m_Items: []
+  - m_Id: 30300000011
+    m_Key: perk.gk_width.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30300000012
+    m_Key: perk.gk_width.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30300000013
+    m_Key: perk.gk_kick.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30300000014
+    m_Key: perk.gk_kick.description
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
