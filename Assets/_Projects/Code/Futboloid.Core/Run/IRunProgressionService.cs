@@ -11,6 +11,16 @@ namespace Futboloid.Core.Run
 
         float GetGoalkeeperMoveSpeedMultiplier();
 
+        float GetGoalkeeperWidthMultiplier();
+
+        float GetGoalkeeperKickMultiplier();
+
+        int GetBallDamageBonus();
+
+        int GetGhostBallCharges();
+
+        float GetEnemyHpMultiplier();
+
         int GetComboMinMultiplier();
 
         float GetComboDecayIntervalMultiplier();

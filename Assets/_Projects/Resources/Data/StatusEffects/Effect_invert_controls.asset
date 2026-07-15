@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 391651829db2c7a419e7ad5078a3ad5c, type: 3}
+  m_Name: Effect_invert_controls
+  m_EditorClassIdentifier: Futboloid.Core::Futboloid.Core.StatusEffects.StatusEffectDefinition
+  id: invert_controls
+  icon: {fileID: 21300000, guid: 290ddc1e481e29447bb8593d67519982, type: 3}
+  isDebuff: 1
+  durationSeconds: 8
+  affectedStat: 7
+  multiplier: -1

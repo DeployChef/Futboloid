@@ -5,5 +5,10 @@ namespace Futboloid.Core.StatusEffects
         public const string SlowGoalkeeper = "slow_gk";
         public const string FastGoalkeeper = "fast_gk";
         public const string ComboBoost = "combo_boost";
+        public const string WideGoalkeeper = "wide_gk";
+        public const string ThinGoalkeeper = "thin_gk";
+        public const string InvertControls = "invert_controls";
+        public const string ExtraTime = "extra_time";
+        public const string TimePenalty = "time_penalty";
     }
 }

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Futboloid.Core.StatusEffects;
 using Futboloid.Gameplay.Match;
 using UnityEngine;
@@ -8,7 +7,7 @@ namespace Futboloid.Gameplay.Tribune
 {
     /// <summary>
     /// Спавнит предметы с вертикальных линий по бокам поля по дуге во время Simulating.
-    /// Настройки и gizmo — на этом компоненте. На том же объекте тикает <see cref="IStatusEffectService"/>.
+    /// Пул эффектов — из <see cref="StatusEffectCatalog"/>. На том же объекте тикает <see cref="IStatusEffectService"/>.
     /// </summary>
     public class TribuneSpawner : MonoBehaviour
     {
@@ -16,7 +15,6 @@ namespace Futboloid.Gameplay.Tribune
         [SerializeField] private TribuneItemView itemPrefab;
         [SerializeField] private Transform itemRoot;
         [SerializeField] private PitchBounds pitchBounds;
-        [SerializeField] private List<StatusEffectDefinition> spawnPool = new();
 
         [Header("Spawn lines")]
         [Tooltip("Расстояние от центра поля до вертикальной линии спавна (симметрично L/R).")]
@@ -52,6 +50,7 @@ namespace Futboloid.Gameplay.Tribune
         private PitchStateMachine _pitch;
         private PitchBounds _bounds;
         private IStatusEffectService _statusEffects;
+        private StatusEffectCatalog _catalog;
         private float _spawnTimer;
 
         [Inject]
@@ -63,6 +62,7 @@ namespace Futboloid.Gameplay.Tribune
             _pitch = pitch;
             _bounds = pitchBounds != null ? pitchBounds : bounds;
             _statusEffects = statusEffects;
+            _catalog = StatusEffectCatalog.Load();
             ResetSpawnTimer();
         }
 
@@ -80,7 +80,7 @@ namespace Futboloid.Gameplay.Tribune
 
         private void TickSpawn(float deltaTime)
         {
-            if (itemPrefab == null || spawnPool.Count == 0)
+            if (itemPrefab == null || !HasSpawnableEffects())
                 return;
 
             _spawnTimer -= deltaTime;
@@ -93,7 +93,7 @@ namespace Futboloid.Gameplay.Tribune
 
         private void SpawnRandomItem()
         {
-            var definition = spawnPool[Random.Range(0, spawnPool.Count)];
+            var definition = PickRandomEffect();
             if (definition == null)
                 return;
 
@@ -135,6 +135,52 @@ namespace Futboloid.Gameplay.Tribune
                 end,
                 arcHeight,
                 duration);
+        }
+
+        private bool HasSpawnableEffects()
+        {
+            var effects = _catalog?.Effects;
+            if (effects == null || effects.Count == 0)
+                return false;
+
+            for (var i = 0; i < effects.Count; i++)
+            {
+                if (effects[i] != null)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private StatusEffectDefinition PickRandomEffect()
+        {
+            var effects = _catalog?.Effects;
+            if (effects == null || effects.Count == 0)
+                return null;
+
+            var validCount = 0;
+            for (var i = 0; i < effects.Count; i++)
+            {
+                if (effects[i] != null)
+                    validCount++;
+            }
+
+            if (validCount == 0)
+                return null;
+
+            var pick = Random.Range(0, validCount);
+            for (var i = 0; i < effects.Count; i++)
+            {
+                if (effects[i] == null)
+                    continue;
+
+                if (pick == 0)
+                    return effects[i];
+
+                pick--;
+            }
+
+            return null;
         }
 
         private void ResetSpawnTimer()

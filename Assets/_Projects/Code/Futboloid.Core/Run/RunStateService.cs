@@ -69,6 +69,61 @@ namespace Futboloid.Core.Run
             return 1f + perLevel * level;
         }
 
+        public float GetGoalkeeperWidthMultiplier()
+        {
+            var level = GetPerkLevel(PerkIds.GoalkeeperWidth);
+            if (level <= 0)
+                return 1f;
+
+            var def = FindPerk(PerkIds.GoalkeeperWidth);
+            var perLevel = def != null ? def.ValuePerLevel : 0.25f;
+            return 1f + perLevel * level;
+        }
+
+        public float GetGoalkeeperKickMultiplier()
+        {
+            var level = GetPerkLevel(PerkIds.GoalkeeperKick);
+            if (level <= 0)
+                return 1f;
+
+            var def = FindPerk(PerkIds.GoalkeeperKick);
+            var perLevel = def != null ? def.ValuePerLevel : 0.25f;
+            return 1f + perLevel * level;
+        }
+
+        public int GetBallDamageBonus()
+        {
+            var level = GetPerkLevel(PerkIds.BallDamage);
+            if (level <= 0)
+                return 0;
+
+            var def = FindPerk(PerkIds.BallDamage);
+            var perLevel = def != null ? def.ValuePerLevel : 1f;
+            return Mathf.Max(0, Mathf.RoundToInt(perLevel * level));
+        }
+
+        public int GetGhostBallCharges()
+        {
+            var level = GetPerkLevel(PerkIds.GhostBall);
+            if (level <= 0)
+                return 0;
+
+            var def = FindPerk(PerkIds.GhostBall);
+            var perLevel = def != null ? def.ValuePerLevel : 1f;
+            return Mathf.Max(0, Mathf.RoundToInt(perLevel * level));
+        }
+
+        public float GetEnemyHpMultiplier()
+        {
+            var level = GetPerkLevel(PerkIds.EnemyHp);
+            if (level <= 0)
+                return 1f;
+
+            var def = FindPerk(PerkIds.EnemyHp);
+            var perLevel = def != null ? def.ValuePerLevel : 0.1f;
+            return Mathf.Max(0.1f, 1f - perLevel * level);
+        }
+
         public int GetComboMinMultiplier()
         {
             var level = GetPerkLevel(PerkIds.ComboFloor);
@@ -210,28 +265,60 @@ namespace Futboloid.Core.Run
                 if (GetPerkLevel(perk.Id) >= perk.MaxLevel)
                     continue;
 
+                if (perk.OfferWeight <= 0f)
+                    continue;
+
                 _rollBuffer.Add(perk);
             }
 
             if (_rollBuffer.Count == 0)
                 return false;
 
-            Shuffle(_rollBuffer);
-
             var count = Mathf.Min(_settings.OfferCount, _rollBuffer.Count);
-            if (count > 0) offer0 = _rollBuffer[0];
-            if (count > 1) offer1 = _rollBuffer[1];
-            if (count > 2) offer2 = _rollBuffer[2];
+            if (count > 0) offer0 = TakeWeighted(_rollBuffer);
+            if (count > 1) offer1 = TakeWeighted(_rollBuffer);
+            if (count > 2) offer2 = TakeWeighted(_rollBuffer);
             return offer0 != null;
         }
 
-        private void Shuffle<T>(IList<T> list)
+        private PerkDefinition TakeWeighted(List<PerkDefinition> pool)
         {
-            for (var i = list.Count - 1; i > 0; i--)
+            if (pool.Count == 0)
+                return null;
+
+            if (pool.Count == 1)
             {
-                var j = _random.Next(i + 1);
-                (list[i], list[j]) = (list[j], list[i]);
+                var only = pool[0];
+                pool.Clear();
+                return only;
             }
+
+            var totalWeight = 0f;
+            for (var i = 0; i < pool.Count; i++)
+                totalWeight += pool[i].OfferWeight;
+
+            if (totalWeight <= 0f)
+            {
+                var fallback = pool[pool.Count - 1];
+                pool.RemoveAt(pool.Count - 1);
+                return fallback;
+            }
+
+            var roll = (float)_random.NextDouble() * totalWeight;
+            for (var i = 0; i < pool.Count; i++)
+            {
+                roll -= pool[i].OfferWeight;
+                if (roll > 0f)
+                    continue;
+
+                var picked = pool[i];
+                pool.RemoveAt(i);
+                return picked;
+            }
+
+            var last = pool[pool.Count - 1];
+            pool.RemoveAt(pool.Count - 1);
+            return last;
         }
 
         private bool IsOffered(string perkId)

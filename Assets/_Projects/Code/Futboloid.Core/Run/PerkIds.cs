@@ -3,6 +3,9 @@ namespace Futboloid.Core.Run
     public static class PerkIds
     {
         public const string GoalkeeperSpeed = "gk_speed";
+        public const string GoalkeeperWidth = "gk_width";
+        public const string GoalkeeperKick = "gk_kick";
+        public const string GhostBall = "ghost_ball";
         public const string BallDamage = "ball_damage";
         public const string EnemyHp = "enemy_hp";
         public const string ComboFloor = "combo_floor";

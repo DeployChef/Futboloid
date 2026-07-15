@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
+using Futboloid.Core.Run;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -20,6 +21,7 @@ namespace Futboloid.Gameplay.Defenders
         private IObjectResolver _resolver;
         private GoalAnchor _goalAnchor;
         private ITournamentBracketReadModel _tournament;
+        private IRunProgressionService _runProgression;
         private DefenderGenerationSettings _generationSettings;
         private readonly List<DefenderView> _spawned = new();
         private readonly List<IDisposable> _subscriptions = new();
@@ -29,12 +31,14 @@ namespace Futboloid.Gameplay.Defenders
             IGameEventBus bus,
             IObjectResolver resolver,
             ITournamentBracketReadModel tournament,
+            IRunProgressionService runProgression,
             DefenderGenerationSettings generationSettings,
             GoalAnchor goalAnchor)
         {
             _resolver = resolver;
             _goalAnchor = goalAnchor;
             _tournament = tournament;
+            _runProgression = runProgression;
             _generationSettings = generationSettingsOverride != null
                 ? generationSettingsOverride
                 : generationSettings;
@@ -66,7 +70,12 @@ namespace Futboloid.Gameplay.Defenders
             var matchNumber = _tournament?.CurrentMatchNumber ?? 1;
             var totalMatches = _tournament?.MatchesToWin ?? 9;
             var runSeed = _tournament?.RunSeed ?? 0;
-            var context = new DefenderGenerationContext(matchNumber, totalMatches, runSeed: runSeed);
+            var enemyHpMul = _runProgression?.GetEnemyHpMultiplier() ?? 1f;
+            var context = new DefenderGenerationContext(
+                matchNumber,
+                totalMatches,
+                enemyHpMultiplier: enemyHpMul,
+                runSeed: runSeed);
             var generation = DefenderMatchGenerator.Generate(_generationSettings, context);
 
             SpawnGoalkeeper(generation.Goalkeeper);

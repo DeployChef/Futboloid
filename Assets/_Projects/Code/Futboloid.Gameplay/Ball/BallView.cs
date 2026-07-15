@@ -6,6 +6,7 @@ using DG.Tweening;
 using Futboloid.Core;
 using Futboloid.Core.Bus;
 using Futboloid.Core.Bus.Events;
+using Futboloid.Core.Run;
 using Futboloid.Gameplay.Defenders;
 using Futboloid.Gameplay.Match;
 using UnityEngine;
@@ -27,6 +28,7 @@ namespace Futboloid.Gameplay.Ball
         private readonly List<IDisposable> _subscriptions = new();
 
         private IGameEventBus _bus;
+        private IRunProgressionService _runProgression;
         private BallMotion _motion;
         private PitchPhase _phase = PitchPhase.KickoffWait;
         private bool _onField;
@@ -39,7 +41,15 @@ namespace Futboloid.Gameplay.Ball
         public Vector2 Direction => _motion != null ? _motion.Direction : Vector2.zero;
         public float Speed => _motion != null ? _motion.Speed : 0f;
         public bool IsOnFire => _motion != null && _motion.IsOnFire;
-        public int HitDamage => _motion != null ? _motion.HitDamage : 1;
+        public int HitDamage
+        {
+            get
+            {
+                var baseDamage = _motion != null ? _motion.HitDamage : 1;
+                var bonus = _runProgression?.GetBallDamageBonus() ?? 0;
+                return Mathf.Max(1, baseDamage + bonus);
+            }
+        }
         public bool InPlay => _motion != null && _motion.InPlay;
         public BallSettings Settings => settings;
 
@@ -49,10 +59,12 @@ namespace Futboloid.Gameplay.Ball
             DefenderGridRegistry defenderRegistry,
             PitchStateMachine pitch,
             MatchFlow matchFlow,
-            PitchBounds pitchBounds)
+            PitchBounds pitchBounds,
+            IRunProgressionService runProgression)
         {
             _bus = bus;
-            _motion = new BallMotion(settings, bus, defenderRegistry, pitchBounds);
+            _runProgression = runProgression;
+            _motion = new BallMotion(settings, bus, defenderRegistry, pitchBounds, runProgression);
 
             if (kickoffAnchor == null)
                 Debug.LogWarning("[BallView] BallKickoffAnchor is not assigned.", this);

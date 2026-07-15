@@ -12,6 +12,8 @@ namespace Futboloid.Core.StatusEffects
         [SerializeField] private float durationSeconds = 8f;
         [SerializeField] private StatId affectedStat = StatId.GoalkeeperMoveSpeed;
         [SerializeField] private float multiplier = 1f;
+        [Tooltip("Мгновенный сдвиг (напр. секунды таймера матча).")]
+        [SerializeField] private float additiveValue;
 
         public string Id => id;
         public string NameLocalizationKey => LocalizationKeys.StatusEffectName(id);
@@ -20,6 +22,7 @@ namespace Futboloid.Core.StatusEffects
         public bool IsDebuff => isDebuff;
         public float DurationSeconds => Mathf.Max(0f, durationSeconds);
         public StatId AffectedStat => affectedStat;
-        public float Multiplier => multiplier > 0f ? multiplier : 1f;
+        public float Multiplier => Mathf.Approximately(multiplier, 0f) ? 1f : multiplier;
+        public float AdditiveValue => additiveValue;
     }
 }
