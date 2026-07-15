@@ -31,7 +31,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 30300000004
-    m_Localized: +ball damage (speed)
+    m_Localized: +1 ball damage per level
     m_Metadata:
       m_Items: []
   - m_Id: 30300000005
@@ -51,11 +51,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 30300000009
-    m_Localized: Tough Defense
+    m_Localized: Soft Targets
     m_Metadata:
       m_Items: []
   - m_Id: 30300000010
-    m_Localized: +enemy HP
+    m_Localized: -10% enemy HP per level
     m_Metadata:
       m_Items: []
   references:

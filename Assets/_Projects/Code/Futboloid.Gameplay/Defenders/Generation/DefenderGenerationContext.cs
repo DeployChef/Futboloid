@@ -1,6 +1,6 @@
 namespace Futboloid.Gameplay.Defenders
 {
-    /// <summary>Вход генерации: номер матча, длина забега, сид и модификаторы (перки — позже).</summary>
+    /// <summary>Вход генерации: номер матча, длина забега, сид и модификаторы перков (HP врагов и т.п.).</summary>
     public readonly struct DefenderGenerationContext
     {
         public int MatchNumber { get; }

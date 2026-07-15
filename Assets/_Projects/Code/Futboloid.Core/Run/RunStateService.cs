@@ -69,6 +69,28 @@ namespace Futboloid.Core.Run
             return 1f + perLevel * level;
         }
 
+        public int GetBallDamageBonus()
+        {
+            var level = GetPerkLevel(PerkIds.BallDamage);
+            if (level <= 0)
+                return 0;
+
+            var def = FindPerk(PerkIds.BallDamage);
+            var perLevel = def != null ? def.ValuePerLevel : 1f;
+            return Mathf.Max(0, Mathf.RoundToInt(perLevel * level));
+        }
+
+        public float GetEnemyHpMultiplier()
+        {
+            var level = GetPerkLevel(PerkIds.EnemyHp);
+            if (level <= 0)
+                return 1f;
+
+            var def = FindPerk(PerkIds.EnemyHp);
+            var perLevel = def != null ? def.ValuePerLevel : 0.1f;
+            return Mathf.Max(0.1f, 1f - perLevel * level);
+        }
+
         public int GetComboMinMultiplier()
         {
             var level = GetPerkLevel(PerkIds.ComboFloor);
