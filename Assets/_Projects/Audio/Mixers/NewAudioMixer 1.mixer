@@ -104,6 +104,20 @@ AudioMixerGroupController:
   m_Mute: 0
   m_Solo: 0
   m_BypassEffects: 0
+--- !u!244 &-6253694834633060719
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_EffectID: 2c22b2cf768e9904cb327311bbeb8c57
+  m_EffectName: Attenuation
+  m_MixLevel: 468282d5052222e4c848ecc6baa44c65
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
 --- !u!244 &-6094617746861313453
 AudioMixerEffectController:
   m_ObjectHideFlags: 3
@@ -448,6 +462,7 @@ AudioMixerController:
     - d19a406e38d75a444ab2e40b8d7bc236
     - 67471f507059e8147818c1bd5cf9bcba
     - 13c12061c67f9be4996c029586cb2877
+    - 5817b68a390278648ba0edf45b2de59a
     name: View
   m_CurrentViewIndex: 0
   m_TargetSnapshot: {fileID: 24500006}
@@ -463,6 +478,7 @@ AudioMixerGroupController:
   m_Children:
   - {fileID: 2789013548563269435}
   - {fileID: -6905417062454781257}
+  - {fileID: 1036031897283796597}
   m_Volume: 74292185b4aaefc4f99dd77a3294dfff
   m_Pitch: 38c8a6ef5c5842c42b7b3adcef2c6557
   m_Send: 00000000000000000000000000000000
@@ -511,6 +527,7 @@ AudioMixerSnapshotController:
     a4e721693ab0cd74aa6c8e5c0a89ba06: 10
     32ec58ba39b182f4991542492626988f: 1
     ce1fdbbac5e513c4293ce2f34687d146: 0
+    7e901a0c463d75e44befca8cdf6898a0: -7.8940816
     1fa85b8c892fd2845b26d802d16e6122: -7.7
     8fbc88cc57a24954f93109afe584981d: -80
     fac121dd3c5a54d438373bc486022712: -9.332112
@@ -533,6 +550,25 @@ AudioMixerEffectController:
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
   m_Bypass: 0
+--- !u!243 &1036031897283796597
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: UiGroup
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: 5817b68a390278648ba0edf45b2de59a
+  m_Children: []
+  m_Volume: 7e901a0c463d75e44befca8cdf6898a0
+  m_Pitch: 9c7aa412ca5be48499bd53f589877a0f
+  m_Send: 00000000000000000000000000000000
+  m_Effects:
+  - {fileID: -6253694834633060719}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
 --- !u!243 &1438017212669871657
 AudioMixerGroupController:
   m_ObjectHideFlags: 0
@@ -644,6 +680,7 @@ AudioMixerSnapshotController:
     74292185b4aaefc4f99dd77a3294dfff: 20
     bf486636992d7964298d3b53e21db084: 0.53
     951ebc286132be24789a061ebd63797c: -6.133707
+    7e901a0c463d75e44befca8cdf6898a0: -12.498478
     8fbc88cc57a24954f93109afe584981d: -80
     090bf0ce5a321204490c609b7a713a4f: -10.345207
     d9ac98de5bcdbac46a73aa917d4a8cbf: 0.006

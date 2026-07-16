@@ -5286,7 +5286,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 75}
   m_SizeDelta: {x: 1000, y: 340.8489}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1220793726
@@ -7223,7 +7223,7 @@ MonoBehaviour:
   summaryView: {fileID: 408040463}
   topTenView: {fileID: 1749265914}
   nicknameControl: {fileID: 652491206}
-  topCount: 5
+  topCount: 10
 --- !u!1 &1895521437
 GameObject:
   m_ObjectHideFlags: 0
