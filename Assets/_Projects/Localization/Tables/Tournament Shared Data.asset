@@ -43,6 +43,10 @@ MonoBehaviour:
     m_Key: status_victory
     m_Metadata:
       m_Items: []
+  - m_Id: 30200000008
+    m_Key: status_eliminated_concede
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

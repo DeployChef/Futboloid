@@ -57,6 +57,9 @@ namespace Futboloid.Gameplay.Match
 
         private void OnGoalScored()
         {
+            if (_matchFlow.IsMatchEnded)
+                return;
+
             EnterReshuffle();
         }
 

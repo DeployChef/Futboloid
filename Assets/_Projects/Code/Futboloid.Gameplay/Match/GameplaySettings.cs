@@ -9,9 +9,12 @@ namespace Futboloid.Gameplay.Match
         public const string ResourcePath = "Data/Settings/GameplaySettings";
         public const float DefaultMatchDurationSeconds = 90f;
         public const int DefaultMatchesToWin = 9;
+        public const int DefaultConcedeLimitToLose = 5;
 
         [SerializeField] private float matchDurationSeconds = DefaultMatchDurationSeconds;
         [SerializeField] private int matchesToWin = DefaultMatchesToWin;
+        [Tooltip("Сколько голов противника нужно, чтобы матч сразу закончился поражением.")]
+        [SerializeField] private int concedeLimitToLose = DefaultConcedeLimitToLose;
 
         [Header("Debug")]
         [Tooltip("Старт забега с выбранного матча (для проверки баланса). Только при новом забеге из меню.")]
@@ -24,6 +27,7 @@ namespace Futboloid.Gameplay.Match
 
         public float MatchDurationSeconds => Mathf.Max(1f, matchDurationSeconds);
         public int MatchesToWin => Mathf.Max(1, matchesToWin);
+        public int ConcedeLimitToLose => Mathf.Max(1, concedeLimitToLose);
         public bool DebugStartMatchEnabled => debugStartMatchEnabled;
         public int DebugStartMatch => Mathf.Clamp(debugStartMatch, 1, MatchesToWin);
         public DefenderGenerationSettings DefenderGeneration =>

@@ -20,6 +20,7 @@ namespace Futboloid.Main.Session
         private int _matchesCompleted;
         private int _lastPlayerScore;
         private int _lastOpponentScore;
+        private MatchEndReason _lastEndReason;
         private int _runSeed;
         private bool _hasPlayedBefore;
 
@@ -75,10 +76,11 @@ namespace Futboloid.Main.Session
                 CurrentMatchNumber));
         }
 
-        public void RecordMatchResult(int playerScore, int opponentScore, bool playerWon)
+        public void RecordMatchResult(int playerScore, int opponentScore, bool playerWon, MatchEndReason reason)
         {
             _lastPlayerScore = playerScore;
             _lastOpponentScore = opponentScore;
+            _lastEndReason = reason;
             _matchesCompleted++;
 
             if (!playerWon)
@@ -118,6 +120,16 @@ namespace Futboloid.Main.Session
                         LocalizationTables.Tournament,
                         LocalizationKeys.StatusChampion);
                 case TournamentRunState.Eliminated:
+                    if (_lastEndReason == MatchEndReason.ConcedeLimit)
+                    {
+                        return _localization.Get(
+                            LocalizationTables.Tournament,
+                            LocalizationKeys.StatusEliminatedConcede,
+                            _lastPlayerScore,
+                            _lastOpponentScore,
+                            _settings.ConcedeLimitToLose);
+                    }
+
                     return _localization.Get(
                         LocalizationTables.Tournament,
                         LocalizationKeys.StatusEliminated,

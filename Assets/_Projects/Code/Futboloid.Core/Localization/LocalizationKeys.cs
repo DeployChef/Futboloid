@@ -39,6 +39,7 @@ namespace Futboloid.Core.Localization
         public const string RoundMatchOf = "round_match_of";
         public const string StatusChampion = "status_champion";
         public const string StatusEliminated = "status_eliminated";
+        public const string StatusEliminatedConcede = "status_eliminated_concede";
         public const string StatusReadyFirstMatch = "status_ready_first_match";
         public const string StatusVictory = "status_victory";
 

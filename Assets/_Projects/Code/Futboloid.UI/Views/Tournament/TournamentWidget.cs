@@ -7,6 +7,7 @@ using Futboloid.Core.Bus.Events;
 using Futboloid.UI.Views.Leaderboards;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using VContainer;
 
@@ -55,6 +56,16 @@ namespace Futboloid.UI.Views.Tournament
 
             _localization.LocaleChanged += OnLocaleChanged;
             gameObject.SetActive(false);
+        }
+
+        private void Update()
+        {
+            if (!IsMatchContinueAvailable())
+                return;
+
+            var keyboard = Keyboard.current;
+            if (keyboard != null && keyboard.spaceKey.wasPressedThisFrame)
+                OnMatchClicked();
         }
 
         private void OnLocaleChanged()
@@ -127,6 +138,13 @@ namespace Futboloid.UI.Views.Tournament
             }
 
             firstTimeGuide?.Refresh();
+        }
+
+        private bool IsMatchContinueAvailable()
+        {
+            return matchButton != null
+                   && matchButton.gameObject.activeInHierarchy
+                   && matchButton.interactable;
         }
 
         private void OnMatchClicked() => _director?.GoOnField();

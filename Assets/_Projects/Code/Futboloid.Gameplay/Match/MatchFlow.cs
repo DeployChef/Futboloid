@@ -16,6 +16,7 @@ namespace Futboloid.Gameplay.Match
     {
         private readonly IGameEventBus _bus;
         private readonly float _matchDurationSeconds;
+        private readonly int _concedeLimitToLose;
 
         private CancellationTokenSource _timerCts;
         private bool _onField;
@@ -31,12 +32,14 @@ namespace Futboloid.Gameplay.Match
             _totalDurationSeconds > 0f ? RemainingSeconds / _totalDurationSeconds : 0f;
 
         public bool IsOnField => _onField;
+        public bool IsMatchEnded => _matchEnded;
         public bool WipeVictoryPending { get; private set; }
 
         public MatchFlow(IGameEventBus bus, GameplaySettings settings)
         {
             _bus = bus;
             _matchDurationSeconds = settings.MatchDurationSeconds;
+            _concedeLimitToLose = settings.ConcedeLimitToLose;
             _totalDurationSeconds = _matchDurationSeconds;
             RemainingSeconds = _matchDurationSeconds;
 
@@ -65,6 +68,9 @@ namespace Futboloid.Gameplay.Match
 
         public void RecordGoal(bool isPlayerGoal)
         {
+            if (_matchEnded)
+                return;
+
             if (isPlayerGoal)
                 PlayerScore++;
             else
@@ -72,6 +78,12 @@ namespace Futboloid.Gameplay.Match
 
             PublishScore();
             Debug.Log($"[MatchFlow] Score {PlayerScore}:{OpponentScore} (player goal={isPlayerGoal})");
+
+            if (!isPlayerGoal && OpponentScore >= _concedeLimitToLose)
+            {
+                Debug.Log($"[MatchFlow] Opponent reached {_concedeLimitToLose} goals — player loses.");
+                EndMatch(playerWon: false, MatchEndReason.ConcedeLimit);
+            }
         }
 
         public void AdjustTime(float deltaSeconds, string reason = null)

@@ -1,3 +1,5 @@
+using Futboloid.Core.Bus.Events;
+
 namespace Futboloid.Core
 {
     /// <summary>
@@ -7,6 +9,6 @@ namespace Futboloid.Core
     {
         bool HasPlayedBefore { get; }
         void ResetRun();
-        void RecordMatchResult(int playerScore, int opponentScore, bool playerWon);
+        void RecordMatchResult(int playerScore, int opponentScore, bool playerWon, MatchEndReason reason);
     }
 }

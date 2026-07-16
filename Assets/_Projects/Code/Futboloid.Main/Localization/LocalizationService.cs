@@ -137,6 +137,7 @@ namespace Futboloid.Main.Localization
             }
 
             IsReady = true;
+            LocaleChanged?.Invoke();
         }
 
         private async UniTask PreloadStringTablesAsync()

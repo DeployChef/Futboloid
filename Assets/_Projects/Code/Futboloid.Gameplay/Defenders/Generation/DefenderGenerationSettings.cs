@@ -19,13 +19,13 @@ namespace Futboloid.Gameplay.Defenders
         [SerializeField] private int generationSeedSalt = 7919;
 
         [Header("Goalkeeper")]
-        [SerializeField] private int gkBaseHp = 10;
-        [SerializeField] private int gkHpPerMatch = 2;
+        [SerializeField] private int gkBaseHp = 12;
+        [SerializeField] private int gkHpPerMatch = 3;
         [SerializeField] private float gkTrackSpeed = 1.25f;
 
         [Header("Field HP")]
         [SerializeField] private int fieldBaseHp = 3;
-        [SerializeField] private AnimationCurve pacingCurve = AnimationCurve.Linear(1f, 0.35f, 9f, 1f);
+        [SerializeField] private AnimationCurve pacingCurve = AnimationCurve.Linear(1f, 0.45f, 9f, 1.9f);
 
         [Header("Scoring")]
         [SerializeField] private int gkPointValue = 30;
@@ -85,7 +85,7 @@ namespace Futboloid.Gameplay.Defenders
         private void EnsureDefaults()
         {
             if (pacingCurve == null || pacingCurve.length == 0)
-                pacingCurve = AnimationCurve.Linear(1f, 0.35f, 9f, 1f);
+                pacingCurve = AnimationCurve.Linear(1f, 0.45f, 9f, 1.9f);
 
             if (tutorialMatch.FieldCount < 1)
                 tutorialMatch = TutorialMatchDefinition.CreateDefault();
@@ -392,7 +392,7 @@ namespace Futboloid.Gameplay.Defenders
                 Id = "Shield",
                 MinTier = 0,
                 Weight = 3.5f,
-                Hp = 3,
+                Hp = 8,
                 PointValue = 10,
                 HitType = DefenderHitType.Reflect,
                 MovementType = DefenderMovementType.Idle,
@@ -406,7 +406,7 @@ namespace Futboloid.Gameplay.Defenders
                 Id = "Drifter",
                 MinTier = 0,
                 Weight = 3.5f,
-                Hp = 2,
+                Hp = 7,
                 PointValue = 8,
                 HitType = DefenderHitType.Reflect,
                 MovementType = DefenderMovementType.WanderInRadius,
@@ -420,7 +420,7 @@ namespace Futboloid.Gameplay.Defenders
                 Id = "Hunter",
                 MinTier = 1,
                 Weight = 2f,
-                Hp = 3,
+                Hp = 8,
                 PointValue = 12,
                 HitType = DefenderHitType.Reflect,
                 MovementType = DefenderMovementType.ChaseBall,
@@ -434,7 +434,7 @@ namespace Futboloid.Gameplay.Defenders
                 Id = "Sniper",
                 MinTier = 1,
                 Weight = 1.4f,
-                Hp = 2,
+                Hp = 7,
                 PointValue = 15,
                 HitType = DefenderHitType.ToPlayerGoal,
                 MovementType = DefenderMovementType.Idle,
@@ -448,7 +448,7 @@ namespace Futboloid.Gameplay.Defenders
                 Id = "Tank",
                 MinTier = 2,
                 Weight = 1.5f,
-                Hp = 5,
+                Hp = 10,
                 PointValue = 25,
                 HitType = DefenderHitType.Reflect,
                 MovementType = DefenderMovementType.Idle,
@@ -462,7 +462,7 @@ namespace Futboloid.Gameplay.Defenders
                 Id = "Striker",
                 MinTier = 2,
                 Weight = 1.4f,
-                Hp = 3,
+                Hp = 8,
                 PointValue = 14,
                 HitType = DefenderHitType.ToPlayerGoal,
                 MovementType = DefenderMovementType.ChaseBall,
@@ -476,7 +476,7 @@ namespace Futboloid.Gameplay.Defenders
                 Id = "Presser",
                 MinTier = 3,
                 Weight = 1.1f,
-                Hp = 3,
+                Hp = 9,
                 PointValue = 18,
                 HitType = DefenderHitType.ToPlayerGoal,
                 MovementType = DefenderMovementType.ChaseBall,
