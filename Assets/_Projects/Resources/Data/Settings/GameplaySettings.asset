@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Match.GameplaySettings
   matchDurationSeconds: 60
   matchesToWin: 9
-  debugStartMatchEnabled: 1
-  debugStartMatch: 8
+  debugStartMatchEnabled: 0
+  debugStartMatch: 1
   defenderGeneration: {fileID: 11400000, guid: 4c9a7e2f1b8d4a6e9f0c3d5e7a1b2c3d, type: 2}
   defenderMatch: {fileID: 0}
   comboScore:
-    goalBonusPoints: 50
+    goalBonusPoints: 150
     minMultiplier: 1
     maxMultiplier: 0
     keeperTouchPenalty: 3

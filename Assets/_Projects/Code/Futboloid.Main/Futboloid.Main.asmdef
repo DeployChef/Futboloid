@@ -9,6 +9,7 @@
         "Unity.InputSystem",
         "Unity.Localization",
         "Unity.ResourceManager",
+        "Unity.Services.Analytics",
         "Unity.Services.Authentication",
         "Unity.Services.Core",
         "Unity.Services.Leaderboards",

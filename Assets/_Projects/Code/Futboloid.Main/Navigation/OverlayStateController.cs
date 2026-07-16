@@ -79,8 +79,8 @@ namespace Futboloid.Main.Navigation
                     {
                         if (newRunFromMenu || isColdStart)
                         {
-                            _tournamentRun.ResetRun();
                             _runProgression.Reset();
+                            _tournamentRun.ResetRun();
                         }
                         _bus.Publish(new PitchResetRequestedEvent());
                     }

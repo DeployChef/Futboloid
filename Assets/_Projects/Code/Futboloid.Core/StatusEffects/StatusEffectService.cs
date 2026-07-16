@@ -46,6 +46,8 @@ namespace Futboloid.Core.StatusEffects
 
             _ = stacks;
 
+            ApplyInstantEffects(definition);
+
             var existing = FindByEffectId(definition.Id);
             if (existing != null)
             {
@@ -77,6 +79,18 @@ namespace Futboloid.Core.StatusEffects
                 charges: 0));
 
             Debug.Log($"[StatusEffectService] Applied {definition.Id} for {duration:0.#}s.");
+        }
+
+        private void ApplyInstantEffects(StatusEffectDefinition definition)
+        {
+            if (definition.AffectedStat != StatId.MatchTime)
+                return;
+
+            var delta = definition.AdditiveValue;
+            if (Mathf.Approximately(delta, 0f))
+                return;
+
+            _bus.Publish(new MatchTimeAdjustedEvent(delta, definition.Id));
         }
 
         public void Tick(float deltaTime)

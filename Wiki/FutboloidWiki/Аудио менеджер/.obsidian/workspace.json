@@ -11,14 +11,10 @@
             "id": "a5c74a43e476211a",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Система приоритетов и наложения.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Система приоритетов и наложения"
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Граф"
             }
           }
         ]
@@ -180,10 +176,11 @@
       "bases:Создать новую базу": false
     }
   },
-  "active": "a5c74a43e476211a",
+  "active": "99f01b9bfe658fcc",
   "lastOpenFiles": [
-    "AudioCore схема.canvas",
+    "Без названия.md",
     "Система приоритетов и наложения.md",
+    "AudioCore схема.canvas",
     "Полная инструкция.md",
     "Каталог событий и звуков.md",
     "Инструкция по настройке.md",

@@ -11,6 +11,8 @@ namespace Futboloid.Core.Run
         [SerializeField] private Sprite icon;
         [SerializeField] private int maxLevel = 5;
         [SerializeField] private float valuePerLevel = 1f;
+        [Tooltip("Относительный шанс попасть в BonusPick. Меньше = реже.")]
+        [SerializeField] private float offerWeight = 10f;
 
         public string Id => id;
         public string NameLocalizationKey => LocalizationKeys.PerkName(id);
@@ -19,5 +21,6 @@ namespace Futboloid.Core.Run
         public Sprite Icon => icon;
         public int MaxLevel => Mathf.Max(1, maxLevel);
         public float ValuePerLevel => valuePerLevel;
+        public float OfferWeight => Mathf.Max(0f, offerWeight);
     }
 }

@@ -38,6 +38,8 @@ namespace Futboloid.Gameplay.Keeper
         private PitchBounds _pitchBounds;
         private IRunProgressionService _runProgression;
         private IStatusEffectService _statusEffects;
+        private Vector3 _baseLocalScale = Vector3.one;
+        private bool _baseScaleCaptured;
 
         [Inject]
         public void Construct(
@@ -56,14 +58,28 @@ namespace Futboloid.Gameplay.Keeper
             _runProgression = runProgression;
             _statusEffects = statusEffects;
 
+            if (!_baseScaleCaptured)
+            {
+                _baseLocalScale = transform.localScale;
+                _baseScaleCaptured = true;
+            }
+
             if (kickoffAnchor == null)
                 Debug.LogWarning("[GoalkeeperView] BallKickoffAnchor is not assigned.", this);
 
             _subscriptions.Add(bus.Subscribe<PitchPhaseChangedEvent>(OnPitchPhaseChanged));
             _subscriptions.Add(bus.Subscribe<NavigationChangedEvent>(OnNavigationChanged));
+            _subscriptions.Add(bus.Subscribe<PerkPickedEvent>(_ => ApplyWidthScale()));
+            _subscriptions.Add(bus.Subscribe<RunProgressionUpdatedEvent>(_ => ApplyWidthScale()));
+            _subscriptions.Add(bus.Subscribe<TournamentRunStartedEvent>(_ => ApplyWidthScale()));
+            _subscriptions.Add(bus.Subscribe<PitchResetRequestedEvent>(_ => ApplyWidthScale()));
+            _subscriptions.Add(bus.Subscribe<StatusEffectAppliedEvent>(_ => ApplyWidthScale()));
+            _subscriptions.Add(bus.Subscribe<StatusEffectRemovedEvent>(_ => ApplyWidthScale()));
+            _subscriptions.Add(bus.Subscribe<StatusEffectRefreshedEvent>(_ => ApplyWidthScale()));
 
             _phase = pitch.Current;
             _onField = matchFlow.IsOnField;
+            ApplyWidthScale();
         }
 
         public UniTask PlayReshuffleToCenterAsync(float moveDuration, CancellationToken ct)
@@ -122,7 +138,8 @@ namespace Futboloid.Gameplay.Keeper
 
         private void TickMovement(float minX, float maxX)
         {
-            var moveInput = _input?.MoveX ?? 0f;
+            var moveInput = (_input?.MoveX ?? 0f)
+                * (_statusEffects?.GetMultiplier(StatId.GoalkeeperMoveInput) ?? 1f);
             var speedMultiplier =
                 (_runProgression?.GetGoalkeeperMoveSpeedMultiplier() ?? 1f)
                 * (_statusEffects?.GetMultiplier(StatId.GoalkeeperMoveSpeed) ?? 1f);
@@ -140,6 +157,15 @@ namespace Futboloid.Gameplay.Keeper
 
             transform.position = result.Position;
             animationPresenter?.SetLocomotion(result.IsMoving, result.VelocityX);
+        }
+
+        private void ApplyWidthScale()
+        {
+            var perkMul = _runProgression?.GetGoalkeeperWidthMultiplier() ?? 1f;
+            var statusMul = _statusEffects?.GetMultiplier(StatId.GoalkeeperWidth) ?? 1f;
+            var scale = _baseLocalScale;
+            scale.x = _baseLocalScale.x * perkMul * statusMul;
+            transform.localScale = scale;
         }
 
         private void UpdateKickoffAim()

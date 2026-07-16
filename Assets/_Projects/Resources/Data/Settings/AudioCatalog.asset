@@ -64,7 +64,7 @@ MonoBehaviour:
     mixerGroup: {fileID: -1377188511162530804, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
     priority: 0
     allowOverlap: 0
-    cooldown: 1.47
+    cooldown: 0.45
     loop: 0
     enableFade: 1
     fadeDuration: 0.3
@@ -82,7 +82,7 @@ MonoBehaviour:
     mixerGroup: {fileID: -6072428715209177553, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
     priority: 0
     allowOverlap: 0
-    cooldown: 1
+    cooldown: 0.5
     loop: 0
     enableFade: 1
     fadeDuration: 0.3
@@ -482,6 +482,54 @@ MonoBehaviour:
     priority: 25
     allowOverlap: 0
     cooldown: 0.3
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
+    basePitch: 1
+    pitchRandomRange: 0
+  - id: UiMove
+    channel: 2
+    clips:
+    - {fileID: 8300000, guid: 299965d87f5decf4c8dc4eb19c5eb48f, type: 3}
+    mixerGroup: {fileID: 1036031897283796597, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 30
+    allowOverlap: 1
+    cooldown: 0.05
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
+    basePitch: 1
+    pitchRandomRange: 0
+  - id: UiStart
+    channel: 2
+    clips:
+    - {fileID: 8300000, guid: fd11b8b9e9dc1f948a36f52f9bdfc989, type: 3}
+    mixerGroup: {fileID: 1036031897283796597, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 20
+    allowOverlap: 0
+    cooldown: 0.2
+    loop: 0
+    enableFade: 0
+    fadeDuration: 0
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    stopOnPause: 0
+    basePitch: 1
+    pitchRandomRange: 0
+  - id: UiClick
+    channel: 2
+    clips:
+    - {fileID: 8300000, guid: 4a167eeb684afff499ea39c27f70a47c, type: 3}
+    mixerGroup: {fileID: 1036031897283796597, guid: 2b10d11badfaa8f4c9c4afa2929cee9b, type: 2}
+    priority: 25
+    allowOverlap: 1
+    cooldown: 0.05
     loop: 0
     enableFade: 0
     fadeDuration: 0

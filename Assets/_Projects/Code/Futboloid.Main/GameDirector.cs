@@ -32,9 +32,19 @@ namespace Futboloid.Main
 
         public ITournamentBracketReadModel TournamentBracket { get; private set; }
 
-        public void InitializeGame()
+        public async UniTask InitializeGameAsync()
         {
-            RunInitializeAsync().Forget();
+            Debug.Log("[GameDirector] Cold start…");
+
+            var appRoot = new AppRootState(_rootLifetimeScope);
+            await appRoot.Enter();
+
+            _appGameState = appRoot.AppGameState;
+            await _appGameState.Enter();
+            _overlay = _appGameState.Overlay;
+            TournamentBracket = _appGameState.LifetimeScope.Container.Resolve<ITournamentBracketReadModel>();
+
+            Debug.Log("[GameDirector] Infrastructure ready (Root → App → Game → OnField).");
         }
 
         public void GoOnField() =>
@@ -50,11 +60,11 @@ namespace Futboloid.Main
 
             var container = _appGameState.LifetimeScope.Container;
             
-            // Сбрасываем прогресс забега
+            // Сначала перки/XP, потом забег — чтобы TournamentRunStarted уже видел сброс.
             var run = container.Resolve<ITournamentRunService>();
             var progression = container.Resolve<IRunProgressionService>();
-            run.ResetRun();
             progression.Reset();
+            run.ResetRun();
 
             // Явно сбрасываем поле и таймер
             var bus = container.Resolve<IGameEventBus>();
@@ -72,20 +82,5 @@ namespace Futboloid.Main
 
         public void LoadLastSave() =>
             Debug.LogWarning("[GameDirector] LoadLastSave — not implemented yet.");
-
-        private async UniTaskVoid RunInitializeAsync()
-        {
-            Debug.Log("[GameDirector] Cold start…");
-
-            var appRoot = new AppRootState(_rootLifetimeScope);
-            await appRoot.Enter();
-
-            _appGameState = appRoot.AppGameState;
-            await _appGameState.Enter();
-            _overlay = _appGameState.Overlay;
-            TournamentBracket = _appGameState.LifetimeScope.Container.Resolve<ITournamentBracketReadModel>();
-
-            Debug.Log("[GameDirector] Infrastructure ready (Root → App → Game → OnField).");
-        }
     }
 }

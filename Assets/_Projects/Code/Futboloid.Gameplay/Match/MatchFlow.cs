@@ -142,7 +142,7 @@ namespace Futboloid.Gameplay.Match
                 return;
 
             Debug.Log("[MatchFlow] All defenders eliminated — player wins.");
-            EndMatch(playerWon: true);
+            EndMatch(playerWon: true, MatchEndReason.Wipe);
         }
 
         public void MarkWipeVictoryPending()
@@ -166,18 +166,26 @@ namespace Futboloid.Gameplay.Match
             return true;
         }
 
-        private void EndMatch(bool playerWon)
+        private void EndMatch(bool playerWon, MatchEndReason reason)
         {
             if (_matchEnded)
                 return;
 
             _matchEnded = true;
             StopTimerLoop();
-            _bus.Publish(new MatchEndedEvent(PlayerScore, OpponentScore, playerWon));
-            Debug.Log($"[MatchFlow] Match ended {PlayerScore}:{OpponentScore}, playerWon={playerWon}");
+            var durationSeconds = Mathf.Max(0f, _totalDurationSeconds - RemainingSeconds);
+            _bus.Publish(new MatchEndedEvent(
+                PlayerScore,
+                OpponentScore,
+                playerWon,
+                reason,
+                durationSeconds));
+            Debug.Log(
+                $"[MatchFlow] Match ended {PlayerScore}:{OpponentScore}, playerWon={playerWon}, reason={reason}");
         }
 
-        private void EndMatchByTime() => EndMatch(playerWon: PlayerScore > OpponentScore);
+        private void EndMatchByTime() =>
+            EndMatch(playerWon: PlayerScore > OpponentScore, MatchEndReason.Timer);
 
         private void OnGoalScored(GoalScoredEvent e) => RecordGoal(e.IsPlayerGoal);
 

@@ -56,6 +56,9 @@ namespace Futboloid.Core.Audio
             public const string UiMenuOpen = "UiMenuOpen";
             public const string UiPauseOpen = "UiPauseOpen";
             public const string UiTournamentOpen = "UiTournamentOpen";
+            public const string UiMove = "UiMove";
+            public const string UiStart = "UiStart";
+            public const string UiClick = "UiClick";
         }
 
         [SerializeField] private List<SoundDefinition> sounds = new();

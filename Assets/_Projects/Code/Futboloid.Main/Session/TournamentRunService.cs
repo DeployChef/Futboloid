@@ -1,4 +1,6 @@
 using Futboloid.Core;
+using Futboloid.Core.Bus;
+using Futboloid.Core.Bus.Events;
 using Futboloid.Core.Localization;
 using Futboloid.Gameplay.Match;
 using UnityEngine;
@@ -12,6 +14,7 @@ namespace Futboloid.Main.Session
     {
         private readonly GameplaySettings _settings;
         private readonly ILocalizationService _localization;
+        private readonly IGameEventBus _bus;
         private readonly int _matchesToWin;
 
         private int _matchesCompleted;
@@ -32,10 +35,14 @@ namespace Futboloid.Main.Session
         public string RoundLabel => GetRoundLabel();
         public string StatusLine => GetStatusLine();
 
-        public TournamentRunService(GameplaySettings settings, ILocalizationService localization)
+        public TournamentRunService(
+            GameplaySettings settings,
+            ILocalizationService localization,
+            IGameEventBus bus)
         {
             _settings = settings;
             _localization = localization;
+            _bus = bus;
             _matchesToWin = settings.MatchesToWin;
             _runSeed = Random.Range(1, int.MaxValue);
         }
@@ -61,6 +68,11 @@ namespace Futboloid.Main.Session
                 Debug.Log(
                     $"[TournamentRunService] Debug start: match {CurrentMatchNumber} / {_matchesToWin}");
             }
+
+            _bus.Publish(new TournamentRunStartedEvent(
+                _matchesToWin,
+                _runSeed,
+                CurrentMatchNumber));
         }
 
         public void RecordMatchResult(int playerScore, int opponentScore, bool playerWon)

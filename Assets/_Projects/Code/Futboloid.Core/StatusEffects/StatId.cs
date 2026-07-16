@@ -8,5 +8,8 @@ namespace Futboloid.Core.StatusEffects
         EnemyDamage,
         BallMaxSpeed,
         ComboGain,
+        GoalkeeperWidth,
+        GoalkeeperMoveInput,
+        MatchTime,
     }
 }

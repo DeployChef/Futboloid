@@ -6,7 +6,7 @@ namespace Futboloid.Gameplay.Match
     [Serializable]
     public sealed class ComboScoreSettings
     {
-        [SerializeField] private int goalBonusPoints = 50;
+        [SerializeField] private int goalBonusPoints = 150;
         [SerializeField] private int minMultiplier = 1;
         [SerializeField] private int maxMultiplier;
         [SerializeField] private int keeperTouchPenalty = 3;
