@@ -6,10 +6,12 @@ using Futboloid.Core.Localization;
 using Futboloid.Main.Audio;
 using Futboloid.Main.Localization;
 using Futboloid.UI;
+using Futboloid.UI.Audio;
 using Futboloid.UI.Views.Leaderboards;
 using Futboloid.UI.Views.MainMenu;
 using Futboloid.UI.Views.PauseMenu;
 using Futboloid.UI.Views.Settings;
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -57,6 +59,12 @@ namespace Futboloid.Main.DI
             ui.Register(container.Resolve<MainMenuWidget>());
             ui.Register(container.Resolve<PauseMenuView>());
             ui.Register(container.Resolve<SettingsView>());
+
+            foreach (var buttonSound in Object.FindObjectsByType<UiButtonSound>(
+                         FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                container.Inject(buttonSound);
+            }
         }
     }
 }

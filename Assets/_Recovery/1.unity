@@ -1019,7 +1019,6 @@ GameObject:
   - component: {fileID: 570308143}
   - component: {fileID: 570308142}
   - component: {fileID: 570308141}
-  - component: {fileID: 570308144}
   m_Layer: 5
   m_Name: MatchButton
   m_TagString: Untagged
@@ -1129,22 +1128,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 570308139}
   m_CullTransparentMesh: 1
---- !u!114 &570308144
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 570308139}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a6e7e9ad046b1d4398e82b069d5a94a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Audio.UiButtonSound
-  playHover: 1
-  playClick: 1
-  hoverSoundId: UiMove
-  clickSoundId: UiClick
 --- !u!1 &572753875
 GameObject:
   m_ObjectHideFlags: 0
@@ -1447,7 +1430,6 @@ GameObject:
   - component: {fileID: 701525218}
   - component: {fileID: 701525217}
   - component: {fileID: 701525220}
-  - component: {fileID: 701525221}
   m_Layer: 5
   m_Name: RestartButton
   m_TagString: Untagged
@@ -1597,22 +1579,6 @@ MonoBehaviour:
   references:
     version: 2
     RefIds: []
---- !u!114 &701525221
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 701525215}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a6e7e9ad046b1d4398e82b069d5a94a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Audio.UiButtonSound
-  playHover: 1
-  playClick: 1
-  hoverSoundId: UiMove
-  clickSoundId: UiClick
 --- !u!1 &706224299
 GameObject:
   m_ObjectHideFlags: 0
@@ -5492,7 +5458,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 1
+  m_fontStyle: 17
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -5770,7 +5736,6 @@ GameObject:
   - component: {fileID: 1933042306}
   - component: {fileID: 1933042305}
   - component: {fileID: 1933042308}
-  - component: {fileID: 1933042309}
   m_Layer: 5
   m_Name: MainMenuButton
   m_TagString: Untagged
@@ -5920,22 +5885,6 @@ MonoBehaviour:
   references:
     version: 2
     RefIds: []
---- !u!114 &1933042309
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1933042303}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a6e7e9ad046b1d4398e82b069d5a94a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Audio.UiButtonSound
-  playHover: 1
-  playClick: 1
-  hoverSoundId: UiMove
-  clickSoundId: UiClick
 --- !u!1001 &1939333904
 PrefabInstance:
   m_ObjectHideFlags: 0

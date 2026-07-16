@@ -848,7 +848,6 @@ GameObject:
   - component: {fileID: 120745279}
   - component: {fileID: 120745278}
   - component: {fileID: 120745277}
-  - component: {fileID: 120745280}
   m_Layer: 0
   m_Name: Continue
   m_TagString: Untagged
@@ -958,22 +957,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 120745275}
   m_CullTransparentMesh: 1
---- !u!114 &120745280
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 120745275}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a6e7e9ad046b1d4398e82b069d5a94a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Audio.UiButtonSound
-  playHover: 1
-  playClick: 1
-  hoverSoundId: UiMove
-  clickSoundId: UiClick
 --- !u!1 &151248273
 GameObject:
   m_ObjectHideFlags: 0
@@ -1511,7 +1494,6 @@ GameObject:
   - component: {fileID: 224333637}
   - component: {fileID: 224333636}
   - component: {fileID: 224333635}
-  - component: {fileID: 224333638}
   m_Layer: 0
   m_Name: BackToMenu
   m_TagString: Untagged
@@ -1621,43 +1603,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 224333633}
   m_CullTransparentMesh: 1
---- !u!114 &224333638
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 224333633}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a6e7e9ad046b1d4398e82b069d5a94a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Audio.UiButtonSound
-  playHover: 1
-  playClick: 1
-  hoverSoundId: UiMove
-  clickSoundId: UiClick
---- !u!1 &288682010 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8350686253408873614, guid: b98ab46a8a5c9e54ea946ba1fdc26757, type: 3}
-  m_PrefabInstance: {fileID: 4171201232969605855}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &288682015
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 288682010}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a6e7e9ad046b1d4398e82b069d5a94a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Audio.UiButtonSound
-  playHover: 1
-  playClick: 1
-  hoverSoundId: UiMove
-  clickSoundId: UiClick
 --- !u!1 &293766246
 GameObject:
   m_ObjectHideFlags: 0
@@ -3723,27 +3668,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 896823456}
   m_CullTransparentMesh: 1
---- !u!1 &928661936 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7350686253408873614, guid: b98ab46a8a5c9e54ea946ba1fdc26757, type: 3}
-  m_PrefabInstance: {fileID: 4171201232969605855}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &928661941
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 928661936}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a6e7e9ad046b1d4398e82b069d5a94a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Audio.UiButtonSound
-  playHover: 1
-  playClick: 1
-  hoverSoundId: UiMove
-  clickSoundId: UiStart
 --- !u!1 &939775050
 GameObject:
   m_ObjectHideFlags: 0
@@ -5011,7 +4935,6 @@ GameObject:
   - component: {fileID: 1150304691}
   - component: {fileID: 1150304690}
   - component: {fileID: 1150304689}
-  - component: {fileID: 1150304692}
   m_Layer: 0
   m_Name: CloseB
   m_TagString: Untagged
@@ -5121,22 +5044,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1150304687}
   m_CullTransparentMesh: 1
---- !u!114 &1150304692
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1150304687}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a6e7e9ad046b1d4398e82b069d5a94a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Audio.UiButtonSound
-  playHover: 1
-  playClick: 1
-  hoverSoundId: UiMove
-  clickSoundId: UiClick
 --- !u!1 &1153371954
 GameObject:
   m_ObjectHideFlags: 0
@@ -6810,7 +6717,6 @@ GameObject:
   - component: {fileID: 1673835011}
   - component: {fileID: 1673835010}
   - component: {fileID: 1673835009}
-  - component: {fileID: 1673835012}
   m_Layer: 0
   m_Name: Settings
   m_TagString: Untagged
@@ -6920,22 +6826,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1673835007}
   m_CullTransparentMesh: 1
---- !u!114 &1673835012
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1673835007}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a6e7e9ad046b1d4398e82b069d5a94a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Audio.UiButtonSound
-  playHover: 1
-  playClick: 1
-  hoverSoundId: UiMove
-  clickSoundId: UiClick
 --- !u!1 &1699219711 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 926444008560404619, guid: b98ab46a8a5c9e54ea946ba1fdc26757, type: 3}
@@ -7315,7 +7205,6 @@ GameObject:
   - component: {fileID: 1935886042}
   - component: {fileID: 1935886041}
   - component: {fileID: 1935886040}
-  - component: {fileID: 1935886043}
   m_Layer: 0
   m_Name: Restart
   m_TagString: Untagged
@@ -7425,22 +7314,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1935886038}
   m_CullTransparentMesh: 1
---- !u!114 &1935886043
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1935886038}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a6e7e9ad046b1d4398e82b069d5a94a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Futboloid.UI::Futboloid.UI.Audio.UiButtonSound
-  playHover: 1
-  playClick: 1
-  hoverSoundId: UiMove
-  clickSoundId: UiClick
 --- !u!1 &1996262909
 GameObject:
   m_ObjectHideFlags: 0
@@ -8551,15 +8424,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 923706725278889255, guid: b98ab46a8a5c9e54ea946ba1fdc26757, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1800238008}
-    - targetCorrespondingSourceObject: {fileID: 8350686253408873614, guid: b98ab46a8a5c9e54ea946ba1fdc26757, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 288682015}
     - targetCorrespondingSourceObject: {fileID: 926444008560404620, guid: b98ab46a8a5c9e54ea946ba1fdc26757, type: 3}
       insertIndex: -1
       addedObject: {fileID: 87722079}
-    - targetCorrespondingSourceObject: {fileID: 7350686253408873614, guid: b98ab46a8a5c9e54ea946ba1fdc26757, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 928661941}
     - targetCorrespondingSourceObject: {fileID: 926444008560404619, guid: b98ab46a8a5c9e54ea946ba1fdc26757, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1699219715}
