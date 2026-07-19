@@ -11,6 +11,7 @@ namespace Futboloid.Gameplay.Defenders
         [SerializeField] private int maxHp = 3;
         [SerializeField] private TextMeshProUGUI hpLabel;
         [SerializeField] private DefenderView defender;
+        [SerializeField] private DefenderDeathVfx deathVfx;
 
         private IGameEventBus _bus;
 
@@ -71,6 +72,7 @@ namespace Futboloid.Gameplay.Defenders
 
             var wasGoalkeeper = defender.Role == DefenderRole.Goalkeeper;
             _bus.Publish(new DefenderDestroyedEvent(slotId, wasGoalkeeper));
+            deathVfx?.Play();
             defender.NotifyDestroyed(wasGoalkeeper);
         }
 

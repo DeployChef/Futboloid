@@ -123,6 +123,7 @@ GameObject:
   - component: {fileID: 8128865829371798977}
   - component: {fileID: 3152381632761037567}
   - component: {fileID: 7692808108287274353}
+  - component: {fileID: 1302401658131410198}
   m_Layer: 10
   m_Name: Defender
   m_TagString: Untagged
@@ -240,6 +241,7 @@ MonoBehaviour:
   maxHp: 3
   hpLabel: {fileID: 2968189813365401722}
   defender: {fileID: 8128865829371798977}
+  deathVfx: {fileID: 1302401658131410198}
 --- !u!114 &7692808108287274353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -258,6 +260,23 @@ MonoBehaviour:
   defender: {fileID: 8128865829371798977}
   health: {fileID: 3152381632761037567}
   bodyCollider: {fileID: 1864416684892860211}
+--- !u!114 &1302401658131410198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4969127172605605462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef459cdffeafcd44fb65a7f648b50c7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.DefenderDeathVfx
+  vfxPrefab: {fileID: 141433446842962269, guid: 9fe8f8b3288e45a44af36ff8aa04486e, type: 3}
+  localOffset: {x: 0, y: 0, z: 0}
+  destroyAfter: -1
+  sortingLayerName: FX
+  sortingOrder: 10
 --- !u!1 &5333510178830016538
 GameObject:
   m_ObjectHideFlags: 0
