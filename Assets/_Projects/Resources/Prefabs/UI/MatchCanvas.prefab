@@ -666,7 +666,7 @@ PrefabInstance:
     - target: {fileID: 3363875121642093729, guid: 7d569ba4ab22f994e9952d262c31236a, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: -5913271259585754490, guid: c513bae76822c574a9bf1f29ee13c164, type: 3}
+      objectReference: {fileID: -8763105386053166087, guid: 81c2d4ead889d0841865e343985c32c5, type: 3}
     - target: {fileID: 4069906343250343201, guid: 7d569ba4ab22f994e9952d262c31236a, type: 3}
       propertyPath: m_SizeDelta.x
       value: 725.5891
@@ -790,7 +790,7 @@ PrefabInstance:
     - target: {fileID: 8805402789063242555, guid: 7d569ba4ab22f994e9952d262c31236a, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 6965180548041100383, guid: c513bae76822c574a9bf1f29ee13c164, type: 3}
+      objectReference: {fileID: -3875108700871916649, guid: c461a324ec1bd77439eafac77565b470, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:

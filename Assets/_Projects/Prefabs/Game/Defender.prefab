@@ -67,7 +67,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 7a0c1c51319e9084db465aa282cb2dcd, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -90,24 +90,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.DefenderBehaviorVisual
   typeImage: {fileID: 3164381573437883803}
-  goalkeeperColor: {r: 0.95, g: 0.85, b: 0.2, a: 1}
+  goalkeeperColor: {r: 0.39215684, g: 1, b: 0.73506284, a: 1}
   palette:
   - Kind: 0
-    Color: {r: 0.65, g: 0.72, b: 0.85, a: 1}
+    Color: {r: 0.78039217, g: 0.8392157, b: 1, a: 1}
   - Kind: 1
-    Color: {r: 0.45, g: 0.82, b: 0.55, a: 1}
+    Color: {r: 1, g: 0.73333335, b: 0.78039217, a: 1}
   - Kind: 2
-    Color: {r: 0.25, g: 0.88, b: 0.95, a: 1}
+    Color: {r: 0.9098039, g: 0.8235294, b: 0.29411766, a: 1}
   - Kind: 3
-    Color: {r: 0.35, g: 0.72, b: 0.68, a: 1}
+    Color: {r: 0.6627451, g: 0.81960785, b: 0.75686276, a: 1}
   - Kind: 4
-    Color: {r: 0.95, g: 0.42, b: 0.32, a: 1}
+    Color: {r: 0.7764706, g: 0.9254902, b: 1, a: 1}
   - Kind: 5
-    Color: {r: 0.98, g: 0.72, b: 0.28, a: 1}
+    Color: {r: 1, g: 0.85882354, b: 1, a: 1}
   - Kind: 6
-    Color: {r: 0.92, g: 0.32, b: 0.58, a: 1}
+    Color: {r: 1, g: 0.9647059, b: 0.30980393, a: 1}
   - Kind: 7
-    Color: {r: 0.72, g: 0.42, b: 0.92, a: 1}
+    Color: {r: 0.8784314, g: 0.98039216, b: 0.92156863, a: 1}
   flashColor: {r: 1, g: 0, b: 0, a: 1}
   flashDuration: 0.1
 --- !u!1 &4969127172605605462
@@ -560,8 +560,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.0000000037253, y: 0.000000067055}
-  m_SizeDelta: {x: 38.446, y: 18.755}
+  m_AnchoredPosition: {x: 0.00000010749, y: 0.000000067055}
+  m_SizeDelta: {x: 35.1, y: 18.755}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7810527546149913010
 CanvasRenderer:
@@ -618,8 +618,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 26
-  m_fontSizeBase: 26
+  m_fontSize: 24
+  m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

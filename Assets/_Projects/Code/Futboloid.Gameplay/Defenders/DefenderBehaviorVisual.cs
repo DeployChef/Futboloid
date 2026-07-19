@@ -17,14 +17,16 @@ namespace Futboloid.Gameplay.Defenders
 
         private static readonly (DefenderBehaviorKind Kind, Color Color)[] DefaultColors =
         {
-            (DefenderBehaviorKind.ReflectIdle, new Color(0.65f, 0.72f, 0.85f)),
-            (DefenderBehaviorKind.ReflectWander, new Color(0.45f, 0.82f, 0.55f)),
-            (DefenderBehaviorKind.ReflectChase, new Color(0.25f, 0.88f, 0.95f)),
-            (DefenderBehaviorKind.ReflectPatrol, new Color(0.35f, 0.72f, 0.68f)),
-            (DefenderBehaviorKind.ShootIdle, new Color(0.95f, 0.42f, 0.32f)),
-            (DefenderBehaviorKind.ShootWander, new Color(0.98f, 0.72f, 0.28f)),
-            (DefenderBehaviorKind.ShootChase, new Color(0.92f, 0.32f, 0.58f)),
-            (DefenderBehaviorKind.ShootPatrol, new Color(0.72f, 0.42f, 0.92f))
+            // Reflect — тусклые (пастельные)
+            (DefenderBehaviorKind.ReflectIdle, new Color(0.659f, 0.769f, 0.878f)),   // голубой
+            (DefenderBehaviorKind.ReflectWander, new Color(0.659f, 0.800f, 0.659f)), // зелёный
+            (DefenderBehaviorKind.ReflectChase, new Color(0.847f, 0.816f, 0.659f)),  // жёлтый
+            (DefenderBehaviorKind.ReflectPatrol, new Color(0.847f, 0.690f, 0.690f)), // красный
+            // Shoot — яркие (насыщенные)
+            (DefenderBehaviorKind.ShootIdle, new Color(0.416f, 0.710f, 0.961f)),     // голубой
+            (DefenderBehaviorKind.ShootWander, new Color(0.361f, 0.784f, 0.408f)),   // зелёный
+            (DefenderBehaviorKind.ShootChase, new Color(0.961f, 0.800f, 0.188f)),    // жёлтый
+            (DefenderBehaviorKind.ShootPatrol, new Color(0.961f, 0.376f, 0.376f))    // красный
         };
 
         [SerializeField] private Image typeImage;
