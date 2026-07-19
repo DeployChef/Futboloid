@@ -108,6 +108,8 @@ MonoBehaviour:
     Color: {r: 0.92, g: 0.32, b: 0.58, a: 1}
   - Kind: 7
     Color: {r: 0.72, g: 0.42, b: 0.92, a: 1}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
 --- !u!1 &4969127172605605462
 GameObject:
   m_ObjectHideFlags: 0
@@ -207,6 +209,7 @@ MonoBehaviour:
   bodyCollider: {fileID: 1864416684892860211}
   animationPresenter: {fileID: 7438566234465488061}
   behaviorVisual: {fileID: 4803946836639967962}
+  hitFlash: {fileID: 7112532313539348186}
   health: {fileID: 3152381632761037567}
   hitType: 0
   launchSpeed: 12
@@ -370,6 +373,7 @@ GameObject:
   - component: {fileID: 3005694690385198493}
   - component: {fileID: 696242960672357460}
   - component: {fileID: 7438566234465488061}
+  - component: {fileID: 7112532313539348186}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -489,6 +493,20 @@ MonoBehaviour:
   animator: {fileID: 696242960672357460}
   facingRoot: {fileID: 0}
   numbersFace: {fileID: 2532175341332586269}
+--- !u!114 &7112532313539348186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6797947194657875002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 764f8ce3b89f0d443b9fc1b12a157f59, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.DefenderHitFlash
+  flashColor: {r: 1, g: 0, b: 0, a: 0.6666667}
+  flashDuration: 0.2
 --- !u!1 &7680952560169528931
 GameObject:
   m_ObjectHideFlags: 0
