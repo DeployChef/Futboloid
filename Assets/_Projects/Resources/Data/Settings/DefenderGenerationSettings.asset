@@ -15,8 +15,8 @@ MonoBehaviour:
   gridColumns: 5
   gridRows: 7
   generationSeedSalt: 7919
-  gkBaseHp: 10
-  gkHpPerMatch: 2
+  gkBaseHp: 12
+  gkHpPerMatch: 3
   gkTrackSpeed: 0.75
   fieldBaseHp: 3
   pacingCurve:
@@ -24,7 +24,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 1
-      value: 0.35
+      value: 0.45
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -33,36 +33,40 @@ MonoBehaviour:
       outWeight: 0
     - serializedVersion: 3
       time: 3
-      value: 0.5
-      inSlope: 0.075
-      outSlope: 0.075
+      value: 0.75
+      inSlope: 0.15
+      outSlope: 0.15
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
       time: 5
-      value: 0.72
-      inSlope: 0.08
-      outSlope: 0.08
+      value: 1.25
+      inSlope: 0.2
+      outSlope: 0.2
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
       time: 7
-      value: 0.88
-      inSlope: 0.06
-      outSlope: 0.06
+      value: 1.65
+      inSlope: 0.12
+      outSlope: 0.12
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
       time: 9
-      value: 1
+      value: 1.9
       inSlope: 0
       outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
@@ -164,7 +168,7 @@ MonoBehaviour:
   - Id: Shield
     MinTier: 0
     Weight: 3.5
-    Hp: 3
+    Hp: 8
     HitType: 0
     MovementType: 0
     WanderRadius: 2.5
@@ -175,7 +179,7 @@ MonoBehaviour:
   - Id: Drifter
     MinTier: 0
     Weight: 3.5
-    Hp: 2
+    Hp: 7
     HitType: 0
     MovementType: 2
     WanderRadius: 3.5
@@ -186,7 +190,7 @@ MonoBehaviour:
   - Id: Hunter
     MinTier: 1
     Weight: 2
-    Hp: 3
+    Hp: 8
     HitType: 0
     MovementType: 3
     WanderRadius: 3
@@ -197,7 +201,7 @@ MonoBehaviour:
   - Id: Sniper
     MinTier: 1
     Weight: 1.4
-    Hp: 2
+    Hp: 7
     HitType: 1
     MovementType: 0
     WanderRadius: 2.5
@@ -208,7 +212,7 @@ MonoBehaviour:
   - Id: Tank
     MinTier: 2
     Weight: 1.5
-    Hp: 5
+    Hp: 10
     HitType: 0
     MovementType: 0
     WanderRadius: 2.5
@@ -219,7 +223,7 @@ MonoBehaviour:
   - Id: Striker
     MinTier: 2
     Weight: 1.4
-    Hp: 3
+    Hp: 8
     HitType: 1
     MovementType: 3
     WanderRadius: 3
@@ -230,7 +234,7 @@ MonoBehaviour:
   - Id: Presser
     MinTier: 3
     Weight: 1.1
-    Hp: 3
+    Hp: 9
     HitType: 1
     MovementType: 3
     WanderRadius: 3

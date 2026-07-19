@@ -111,7 +111,12 @@ namespace Futboloid.Core.Analytics
                     ["player_score"] = e.PlayerScore,
                     ["enemy_score"] = e.OpponentScore,
                     ["win"] = e.PlayerWon,
-                    ["end_reason"] = e.Reason == MatchEndReason.Wipe ? "wipe" : "timer",
+                    ["end_reason"] = e.Reason switch
+                    {
+                        MatchEndReason.Wipe => "wipe",
+                        MatchEndReason.ConcedeLimit => "concede_limit",
+                        _ => "timer"
+                    },
                     ["duration_sec"] = Mathf.RoundToInt(e.DurationSeconds),
                     ["max_combo"] = _maxCombo,
                     ["bonus_picks"] = _bonusPicksThisMatch

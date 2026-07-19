@@ -54,6 +54,14 @@ MonoBehaviour:
       victory!'
     m_Metadata:
       m_Items: []
+  - m_Id: 30200000008
+    m_Localized: 'Score
+
+      <color=red><size=150%>{0}:{1}</size></color>
+
+      {2} goals conceded — eliminated from the tournament'
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
