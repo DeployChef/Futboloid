@@ -67,7 +67,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 7a0c1c51319e9084db465aa282cb2dcd, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -90,24 +90,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.DefenderBehaviorVisual
   typeImage: {fileID: 3164381573437883803}
-  goalkeeperColor: {r: 0.95, g: 0.85, b: 0.2, a: 1}
+  goalkeeperColor: {r: 0.39215684, g: 1, b: 0.73506284, a: 1}
   palette:
   - Kind: 0
-    Color: {r: 0.65, g: 0.72, b: 0.85, a: 1}
+    Color: {r: 0.78039217, g: 0.8392157, b: 1, a: 1}
   - Kind: 1
-    Color: {r: 0.45, g: 0.82, b: 0.55, a: 1}
+    Color: {r: 1, g: 0.73333335, b: 0.78039217, a: 1}
   - Kind: 2
-    Color: {r: 0.25, g: 0.88, b: 0.95, a: 1}
+    Color: {r: 0.9098039, g: 0.8235294, b: 0.29411766, a: 1}
   - Kind: 3
-    Color: {r: 0.35, g: 0.72, b: 0.68, a: 1}
+    Color: {r: 0.6627451, g: 0.81960785, b: 0.75686276, a: 1}
   - Kind: 4
-    Color: {r: 0.95, g: 0.42, b: 0.32, a: 1}
+    Color: {r: 0.7764706, g: 0.9254902, b: 1, a: 1}
   - Kind: 5
-    Color: {r: 0.98, g: 0.72, b: 0.28, a: 1}
+    Color: {r: 1, g: 0.85882354, b: 1, a: 1}
   - Kind: 6
-    Color: {r: 0.92, g: 0.32, b: 0.58, a: 1}
+    Color: {r: 1, g: 0.9647059, b: 0.30980393, a: 1}
   - Kind: 7
-    Color: {r: 0.72, g: 0.42, b: 0.92, a: 1}
+    Color: {r: 0.8784314, g: 0.98039216, b: 0.92156863, a: 1}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
+  flashDuration: 0.1
 --- !u!1 &4969127172605605462
 GameObject:
   m_ObjectHideFlags: 0
@@ -121,6 +123,7 @@ GameObject:
   - component: {fileID: 8128865829371798977}
   - component: {fileID: 3152381632761037567}
   - component: {fileID: 7692808108287274353}
+  - component: {fileID: 1302401658131410198}
   m_Layer: 10
   m_Name: Defender
   m_TagString: Untagged
@@ -207,6 +210,7 @@ MonoBehaviour:
   bodyCollider: {fileID: 1864416684892860211}
   animationPresenter: {fileID: 7438566234465488061}
   behaviorVisual: {fileID: 4803946836639967962}
+  hitFlash: {fileID: 7112532313539348186}
   health: {fileID: 3152381632761037567}
   hitType: 0
   launchSpeed: 12
@@ -237,6 +241,7 @@ MonoBehaviour:
   maxHp: 3
   hpLabel: {fileID: 2968189813365401722}
   defender: {fileID: 8128865829371798977}
+  deathVfx: {fileID: 1302401658131410198}
 --- !u!114 &7692808108287274353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -255,6 +260,23 @@ MonoBehaviour:
   defender: {fileID: 8128865829371798977}
   health: {fileID: 3152381632761037567}
   bodyCollider: {fileID: 1864416684892860211}
+--- !u!114 &1302401658131410198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4969127172605605462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef459cdffeafcd44fb65a7f648b50c7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.DefenderDeathVfx
+  vfxPrefab: {fileID: 141433446842962269, guid: 9fe8f8b3288e45a44af36ff8aa04486e, type: 3}
+  localOffset: {x: 0, y: 0, z: 0}
+  destroyAfter: -1
+  sortingLayerName: FX
+  sortingOrder: 10
 --- !u!1 &5333510178830016538
 GameObject:
   m_ObjectHideFlags: 0
@@ -370,6 +392,7 @@ GameObject:
   - component: {fileID: 3005694690385198493}
   - component: {fileID: 696242960672357460}
   - component: {fileID: 7438566234465488061}
+  - component: {fileID: 7112532313539348186}
   m_Layer: 0
   m_Name: Visual
   m_TagString: Untagged
@@ -489,6 +512,20 @@ MonoBehaviour:
   animator: {fileID: 696242960672357460}
   facingRoot: {fileID: 0}
   numbersFace: {fileID: 2532175341332586269}
+--- !u!114 &7112532313539348186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6797947194657875002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 764f8ce3b89f0d443b9fc1b12a157f59, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Futboloid.Gameplay::Futboloid.Gameplay.Defenders.DefenderHitFlash
+  flashColor: {r: 1, g: 0, b: 0, a: 0.6666667}
+  flashDuration: 0.2
 --- !u!1 &7680952560169528931
 GameObject:
   m_ObjectHideFlags: 0
@@ -523,8 +560,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.0000000037253, y: 0.000000067055}
-  m_SizeDelta: {x: 38.446, y: 18.755}
+  m_AnchoredPosition: {x: 0.00000010749, y: 0.000000067055}
+  m_SizeDelta: {x: 35.1, y: 18.755}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7810527546149913010
 CanvasRenderer:
@@ -581,8 +618,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 26
-  m_fontSizeBase: 26
+  m_fontSize: 24
+  m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

@@ -21,6 +21,7 @@ namespace Futboloid.Gameplay.Defenders
         [SerializeField] private Collider2D bodyCollider;
         [SerializeField] private CharacterAnimationPresenter animationPresenter;
         [SerializeField] private DefenderBehaviorVisual behaviorVisual;
+        [SerializeField] private DefenderHitFlash hitFlash;
         [SerializeField] private DefenderHealth health;
 
         [Header("Hit")]
@@ -118,6 +119,9 @@ namespace Futboloid.Gameplay.Defenders
         {
             if (behaviorVisual == null)
                 behaviorVisual = GetComponentInChildren<DefenderBehaviorVisual>(true);
+
+            if (hitFlash == null)
+                hitFlash = GetComponentInChildren<DefenderHitFlash>(true);
 
             if (bodyCollider == null)
                 Debug.LogWarning("[DefenderView] bodyCollider is not assigned.", this);
@@ -427,6 +431,8 @@ namespace Futboloid.Gameplay.Defenders
             _lastInteractionTime = Time.time;
             _logic.ResolveBallHit(motion, hit, this);
             ApplyHitDamage();
+            behaviorVisual?.FlashHit();
+            hitFlash?.FlashHit();
         }
 
         /// <summary>
@@ -442,6 +448,8 @@ namespace Futboloid.Gameplay.Defenders
 
             _lastInteractionTime = Time.time;
             ApplyHitDamage();
+            behaviorVisual?.FlashHit();
+            hitFlash?.FlashHit();
             return true;
         }
 
