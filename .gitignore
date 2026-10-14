@@ -73,3 +73,5 @@ fmod_editor.log
 /Assets/Plugins/FMOD/Cache/
 /Assets/Plugins/FMOD/Cache.meta
 Futboloid_WebGL/Cache/
+Futboloid_WebGL/.cache/
+Futboloid_WebGL/.unsaved/
