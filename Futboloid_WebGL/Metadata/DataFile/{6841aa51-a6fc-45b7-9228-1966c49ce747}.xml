@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="DataFile" id="{6841aa51-a6fc-45b7-9228-1966c49ce747}">
+		<property name="assetPath">
+			<value>Audio/SFX/perc/perc_move/perc_move.ogg.meta</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{ef74a704-fccb-484f-8d33-16845d7794de}</destination>
+		</relationship>
+	</object>
+</objects>

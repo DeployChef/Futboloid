@@ -107,9 +107,8 @@ namespace Futboloid.Core.Audio
 
         private void OnPitchResetRequested(PitchResetRequestedEvent _)
         {
-            _audio.StopMusic();
-
             // Рестарт на поле: NavigationChanged не приходит (уже OnField) — запускаем здесь.
+            // Музыку не глушим: стейт-машина FMOD ведёт её непрерывно весь матч.
             if (_onField)
                 _audio.Play(AudioCatalog.Ids.MusicMatch);
         }
