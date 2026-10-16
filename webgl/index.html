@@ -101,6 +101,41 @@
         showBanner: unityShowBanner,
       };
 
+      // Как itch: жест «Играть» разблокирует Web Audio до Init FMOD.
+      // Патчим AudioContext, чтобы контекст FMOD создавался уже resumed.
+      (function installWebAudioUnlock() {
+        var NativeAC = window.AudioContext || window.webkitAudioContext;
+        if (!NativeAC || NativeAC.__futboloidPatched) return;
+        window.__futboloidNativeAudioContext = NativeAC;
+
+        function PatchedAudioContext() {
+          var ctx = Reflect.construct(NativeAC, arguments);
+          if (window.__futboloidWebAudioGesture) {
+            var p = ctx.resume();
+            if (p && typeof p.catch === "function") p.catch(function () {});
+          }
+          return ctx;
+        }
+        PatchedAudioContext.prototype = NativeAC.prototype;
+        PatchedAudioContext.__futboloidPatched = true;
+        window.AudioContext = PatchedAudioContext;
+        if (window.webkitAudioContext) window.webkitAudioContext = PatchedAudioContext;
+      })();
+
+      function markWebAudioGesture() {
+        window.__futboloidWebAudioGesture = true;
+        var NativeAC = window.__futboloidNativeAudioContext || window.AudioContext || window.webkitAudioContext;
+        if (!NativeAC) return;
+        try {
+          // Держим тёплый контекст живым в жесте — close() убивает activation.
+          if (!window.__futboloidWarmAudio) {
+            window.__futboloidWarmAudio = Reflect.construct(NativeAC, []);
+          }
+          var p = window.__futboloidWarmAudio.resume();
+          if (p && typeof p.catch === "function") p.catch(function () {});
+        } catch (e) {}
+      }
+
       function prepareContainer() {
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
           container.className = "unity-mobile unity-portrait";
@@ -113,6 +148,9 @@
       }
 
       function startUnity() {
+        // В том же user-gesture, что и клик «Играть».
+        markWebAudioGesture();
+
         playButton.disabled = true;
         playLabel.textContent = "…";
         playHint.textContent = "загрузка";
