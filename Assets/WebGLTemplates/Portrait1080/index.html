@@ -67,15 +67,19 @@
       (function () {
         var unlocked = false;
 
+        function resumeIfSuspended(ctx) {
+          // closed нельзя resume — будет InvalidStateError
+          if (!ctx || ctx.state !== 'suspended' || typeof ctx.resume !== 'function') return;
+          ctx.resume().catch(function () {});
+        }
+
         function wrap(name) {
           var Original = self[name];
           if (!Original) return;
           self[name] = new Proxy(Original, {
             construct: function (Target, args) {
               var ctx = Reflect.construct(Target, args);
-              if (unlocked && ctx && ctx.state !== 'running' && typeof ctx.resume === 'function') {
-                ctx.resume().catch(function () {});
-              }
+              if (unlocked) resumeIfSuspended(ctx);
               return ctx;
             }
           });
@@ -87,12 +91,6 @@
 
         self.__futboloidMarkAudioUnlocked = function () {
           unlocked = true;
-          try {
-            var Ctx = self.AudioContext || self.webkitAudioContext;
-            if (!Ctx) return;
-            var warm = new Ctx();
-            if (warm.state !== 'running') warm.resume();
-          } catch (e) {}
         };
       })();
 
