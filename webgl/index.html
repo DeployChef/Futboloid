@@ -54,39 +54,9 @@
     </div>
 
     <script>
-      // Host-page only (как itch): Unity/FMOD стартуют после жеста «Играть».
-      // Если FMOD позже создаст AudioContext — резюмим его, потому что жест уже был на этой странице.
-      (function () {
-        var unlocked = false;
-
-        function resumeIfSuspended(ctx) {
-          // closed нельзя resume — будет InvalidStateError
-          if (!ctx || ctx.state !== 'suspended' || typeof ctx.resume !== 'function') return;
-          ctx.resume().catch(function () {});
-        }
-
-        function wrap(name) {
-          var Original = self[name];
-          if (!Original) return;
-          self[name] = new Proxy(Original, {
-            construct: function (Target, args) {
-              var ctx = Reflect.construct(Target, args);
-              if (unlocked) resumeIfSuspended(ctx);
-              return ctx;
-            }
-          });
-          self[name].prototype = Original.prototype;
-        }
-
-        wrap('AudioContext');
-        wrap('webkitAudioContext');
-
-        self.__futboloidMarkAudioUnlocked = function () {
-          // Сам клик «Играть» = user activation; warm-контекст не нужен
-          // (close/resume гоняются и дают InvalidStateError).
-          unlocked = true;
-        };
-      })();
+      // Host-page only (как itch Run game):
+      // билд не трогаем, пока нет клика. Сам клик = user activation для вкладки.
+      // AudioContext не патчим — Proxy ломал lifecycle FMOD (resume на closed).
 
       var canvas = document.querySelector("#unity-canvas");
       var landing = document.querySelector("#play-landing");
@@ -138,8 +108,6 @@
       }
 
       function startUnity() {
-        // Жест «Run game»: помечаем страницу и только потом поднимаем билд.
-        self.__futboloidMarkAudioUnlocked();
         playButton.disabled = true;
         landing.classList.add("play-landing--leaving");
         prepareContainer();
