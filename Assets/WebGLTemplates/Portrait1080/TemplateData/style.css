@@ -94,3 +94,232 @@ html, body {
   display: none;
   z-index: 3;
 }
+
+/* ===== Futboloid landing: vertical pitch = the page ===== */
+.play-landing {
+  --ink: #083318;
+  --chalk: #F3EFE2;
+  --whistle: #FF2D1A;
+  --acid: #D6FF2F;
+
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 50%, #0c4a22 0%, #04180c 70%);
+  color: var(--chalk);
+  font-family: "Anton", "Archivo Black", Impact, sans-serif;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.play-landing--leaving {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.play-landing--leaving .play-landing__stage {
+  transform: scale(1.04);
+}
+
+.play-landing__stage {
+  position: relative;
+  width: min(100vw, calc(100vh * 9 / 16));
+  height: min(100vh, calc(100vw * 16 / 9));
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  background: var(--ink);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+  transition: transform 0.45s ease;
+  container-type: size;
+}
+
+.play-landing__pitch {
+  position: absolute;
+  inset: -3% -10%;
+  background:
+    url('landing-pitch.jpg') center / cover no-repeat,
+    var(--ink);
+  filter: contrast(1.08) saturate(1.15);
+  transform: rotate(-1.2deg);
+}
+
+.play-landing__grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.28;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+.play-landing__mark {
+  position: absolute;
+  top: 3.2%;
+  left: 5%;
+  z-index: 2;
+  margin: 0;
+  font-family: "Archivo Black", Impact, sans-serif;
+  font-size: clamp(10px, 2.8cqi, 13px);
+  letter-spacing: 0.28em;
+  color: var(--acid);
+  text-shadow: 1px 0 0 rgba(214, 255, 47, 0.35);
+}
+
+.play-landing__title {
+  position: absolute;
+  z-index: 2;
+  top: 7%;
+  left: -6%;
+  right: -8%;
+  margin: 0;
+  line-height: 0.82;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  pointer-events: none;
+  user-select: none;
+}
+
+.play-landing__word {
+  display: block;
+  font-size: clamp(64px, 26cqi, 168px);
+  color: var(--chalk);
+  text-shadow:
+    3px 0 0 rgba(255, 45, 26, 0.55),
+    -2px 1px 0 rgba(214, 255, 47, 0.35);
+  -webkit-text-stroke: 1px rgba(8, 51, 24, 0.35);
+}
+
+.play-landing__word--a {
+  margin-left: 0;
+  padding-left: 4%;
+}
+
+.play-landing__word--b {
+  margin-left: 22%;
+  color: var(--whistle);
+  text-shadow:
+    3px 0 0 rgba(243, 239, 226, 0.45),
+    -2px 1px 0 rgba(8, 51, 24, 0.5);
+}
+
+.play-landing__word--c {
+  margin-left: 2%;
+  width: 112%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.play-landing__side {
+  position: absolute;
+  z-index: 2;
+  top: 48%;
+  right: 3.5%;
+  margin: 0;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: "Archivo Black", Impact, sans-serif;
+  font-size: clamp(10px, 3.2cqi, 14px);
+  letter-spacing: 0.42em;
+  color: var(--chalk);
+  opacity: 0.72;
+}
+
+.play-landing__kickoff {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: 58%;
+  transform: translate(-50%, -50%);
+  width: min(38%, 200px);
+  aspect-ratio: 1;
+  height: auto;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  color: var(--ink);
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.play-landing__kickoff-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--whistle);
+  box-shadow:
+    0 0 0 10px rgba(255, 45, 26, 0.18),
+    0 18px 40px rgba(0, 0, 0, 0.35);
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.play-landing__kickoff-label {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: clamp(22px, 8cqi, 40px);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-family: "Anton", Impact, sans-serif;
+}
+
+.play-landing__kickoff:hover:not(:disabled) .play-landing__kickoff-ring {
+  transform: scale(1.04);
+  filter: brightness(1.05);
+}
+
+.play-landing__kickoff:active:not(:disabled) .play-landing__kickoff-ring {
+  transform: scale(0.97);
+}
+
+.play-landing__kickoff:disabled {
+  cursor: wait;
+  opacity: 0.85;
+}
+
+.play-landing__kickoff:disabled .play-landing__kickoff-ring {
+  animation: kickoff-pulse 1s ease-in-out infinite;
+}
+
+.play-landing__whistle {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: calc(58% + min(22%, 118px));
+  transform: translateX(-50%);
+  margin: 0;
+  font-family: "Archivo Black", Impact, sans-serif;
+  font-size: clamp(10px, 3cqi, 13px);
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--chalk);
+  opacity: 0.7;
+  text-align: center;
+  white-space: nowrap;
+}
+
+@keyframes kickoff-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@supports not (font-size: 1cqi) {
+  .play-landing__word {
+    font-size: clamp(72px, 18vw, 160px);
+  }
+
+  .play-landing__kickoff-label {
+    font-size: clamp(24px, 5vw, 38px);
+  }
+}

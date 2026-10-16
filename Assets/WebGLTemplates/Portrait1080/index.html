@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html lang="ru">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity Web Player | {{{ PRODUCT_NAME }}}</title>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes">
+    <title>{{{ PRODUCT_NAME }}}</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="TemplateData/style.css">
 #if SHOW_DIAGNOSTICS
     <link rel="stylesheet" href="<<<TemplateData/diagnostics.css>>>">
@@ -15,7 +19,31 @@
 #endif
   </head>
   <body>
-    <div id="unity-container" class="unity-desktop unity-portrait">
+    <div id="play-landing" class="play-landing" aria-label="{{{ PRODUCT_NAME }}}">
+      <div class="play-landing__stage">
+        <div class="play-landing__pitch" aria-hidden="true"></div>
+        <div class="play-landing__grain" aria-hidden="true"></div>
+
+        <p class="play-landing__mark">DEVCHEF&nbsp;·&nbsp;WEB</p>
+
+        <h1 class="play-landing__title" aria-label="{{{ PRODUCT_NAME }}}">
+          <span class="play-landing__word play-landing__word--a">FUT</span>
+          <span class="play-landing__word play-landing__word--b">BO</span>
+          <span class="play-landing__word play-landing__word--c">LOID</span>
+        </h1>
+
+        <p class="play-landing__side">ПОРТРЕТНЫЙ&nbsp;ФУТБОЛ</p>
+
+        <button type="button" id="play-button" class="play-landing__kickoff">
+          <span class="play-landing__kickoff-ring" aria-hidden="true"></span>
+          <span class="play-landing__kickoff-label">Играть</span>
+        </button>
+
+        <p class="play-landing__whistle">свисток&nbsp;—&nbsp;кикофф</p>
+      </div>
+    </div>
+
+    <div id="unity-container" class="unity-desktop unity-portrait" hidden>
       <canvas id="unity-canvas" width={{{ WIDTH }}} height={{{ HEIGHT }}} tabindex="-1"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
@@ -33,15 +61,49 @@
         <div id="unity-build-title">{{{ PRODUCT_NAME }}}</div>
       </div>
     </div>
-    <script>
-      var canvas = document.querySelector("#unity-canvas");
 
-      // Shows a temporary message banner/ribbon for a few seconds, or
-      // a permanent error message on top of the canvas if type=='error'.
-      // If type=='warning', a yellow highlight color is used.
-      // Modify or remove this function to customize the visually presented
-      // way that non-critical warnings and error messages are presented to the
-      // user.
+    <script>
+      (function () {
+        var contexts = [];
+        var events = ['click', 'pointerup', 'touchend', 'keydown'];
+        self.AudioContext = new Proxy(self.AudioContext, {
+          construct: function (Target, args) {
+            var ctx = Reflect.construct(Target, args);
+            contexts.push(ctx);
+            return ctx;
+          }
+        });
+        if (self.webkitAudioContext) {
+          self.webkitAudioContext = new Proxy(self.webkitAudioContext, {
+            construct: function (Target, args) {
+              var ctx = Reflect.construct(Target, args);
+              contexts.push(ctx);
+              return ctx;
+            }
+          });
+        }
+        function resumeAll() {
+          var running = 0;
+          contexts.forEach(function (ctx) {
+            if (ctx.state !== 'running') ctx.resume();
+            else running++;
+          });
+          if (contexts.length && running === contexts.length) {
+            events.forEach(function (name) {
+              document.removeEventListener(name, resumeAll);
+            });
+          }
+        }
+        events.forEach(function (name) {
+          document.addEventListener(name, resumeAll);
+        });
+      })();
+
+      var canvas = document.querySelector("#unity-canvas");
+      var landing = document.querySelector("#play-landing");
+      var playButton = document.querySelector("#play-button");
+      var container = document.querySelector("#unity-container");
+
       function unityShowBanner(msg, type) {
         var warningBanner = document.querySelector("#unity-warning");
         function updateBannerVisibility() {
@@ -81,121 +143,84 @@
         productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
         productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
         showBanner: unityShowBanner,
-        // errorHandler: function(err, url, line) {
-        //    alert("error " + err + " occurred at line " + line);
-        //    // Return 'true' if you handled this error and don't want Unity
-        //    // to process it further, 'false' otherwise.
-        //    return true;
-        // },
       };
 
-      // By default, Unity keeps WebGL canvas render target size matched with
-      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
-      // Set this to false if you want to decouple this synchronization from
-      // happening inside the engine, and you would instead like to size up
-      // the canvas DOM size and WebGL render target sizes yourself.
-      // config.matchWebGLToCanvasSize = false;
-
-      // If you would like all file writes inside Unity Application.persistentDataPath
-      // directory to automatically persist so that the contents are remembered when
-      // the user revisits the site the next time, uncomment the following line:
-      // config.autoSyncPersistentDataPath = true;
-      // This autosyncing is currently not the default behavior to avoid regressing
-      // existing user projects that might rely on the earlier manual
-      // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
-      // expected to change.
-
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Mobile device style: fill the whole browser client area with the game canvas:
-
-        var meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-        document.getElementsByTagName('head')[0].appendChild(meta);
-        document.querySelector("#unity-container").className = "unity-mobile unity-portrait";
-        canvas.className = "unity-mobile";
-
-        // To lower canvas resolution on mobile devices to gain some
-        // performance, uncomment the following line:
-        // config.devicePixelRatio = 1;
-
+      function prepareContainer() {
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+          container.className = "unity-mobile unity-portrait";
+          canvas.className = "unity-mobile";
 #if SHOW_DIAGNOSTICS
-        // position the diagnostics icon in the corner on the canvas
-        let diagnostics_icon = document.getElementById("diagnostics-icon");
-        diagnostics_icon.style.position = "fixed";
-        diagnostics_icon.style.bottom = "10px";
-        diagnostics_icon.style.right = "0px";
-        canvas.after(diagnostics_icon);
+          let diagnostics_icon = document.getElementById("diagnostics-icon");
+          diagnostics_icon.style.position = "fixed";
+          diagnostics_icon.style.bottom = "10px";
+          diagnostics_icon.style.right = "0px";
+          canvas.after(diagnostics_icon);
 #endif
-
-      } else {
-        document.querySelector("#unity-container").className = "unity-desktop unity-portrait";
+        } else {
+          container.className = "unity-desktop unity-portrait";
+        }
+#if BACKGROUND_FILENAME
+        canvas.style.background = "url('" + buildUrl + "/{{{ BACKGROUND_FILENAME.replace(/'/g, '%27') }}}') center / cover";
+#endif
+        container.hidden = false;
+        document.querySelector("#unity-loading-bar").style.display = "block";
       }
 
-#if BACKGROUND_FILENAME
-      canvas.style.background = "url('" + buildUrl + "/{{{ BACKGROUND_FILENAME.replace(/'/g, '%27') }}}') center / cover";
-#endif
-      document.querySelector("#unity-loading-bar").style.display = "block";
+      function startUnity() {
+        playButton.disabled = true;
+        landing.classList.add("play-landing--leaving");
+        prepareContainer();
 
-      var script = document.createElement("script");
-      script.src = loaderUrl;
-      script.onload = () => {
-        createUnityInstance(canvas, config, (progress) => {
-          document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
-              }).then((unityInstance) => {
-                document.querySelector("#unity-loading-bar").style.display = "none";
+        var script = document.createElement("script");
+        script.src = loaderUrl;
+        script.onload = function () {
+          createUnityInstance(canvas, config, function (progress) {
+            document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+          }).then(function (unityInstance) {
+            landing.remove();
+            document.querySelector("#unity-loading-bar").style.display = "none";
 #if SHOW_DIAGNOSTICS
-                document.getElementById("diagnostics-icon").onclick = () => {
-                  unityDiagnostics.openDiagnosticsDiv(unityInstance.GetMetricsInfo);
-                };
+            document.getElementById("diagnostics-icon").onclick = function () {
+              unityDiagnostics.openDiagnosticsDiv(unityInstance.GetMetricsInfo);
+            };
 #endif
-                document.querySelector("#unity-fullscreen-button").onclick = () => {
-                  unityInstance.SetFullscreen(1);
-                };
-
+            document.querySelector("#unity-fullscreen-button").onclick = function () {
+              unityInstance.SetFullscreen(1);
+            };
 #if DEVELOPMENT_PLAYER
-                var profile = unityProfiler.createButton(unityInstance);
-                profile.style.marginLeft = '5px';
-                document.querySelector("#unity-build-title").appendChild(profile);
+            var profile = unityProfiler.createButton(unityInstance);
+            profile.style.marginLeft = '5px';
+            document.querySelector("#unity-build-title").appendChild(profile);
 
-                // Unloading web content from DOM so that browser GC can run can be tricky to get right.
-                // This code snippet shows how to correctly implement a Unity content Unload mechanism to a web page.
-
-                // Unloading Unity content enables a web page to reclaim the memory used by Unity, e.g. for
-                // the purpose of later loading another Unity content instance on the _same_ web page.
-
-                // When using this functionality, take caution to carefully make sure to clear all JavaScript code,
-                // DOM element and event handler references to the old content you may have retained, or
-                // otherwise the browser's garbage collector will be unable to reclaim the old page.
-
-                // N.b. Unity content does _not_ need to be manually unloaded when the user is navigating away from
-                // the current page to another web page. The browser will take care to clear memory of old visited
-                // pages automatically. This functionality is only needed if you want to switch between loading
-                // multiple Unity builds on a single web page.
-                var quit = document.createElement("button");
-                quit.style = "margin-left: 5px; background-color: lightgray; border: none; padding: 5px; cursor: pointer";
-                quit.innerHTML = "Unload";
-                document.querySelector("#unity-build-title").appendChild(quit);
-                quit.onclick = () => {
-                  // Quit Unity application execution
-                  unityInstance.Quit().then(() => {
-                    unityProfiler.shutDown();
-                    // Remove DOM elements from the page so GC can run
-                    document.querySelector("#unity-container").remove();
-                    canvas = null;
-                    // Remover script elements from the page so GC can run
-                    script.remove();
-                    script = null;
-                  });
-                };
-#endif
-              }).catch((message) => {
-                alert(message);
+            var quit = document.createElement("button");
+            quit.style = "margin-left: 5px; background-color: lightgray; border: none; padding: 5px; cursor: pointer";
+            quit.innerHTML = "Unload";
+            document.querySelector("#unity-build-title").appendChild(quit);
+            quit.onclick = function () {
+              unityInstance.Quit().then(function () {
+                unityProfiler.shutDown();
+                document.querySelector("#unity-container").remove();
+                canvas = null;
+                script.remove();
+                script = null;
               });
             };
+#endif
+          }).catch(function (message) {
+            alert(message);
+            playButton.disabled = false;
+            landing.classList.remove("play-landing--leaving");
+          });
+        };
+        script.onerror = function () {
+          alert("Не удалось загрузить билд Unity.");
+          playButton.disabled = false;
+          landing.classList.remove("play-landing--leaving");
+        };
+        document.body.appendChild(script);
+      }
 
-      document.body.appendChild(script);
-
+      playButton.addEventListener("click", startUnity);
     </script>
   </body>
 </html>
