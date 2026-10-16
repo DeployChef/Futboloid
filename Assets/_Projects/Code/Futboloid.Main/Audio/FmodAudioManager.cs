@@ -36,7 +36,7 @@ namespace Futboloid.Main.Audio
 
         private const string LabelNone = "none";
 
-        [SerializeField] private string[] banksToLoad = { "Master" };
+        [SerializeField] private string[] banksToLoad = { "Master", "Master.strings", "Master.assets" };
         [Tooltip("Логировать readback глобальных параметров (sent/readback) для проверки доставки значений")]
         [SerializeField] private bool debugGlobalReadback = true;
 
@@ -62,6 +62,7 @@ namespace Futboloid.Main.Audio
         {
             // WebGL: загрузка асинхронная (UnityWebRequest внутри интеграции).
             // Повторный вызов безопасен: RuntimeManager дедуплицирует по имени банка.
+            // loadSamples: true — иначе при AutomaticSampleLoading=0 банки без сэмплов = тишина.
             foreach (var bank in banksToLoad)
             {
                 if (!RuntimeManager.HasBankLoaded(bank))
@@ -89,7 +90,11 @@ namespace Futboloid.Main.Audio
 
         private void TryCreatePersistentInstances()
         {
-            if (banksToLoad.Length == 0 || !RuntimeManager.HasBankLoaded(banksToLoad[0]))
+            if (banksToLoad.Length == 0 || !RuntimeManager.HasBankLoaded("Master"))
+                return;
+
+            // WebGL: метаданные банка могут быть уже в памяти, а сэмплы ещё качаются.
+            if (RuntimeManager.AnySampleDataLoading())
                 return;
 
             if (Time.unscaledTime < _nextInstanceRetryTime)

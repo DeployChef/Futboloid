@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="TemplateData/style.css">
   </head>
   <body>
-    <!-- Лендинг = вертикальное поле; клик «Играть» = кикофф + unlock WebAudio -->
+    <!-- Оболочка как itch «Run game»: жест здесь, игра про WebAudio не знает -->
     <div id="play-landing" class="play-landing" aria-label="Futboloid">
       <div class="play-landing__stage">
         <div class="play-landing__pitch" aria-hidden="true"></div>
@@ -54,40 +54,38 @@
     </div>
 
     <script>
+      // Host-page only (как itch): Unity/FMOD стартуют после жеста «Играть».
+      // Если FMOD позже создаст AudioContext — резюмим его, потому что жест уже был на этой странице.
       (function () {
-        var contexts = [];
-        var events = ['click', 'pointerup', 'touchend', 'keydown'];
-        self.AudioContext = new Proxy(self.AudioContext, {
-          construct: function (Target, args) {
-            var ctx = Reflect.construct(Target, args);
-            contexts.push(ctx);
-            return ctx;
-          }
-        });
-        if (self.webkitAudioContext) {
-          self.webkitAudioContext = new Proxy(self.webkitAudioContext, {
+        var unlocked = false;
+
+        function wrap(name) {
+          var Original = self[name];
+          if (!Original) return;
+          self[name] = new Proxy(Original, {
             construct: function (Target, args) {
               var ctx = Reflect.construct(Target, args);
-              contexts.push(ctx);
+              if (unlocked && ctx && ctx.state !== 'running' && typeof ctx.resume === 'function') {
+                ctx.resume().catch(function () {});
+              }
               return ctx;
             }
           });
+          self[name].prototype = Original.prototype;
         }
-        function resumeAll() {
-          var running = 0;
-          contexts.forEach(function (ctx) {
-            if (ctx.state !== 'running') ctx.resume();
-            else running++;
-          });
-          if (contexts.length && running === contexts.length) {
-            events.forEach(function (name) {
-              document.removeEventListener(name, resumeAll);
-            });
-          }
-        }
-        events.forEach(function (name) {
-          document.addEventListener(name, resumeAll);
-        });
+
+        wrap('AudioContext');
+        wrap('webkitAudioContext');
+
+        self.__futboloidMarkAudioUnlocked = function () {
+          unlocked = true;
+          try {
+            var Ctx = self.AudioContext || self.webkitAudioContext;
+            if (!Ctx) return;
+            var warm = new Ctx();
+            if (warm.state !== 'running') warm.resume();
+          } catch (e) {}
+        };
       })();
 
       var canvas = document.querySelector("#unity-canvas");
@@ -140,6 +138,8 @@
       }
 
       function startUnity() {
+        // Жест «Run game»: помечаем страницу и только потом поднимаем билд.
+        self.__futboloidMarkAudioUnlocked();
         playButton.disabled = true;
         landing.classList.add("play-landing--leaving");
         prepareContainer();
