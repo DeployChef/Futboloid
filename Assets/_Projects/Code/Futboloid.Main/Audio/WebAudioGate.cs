@@ -6,17 +6,16 @@ using UnityEngine.InputSystem;
 namespace Futboloid.Main.Audio
 {
     /// <summary>
-    /// WebGL: снимает mute браузера (FMOD mixerSuspend/Resume).
-    /// Жест «Играть» на лендинге помечается из index.html.
-    /// Unlock вызывается после готовности банков (см. FmodAudioManager.WaitUntilReadyAsync),
-    /// чтобы не ловить FMOD_OS_CriticalSection_* NULL.
+    /// WebGL: один раз mixerSuspend/Resume после жеста «Играть» (флаг из index.html)
+    /// или после первого жеста в билде. Повторные вызовы дают спам
+    /// FMOD_OS_CriticalSection_* NULL и лагают кадр — поэтому попытка строго одна.
     /// </summary>
     public sealed class WebAudioGate : MonoBehaviour
     {
         public const string GameObjectName = "WebAudioGate";
 
         private static WebAudioGate _instance;
-        private bool _unlocked;
+        private bool _attempted;
 
 #if UNITY_WEBGL && !UNITY_EDITOR
         [DllImport("__Internal")]
@@ -44,28 +43,28 @@ namespace Futboloid.Main.Audio
                 _instance = null;
         }
 
-        /// <summary>Вызвать после загрузки банков — mixerSuspend/Resume в окне жеста лендинга.</summary>
+        /// <summary>После готовности банков. Жест лендинга уже был — unlock один раз.</summary>
         public static void UnlockIfNeeded()
         {
-            if (_instance == null || _instance._unlocked || !RuntimeManager.IsInitialized)
+            if (_instance == null || _instance._attempted || !RuntimeManager.IsInitialized)
                 return;
 
-            if (!HasLandingGesture() && !HasRuntimeGesture())
+            if (!HasLandingGesture())
                 return;
 
-            _instance.TryUnlock();
+            _instance.TryUnlockOnce();
         }
 
         private void Update()
         {
-            if (_unlocked || !RuntimeManager.IsInitialized)
+            if (_attempted || !RuntimeManager.IsInitialized)
                 return;
 
-            // Fallback: жест уже внутри игры (банки могли быть готовы раньше).
+            // Fallback только на новый жест внутри игры (не каждый кадр).
             if (!HasRuntimeGesture())
                 return;
 
-            TryUnlock();
+            TryUnlockOnce();
         }
 
         private static bool HasLandingGesture()
@@ -83,48 +82,33 @@ namespace Futboloid.Main.Audio
         private static bool HasRuntimeGesture()
         {
             var mouse = Mouse.current;
-            if (mouse != null && (mouse.leftButton.wasPressedThisFrame || mouse.rightButton.wasPressedThisFrame))
+            if (mouse != null && mouse.leftButton.wasPressedThisFrame)
                 return true;
 
             var touch = Touchscreen.current;
             if (touch != null && touch.primaryTouch.press.wasPressedThisFrame)
                 return true;
 
-            var keyboard = Keyboard.current;
-            if (keyboard != null && keyboard.anyKey.wasPressedThisFrame)
-                return true;
-
-            var pen = Pen.current;
-            if (pen != null && pen.tip.wasPressedThisFrame)
-                return true;
-
             return false;
         }
 
-        private void TryUnlock()
+        private void TryUnlockOnce()
         {
+            // Сразу, до вызова FMOD — иначе при ERR_* Update будет долбить каждый жест/кадр.
+            _attempted = true;
+
             try
             {
                 var core = RuntimeManager.CoreSystem;
                 if (!core.hasHandle())
-                    return;
-
-                var result = core.mixerSuspend();
-                if (result != FMOD.RESULT.OK)
                 {
-                    Debug.LogWarning($"[WebAudioGate] mixerSuspend: {result}");
+                    Debug.LogWarning("[WebAudioGate] CoreSystem has no handle — skip unlock");
                     return;
                 }
 
-                result = core.mixerResume();
-                if (result != FMOD.RESULT.OK)
-                {
-                    Debug.LogWarning($"[WebAudioGate] mixerResume: {result}");
-                    return;
-                }
-
-                _unlocked = true;
-                Debug.Log("[WebAudioGate] unlocked");
+                var suspend = core.mixerSuspend();
+                var resume = core.mixerResume();
+                Debug.Log($"[WebAudioGate] unlock once suspend={suspend} resume={resume}");
             }
             catch (System.Exception e)
             {
