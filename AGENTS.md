@@ -209,6 +209,7 @@ Copy-Item "<папка FMOD-проекта>\Build\<Платформа>\*.bank" "
 - RuntimeManager при старте **сам грузит все банки из StreamingAssets** (ImportType=StreamingAssets) — ручной список банков нужен только как fallback.
 - Hot reload: выгружать только ивентовые банки. **Master и Master.strings НЕ выгружать** — Master.strings хранит пути ивентов, без него GetEventDescription перестаёт резолвить.
 - Runtime-проверка загрузки: `RuntimeManager.HasBankLoaded(name)`
+- ⚠️ **`HasBankLoaded` ≠ сэмплы в памяти.** При `BankLoadType=All` RuntimeManager зовёт `LoadBank(name)` с `loadSamples=false`. На WebGL метаданные (Master.bank) готовы раньше, чем sample data из `Master.assets.bank`. `CreateInstance`/`start`/`setParameter` работают, звука нет. Нужно: `AutomaticSampleLoading=1` и/или повторный `LoadBank(name, loadSamples: true)` даже если `HasBankLoaded==true` (иначе `loadSampleData` не вызовется), ждать `HasBankLoaded("Master.assets")` + `!AnySampleDataLoading()` + `EventDescription.getSampleLoadingState == LOADED` перед созданием инстансов.
 
 ### Как проверить путь ивента (по метаданным FMOD-проекта)
 

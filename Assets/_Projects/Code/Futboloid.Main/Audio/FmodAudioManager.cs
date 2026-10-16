@@ -60,14 +60,11 @@ namespace Futboloid.Main.Audio
 
         private void Start()
         {
-            // WebGL: загрузка асинхронная (UnityWebRequest внутри интеграции).
-            // Повторный вызов безопасен: RuntimeManager дедуплицирует по имени банка.
-            // loadSamples: true — иначе при AutomaticSampleLoading=0 банки без сэмплов = тишина.
-            foreach (var bank in banksToLoad)
-            {
-                if (!RuntimeManager.HasBankLoaded(bank))
-                    RuntimeManager.LoadBank(bank, loadSamples: true);
-            }
+            // WebGL: BankLoadType=All стартует loadFromWeb с loadSamples=false.
+            // Пока банк в полёте HasBankLoaded=false — второй LoadBank стартует дубль-скачивание (дедупа нет).
+            // Когда банк уже в loadedBanks — LoadBank(..., loadSamples: true) только дожимает loadSampleData.
+            // AutomaticSampleLoading=1 также ставит sampleLoadRequests на все банки при Init.
+            EnsureSampleDataLoaded();
         }
 
         private void Update()
@@ -90,7 +87,8 @@ namespace Futboloid.Main.Audio
 
         private void TryCreatePersistentInstances()
         {
-            if (banksToLoad.Length == 0 || !RuntimeManager.HasBankLoaded("Master"))
+            // Master.bank = события; Master.assets.bank = сэмплы. Без assets — API живой, звука нет.
+            if (!RuntimeManager.HasBankLoaded("Master") || !RuntimeManager.HasBankLoaded("Master.assets"))
                 return;
 
             // WebGL: метаданные банка могут быть уже в памяти, а сэмплы ещё качаются.
@@ -101,6 +99,12 @@ namespace Futboloid.Main.Audio
                 return;
 
             _nextInstanceRetryTime = Time.unscaledTime + InstanceRetryCooldown;
+
+            // BankLoadType=All грузит банки без sample data — дожимаем явно.
+            EnsureSampleDataLoaded();
+
+            if (!AreEventSamplesReady(EventMusicPath) || !AreEventSamplesReady(EventSfxPath))
+                return;
 
             var music = CreateInstanceSafe(EventMusicPath);
             var sfx = CreateInstanceSafe(EventSfxPath);
@@ -134,7 +138,11 @@ namespace Futboloid.Main.Audio
             ApplyVolumesToInstances();
             _persistentReady = true;
 
-            Debug.Log($"[FMOD] Инстансы готовы (id={GetInstanceID()}). musicVol={GetMusicVolume():F2} sfxVol={GetSfxVolume():F2}");
+            Debug.Log(
+                $"[FMOD] Инстансы готовы (id={GetInstanceID()}). " +
+                $"musicVol={GetMusicVolume():F2} sfxVol={GetSfxVolume():F2} " +
+                $"banks Master={RuntimeManager.HasBankLoaded("Master")} " +
+                $"assets={RuntimeManager.HasBankLoaded("Master.assets")}");
 
             // Проигрываем то, что пришло до готовности (например, музыку на выходе на поле)
             if (_pendingPlays.Count > 0)
@@ -144,6 +152,33 @@ namespace Futboloid.Main.Audio
 
                 foreach (var soundId in pending)
                     Play(soundId);
+            }
+        }
+
+        private void EnsureSampleDataLoaded()
+        {
+            // Только для уже зарегистрированных банков — иначе WebGL уйдёт во второй loadFromWeb.
+            foreach (var bank in banksToLoad)
+            {
+                if (RuntimeManager.HasBankLoaded(bank))
+                    RuntimeManager.LoadBank(bank, loadSamples: true);
+            }
+        }
+
+        private static bool AreEventSamplesReady(string eventPath)
+        {
+            try
+            {
+                var description = RuntimeManager.GetEventDescription(eventPath);
+                if (!description.isValid())
+                    return false;
+
+                description.getSampleLoadingState(out var state);
+                return state == LOADING_STATE.LOADED;
+            }
+            catch (EventNotFoundException)
+            {
+                return false;
             }
         }
 
