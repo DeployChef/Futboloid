@@ -7,13 +7,15 @@ namespace Futboloid.Main.Audio
 {
     /// <summary>
     /// WebGL: снимает mute браузера (FMOD mixerSuspend/Resume).
-    /// Жест «Играть» на лендинге помечается из index.html — unlock сразу после Init,
-    /// без второго клика и без UnityEngine.Input (проект на Input System).
+    /// Жест «Играть» на лендинге помечается из index.html.
+    /// Unlock вызывается после готовности банков (см. FmodAudioManager.WaitUntilReadyAsync),
+    /// чтобы не ловить FMOD_OS_CriticalSection_* NULL.
     /// </summary>
     public sealed class WebAudioGate : MonoBehaviour
     {
         public const string GameObjectName = "WebAudioGate";
 
+        private static WebAudioGate _instance;
         private bool _unlocked;
 
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -31,14 +33,36 @@ namespace Futboloid.Main.Audio
             go.AddComponent<WebAudioGate>();
         }
 
+        private void Awake()
+        {
+            _instance = this;
+        }
+
+        private void OnDestroy()
+        {
+            if (_instance == this)
+                _instance = null;
+        }
+
+        /// <summary>Вызвать после загрузки банков — mixerSuspend/Resume в окне жеста лендинга.</summary>
+        public static void UnlockIfNeeded()
+        {
+            if (_instance == null || _instance._unlocked || !RuntimeManager.IsInitialized)
+                return;
+
+            if (!HasLandingGesture() && !HasRuntimeGesture())
+                return;
+
+            _instance.TryUnlock();
+        }
+
         private void Update()
         {
             if (_unlocked || !RuntimeManager.IsInitialized)
                 return;
 
-            // 1) Клик «Играть» на лендинге (до загрузки Unity) — как itch.
-            // 2) Иначе любой жест уже внутри билдa (Input System, не legacy Input).
-            if (!HasLandingGesture() && !HasRuntimeGesture())
+            // Fallback: жест уже внутри игры (банки могли быть готовы раньше).
+            if (!HasRuntimeGesture())
                 return;
 
             TryUnlock();
@@ -82,8 +106,23 @@ namespace Futboloid.Main.Audio
             try
             {
                 var core = RuntimeManager.CoreSystem;
-                core.mixerSuspend();
-                core.mixerResume();
+                if (!core.hasHandle())
+                    return;
+
+                var result = core.mixerSuspend();
+                if (result != FMOD.RESULT.OK)
+                {
+                    Debug.LogWarning($"[WebAudioGate] mixerSuspend: {result}");
+                    return;
+                }
+
+                result = core.mixerResume();
+                if (result != FMOD.RESULT.OK)
+                {
+                    Debug.LogWarning($"[WebAudioGate] mixerResume: {result}");
+                    return;
+                }
+
                 _unlocked = true;
                 Debug.Log("[WebAudioGate] unlocked");
             }
@@ -91,6 +130,10 @@ namespace Futboloid.Main.Audio
             {
                 Debug.LogWarning($"[WebAudioGate] unlock failed: {e.Message}");
             }
+        }
+#else
+        public static void UnlockIfNeeded()
+        {
         }
 #endif
     }

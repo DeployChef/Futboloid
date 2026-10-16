@@ -10,9 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="TemplateData/style.css">
+  <script src="TemplateData/profiler.js"></script>
   </head>
   <body>
-    <!-- Как itch: клик «Играть» → только потом грузим билд. -->
     <div id="play-landing" class="play-landing" aria-label="Futboloid">
       <div class="play-landing__stage">
         <div class="play-landing__pitch" aria-hidden="true"></div>
@@ -86,7 +86,6 @@
         updateBannerVisibility();
       }
 
-      // Имена из свежего билда (без .unityweb)
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/Fut.loader.js";
       var config = {
@@ -95,14 +94,13 @@
         frameworkUrl: buildUrl + "/Fut.framework.js",
         codeUrl: buildUrl + "/Fut.wasm",
         streamingAssetsUrl: "StreamingAssets",
-        companyName: "DevChefGames",
+        companyName: "DefaultCompany",
         productName: "Futboloid",
         productVersion: "1.0",
         showBanner: unityShowBanner,
       };
 
       // Как itch: жест «Играть» разблокирует Web Audio до Init FMOD.
-      // Патчим AudioContext, чтобы контекст FMOD создавался уже resumed.
       (function installWebAudioUnlock() {
         var NativeAC = window.AudioContext || window.webkitAudioContext;
         if (!NativeAC || NativeAC.__futboloidPatched) return;
@@ -127,7 +125,6 @@
         var NativeAC = window.__futboloidNativeAudioContext || window.AudioContext || window.webkitAudioContext;
         if (!NativeAC) return;
         try {
-          // Держим тёплый контекст живым в жесте — close() убивает activation.
           if (!window.__futboloidWarmAudio) {
             window.__futboloidWarmAudio = Reflect.construct(NativeAC, []);
           }
@@ -148,7 +145,6 @@
       }
 
       function startUnity() {
-        // В том же user-gesture, что и клик «Играть».
         markWebAudioGesture();
 
         playButton.disabled = true;
@@ -172,6 +168,7 @@
             document.querySelector("#unity-fullscreen-button").onclick = function () {
               unityInstance.SetFullscreen(1);
             };
+            playButton.disabled = false;
           }).catch(function (message) {
             alert(message);
             playButton.disabled = false;

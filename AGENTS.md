@@ -210,6 +210,9 @@ Copy-Item "<папка FMOD-проекта>\Build\<Платформа>\*.bank" "
 - Hot reload: выгружать только ивентовые банки. **Master и Master.strings НЕ выгружать** — Master.strings хранит пути ивентов, без него GetEventDescription перестаёт резолвить.
 - Runtime-проверка загрузки: `RuntimeManager.HasBankLoaded(name)`
 - ⚠️ **`HasBankLoaded` ≠ сэмплы в памяти.** При `BankLoadType=All` RuntimeManager зовёт `LoadBank(name)` с `loadSamples=false`. На WebGL метаданные (Master.bank) готовы раньше, чем sample data из `Master.assets.bank`. `CreateInstance`/`start`/`setParameter` работают, звука нет. Нужно: `AutomaticSampleLoading=1` и/или повторный `LoadBank(name, loadSamples: true)` даже если `HasBankLoaded==true` (иначе `loadSampleData` не вызовется), ждать `HasBankLoaded("Master.assets")` + `!AnySampleDataLoading()` + `EventDescription.getSampleLoadingState == LOADED` перед созданием инстансов.
+- ⚠️ **`mixerSuspend`/`mixerResume` до готовности WebGL-драйвера** → спам `FMOD_OS_CriticalSection_Enter/Leave : cannot enter/leave NULL critical section`. Unlock только после `IAudioManager.WaitUntilReadyAsync` (лоадер в `Startup`), не в первый же кадр после `IsInitialized`.
+- Лоадер (`Startup` + `loadingScreen`): держать экран до `await audio.WaitUntilReadyAsync()`, потом `InitializeGameAsync` и fade-out. Ждать `HaveAllBanksLoaded` + `HasBankLoaded(Master/Master.assets)` + `!AnySampleDataLoading()` + sample state LOADED (BankLoadType=All, AutomaticSampleLoading=1 уже в Settings).
+- ⚠️ **`IsPlaying(MusicMatch)` ≠ `_persistentReady`.** Инстансы после WaitUntilReady уже валидны, но `start()` музыки ещё нет. Если `IsPlaying` смотрит только на ready — `AudioService` пропускает `Play(MusicMatch)` → SFX есть, музыки нет. Правильно: `_musicStarted`.
 
 ### Как проверить путь ивента (по метаданным FMOD-проекта)
 

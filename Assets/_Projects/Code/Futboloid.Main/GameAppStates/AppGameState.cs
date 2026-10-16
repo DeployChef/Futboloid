@@ -39,7 +39,8 @@ namespace Futboloid.Main.GameAppStates
                 return;
             }
 
-            await WarmupAudioClipsAsync(LifetimeScope.Container.Resolve<IAudioManager>());
+            // Банки уже ждут в Startup; здесь — страховка перед OnField/MusicMatch.
+            await LifetimeScope.Container.Resolve<IAudioManager>().WaitUntilReadyAsync();
 
             SceneManager.SetActiveScene(gameScene);
 
@@ -128,16 +129,6 @@ namespace Futboloid.Main.GameAppStates
             return false;
         }
 
-        private static async UniTask WarmupAudioClipsAsync(IAudioManager audio)
-        {
-            if (audio == null)
-                return;
-
-            foreach (var clip in audio.EnumerateClips())
-            {
-                audio.WarmupClip(clip);
-                await UniTask.Yield();
-            }
-        }
     }
 }
+

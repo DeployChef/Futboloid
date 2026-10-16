@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using FMOD.Studio;
 using FMODUnity;
 using Futboloid.Core.Audio;
@@ -58,6 +61,10 @@ namespace Futboloid.Main.Audio
 
         public bool HasMusicClip => _persistentReady;
 
+        public bool IsReady => _persistentReady;
+
+        private const float ReadyTimeoutSeconds = 90f;
+
         private void Start()
         {
             // WebGL: BankLoadType=All стартует loadFromWeb с loadSamples=false.
@@ -73,6 +80,62 @@ namespace Futboloid.Main.Audio
                 TryCreatePersistentInstances();
 
             ProcessPendingResets();
+        }
+
+        public async UniTask WaitUntilReadyAsync(CancellationToken cancellationToken = default)
+        {
+            if (_persistentReady)
+                return;
+
+            if (!RuntimeManager.IsInitialized)
+                await UniTask.WaitUntil(() => RuntimeManager.IsInitialized, cancellationToken: cancellationToken);
+
+            // BankLoadType=All + AutomaticSampleLoading уже в FMOD Settings.
+            // HaveAllBanksLoaded = loadingBanksRef==0 после async loadFromWeb (WebGL).
+            // Лоадер-анимация крутится здесь сколько нужно — сцена не переключается раньше.
+            var deadline = Time.unscaledTime + ReadyTimeoutSeconds;
+            while (!AreBanksAndSamplesReady() && Time.unscaledTime < deadline)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                EnsureSampleDataLoaded();
+                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+            }
+
+            if (!AreBanksAndSamplesReady())
+            {
+                Debug.LogWarning(
+                    "[FMOD] WaitUntilReadyAsync: банки/сэмплы не готовы. " +
+                    $"HaveAll={RuntimeManager.HaveAllBanksLoaded} " +
+                    $"Master={RuntimeManager.HasBankLoaded("Master")} " +
+                    $"assets={RuntimeManager.HasBankLoaded("Master.assets")} " +
+                    $"samplesLoading={RuntimeManager.AnySampleDataLoading()}");
+            }
+
+            while (!_persistentReady && Time.unscaledTime < deadline)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                TryCreatePersistentInstances();
+                if (_persistentReady)
+                    break;
+                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+            }
+
+            // WebGL unlock после готовности банков — иначе mixerSuspend ловит NULL critical section.
+            WebAudioGate.UnlockIfNeeded();
+        }
+
+        private bool AreBanksAndSamplesReady()
+        {
+            // HaveAllBanksLoaded=true и до старта LoadBank (ref=0) — поэтому ждём и HasBankLoaded.
+            if (!RuntimeManager.HaveAllBanksLoaded)
+                return false;
+            if (!RuntimeManager.HasBankLoaded("Master") || !RuntimeManager.HasBankLoaded("Master.assets"))
+                return false;
+            if (RuntimeManager.AnySampleDataLoading())
+                return false;
+            if (!AreEventSamplesReady(EventMusicPath) || !AreEventSamplesReady(EventSfxPath))
+                return false;
+            return true;
         }
 
         private void OnDestroy()
@@ -95,15 +158,14 @@ namespace Futboloid.Main.Audio
             if (RuntimeManager.AnySampleDataLoading())
                 return;
 
-            if (Time.unscaledTime < _nextInstanceRetryTime)
-                return;
-
-            _nextInstanceRetryTime = Time.unscaledTime + InstanceRetryCooldown;
-
             // BankLoadType=All грузит банки без sample data — дожимаем явно.
             EnsureSampleDataLoaded();
 
             if (!AreEventSamplesReady(EventMusicPath) || !AreEventSamplesReady(EventSfxPath))
+                return;
+
+            // Cooldown только после неудачного CreateInstance (событий нет в банке), не пока качаются сэмплы.
+            if (Time.unscaledTime < _nextInstanceRetryTime)
                 return;
 
             var music = CreateInstanceSafe(EventMusicPath);
@@ -118,6 +180,7 @@ namespace Futboloid.Main.Audio
                 ReleaseInstance(sfx);
                 ReleaseInstance(perc);
                 ReleaseInstance(ui);
+                _nextInstanceRetryTime = Time.unscaledTime + InstanceRetryCooldown;
                 return;
             }
 
@@ -352,8 +415,13 @@ namespace Futboloid.Main.Audio
 
         public bool IsPlaying(string soundId)
         {
-            // Музыка — вечный инстанс стейт-машины; клики отслеживания не требуют
-            return _persistentReady && soundId == AudioCatalog.Ids.MusicMatch;
+            // Важно: после WaitUntilReady инстансы уже есть, но музыка ещё не start().
+            // Раньше тут был только _persistentReady → IsPlaying(MusicMatch)==true без старта,
+            // AudioService пропускал Play(MusicMatch) → тишина на поле при живых SFX.
+            if (soundId == AudioCatalog.Ids.MusicMatch)
+                return _persistentReady && _musicStarted;
+
+            return false;
         }
 
         // ===== Warmup (для FMOD — no-op: сэмплы грузятся вместе с банком) =====

@@ -1,6 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Futboloid.Core;
+using Futboloid.Core.Audio;
 using Futboloid.Main.DI;
 using UnityEngine;
 using VContainer;
@@ -9,6 +10,7 @@ namespace Futboloid.Main
 {
     /// <summary>
     /// Точка входа на сцене Root.unity (единственная сцена в Build Settings).
+    /// Лоадер держится, пока аудио (FMOD-банки/сэмплы) не готово — затем стартует игра.
     /// </summary>
     public class Startup : MonoBehaviour
     {
@@ -47,6 +49,12 @@ namespace Futboloid.Main
             }
 
             rootScope.Build();
+
+            // Пока лоадер на экране — дожимаем банки/сэмплы FMOD (WebGL async).
+            var audio = rootScope.Container.Resolve<IAudioManager>();
+            await audio.WaitUntilReadyAsync();
+            Debug.Log($"[Startup] Audio ready={audio.IsReady}");
+
             var director = rootScope.Container.Resolve<IGameDirector>();
             await director.InitializeGameAsync();
 

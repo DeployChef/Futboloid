@@ -41,6 +41,11 @@ namespace Futboloid.Main.Audio
 
         public bool HasMusicClip => _musicSource != null && _musicSource.clip != null;
 
+        public bool IsReady => true;
+
+        public UniTask WaitUntilReadyAsync(CancellationToken cancellationToken = default) =>
+            UniTask.CompletedTask;
+
         private void Awake()
         {
             _musicSource = CreateSource("Music", transform);
