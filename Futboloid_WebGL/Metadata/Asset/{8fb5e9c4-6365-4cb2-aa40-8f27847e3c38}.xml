@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="EncodableAsset" id="{8fb5e9c4-6365-4cb2-aa40-8f27847e3c38}">
+		<property name="assetPath">
+			<value>Audio/SFX/perc/perc_move/</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{ef74a704-fccb-484f-8d33-16845d7794de}</destination>
+		</relationship>
+	</object>
+</objects>

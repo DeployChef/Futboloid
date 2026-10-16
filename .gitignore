@@ -67,3 +67,9 @@ UserSettings/Layouts/default-6000.dwlt
 UserSettings/Layouts/
 .vscode/extensions.json
 .vscode/launch.json
+
+# FMOD: кэши и логи (банки .bank — в гите, не игнорить)
+fmod_editor.log
+/Assets/Plugins/FMOD/Cache/
+/Assets/Plugins/FMOD/Cache.meta
+Futboloid_WebGL/Cache/

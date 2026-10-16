@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{f255b09b-6447-44cb-8be5-596973978a8a}">
+		<property name="assetPath">
+			<value>Audio/SFX/Ball/ball_Man/ball_punch_Man_var1_2.ogg</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>48</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>0.82499999999999996</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{ef74a704-fccb-484f-8d33-16845d7794de}</destination>
+		</relationship>
+	</object>
+</objects>

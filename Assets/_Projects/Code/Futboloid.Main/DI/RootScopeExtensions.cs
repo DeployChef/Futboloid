@@ -21,7 +21,8 @@ namespace Futboloid.Main.DI
     {
         public static IContainerBuilder RegisterRootScope(this IContainerBuilder builder)
         {
-            builder.RegisterComponentInHierarchy<AudioManager>().As<IAudioManager>();
+            builder.RegisterComponentOnNewGameObject<FmodAudioManager>(Lifetime.Singleton, "FMOD Audio")
+                .As<IAudioManager>();
             builder.Register<LocalizationService>(Lifetime.Singleton)
                 .AsSelf()
                 .As<ILocalizationService>();
