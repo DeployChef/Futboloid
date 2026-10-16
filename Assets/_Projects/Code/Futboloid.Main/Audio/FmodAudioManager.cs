@@ -220,12 +220,17 @@ namespace Futboloid.Main.Audio
 
         private void EnsureSampleDataLoaded()
         {
-            // Только для уже зарегистрированных банков — иначе WebGL уйдёт во второй loadFromWeb.
-            foreach (var bank in banksToLoad)
+            // НЕльзя звать loadSampleData на Master, пока Master.assets ещё не в памяти:
+            // FMOD PreloadVisitor → "WaveformResourceModel (Asset) not found".
+            // Ждём все банки из списка, потом дожимаем sample data одним проходом.
+            for (var i = 0; i < banksToLoad.Length; i++)
             {
-                if (RuntimeManager.HasBankLoaded(bank))
-                    RuntimeManager.LoadBank(bank, loadSamples: true);
+                if (!RuntimeManager.HasBankLoaded(banksToLoad[i]))
+                    return;
             }
+
+            for (var i = 0; i < banksToLoad.Length; i++)
+                RuntimeManager.LoadBank(banksToLoad[i], loadSamples: true);
         }
 
         private static bool AreEventSamplesReady(string eventPath)
