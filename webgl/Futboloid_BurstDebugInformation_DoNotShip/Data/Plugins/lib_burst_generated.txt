@@ -10,6 +10,7 @@ Library: C:\Work\DeployChef\Unity\Futboloid\Temp\BurstOutput\Data\Plugins\lib_bu
 --target-framework=NetFramework
 --generate-link-xml=Temp\burst.link.xml
 --temp-folder=C:\Work\DeployChef\Unity\Futboloid\Temp\Burst
+--debug=Full
 --generate-static-linkage-methods
 --key-folder=C:/Program Files/Unity/Hub/Editor/6000.4.0f1/Editor/Data/PlaybackEngines/WebGLSupport
 --decode-folder=C:\Work\DeployChef\Unity\Futboloid\Library\Burst
@@ -127,6 +128,7 @@ Library: C:\Work\DeployChef\Unity\Futboloid\Temp\BurstOutput\Data\Plugins\lib_bu
 --target-framework=NetFramework
 --generate-link-xml=Temp\burst.link.xml
 --temp-folder=C:\Work\DeployChef\Unity\Futboloid\Temp\Burst
+--debug=Full
 --generate-static-linkage-methods
 --key-folder=C:/Program Files/Unity/Hub/Editor/6000.4.0f1/Editor/Data/PlaybackEngines/WebGLSupport
 --decode-folder=C:\Work\DeployChef\Unity\Futboloid\Library\Burst
@@ -163,6 +165,7 @@ Library: C:\Work\DeployChef\Unity\Futboloid\Temp\BurstOutput\Data\Plugins\lib_bu
 --float-mode=Fast
 --generate-link-xml=Temp\burst.link.xml
 --temp-folder=C:\Work\DeployChef\Unity\Futboloid\Temp\Burst
+--debug=Full
 --generate-static-linkage-methods
 --key-folder=C:/Program Files/Unity/Hub/Editor/6000.4.0f1/Editor/Data/PlaybackEngines/WebGLSupport
 --decode-folder=C:\Work\DeployChef\Unity\Futboloid\Library\Burst

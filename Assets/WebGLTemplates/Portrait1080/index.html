@@ -36,10 +36,14 @@
 
         <button type="button" id="play-button" class="play-landing__kickoff">
           <span class="play-landing__kickoff-ring" aria-hidden="true"></span>
-          <span class="play-landing__kickoff-label">Играть</span>
+          <span class="play-landing__kickoff-label" id="play-button-label">Играть</span>
         </button>
 
-        <p class="play-landing__whistle">свисток&nbsp;—&nbsp;кикофф</p>
+        <p class="play-landing__whistle" id="play-hint">свисток — кикофф</p>
+
+        <div class="play-landing__progress" id="play-progress-wrap" hidden>
+          <div class="play-landing__progress-bar" id="play-progress"></div>
+        </div>
       </div>
     </div>
 
@@ -63,13 +67,13 @@
     </div>
 
     <script>
-      // Host-page only (как itch Run game):
-      // билд не трогаем, пока нет клика. Сам клик = user activation для вкладки.
-      // AudioContext не патчим — Proxy ломал lifecycle FMOD (resume на closed).
-
       var canvas = document.querySelector("#unity-canvas");
       var landing = document.querySelector("#play-landing");
       var playButton = document.querySelector("#play-button");
+      var playLabel = document.querySelector("#play-button-label");
+      var playHint = document.querySelector("#play-hint");
+      var playProgressWrap = document.querySelector("#play-progress-wrap");
+      var playProgress = document.querySelector("#play-progress");
       var container = document.querySelector("#unity-container");
 
       function unityShowBanner(msg, type) {
@@ -136,14 +140,20 @@
 
       function startUnity() {
         playButton.disabled = true;
-        landing.classList.add("play-landing--leaving");
+        playLabel.textContent = "…";
+        playHint.textContent = "загрузка";
+        playProgressWrap.hidden = false;
+
         prepareContainer();
+        landing.classList.add("play-landing--leaving");
 
         var script = document.createElement("script");
         script.src = loaderUrl;
         script.onload = function () {
           createUnityInstance(canvas, config, function (progress) {
-            document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+            var pct = Math.round(100 * progress);
+            playProgress.style.width = pct + "%";
+            document.querySelector("#unity-progress-bar-full").style.width = pct + "%";
           }).then(function (unityInstance) {
             landing.remove();
             document.querySelector("#unity-loading-bar").style.display = "none";
@@ -155,34 +165,22 @@
             document.querySelector("#unity-fullscreen-button").onclick = function () {
               unityInstance.SetFullscreen(1);
             };
-#if DEVELOPMENT_PLAYER
-            var profile = unityProfiler.createButton(unityInstance);
-            profile.style.marginLeft = '5px';
-            document.querySelector("#unity-build-title").appendChild(profile);
-
-            var quit = document.createElement("button");
-            quit.style = "margin-left: 5px; background-color: lightgray; border: none; padding: 5px; cursor: pointer";
-            quit.innerHTML = "Unload";
-            document.querySelector("#unity-build-title").appendChild(quit);
-            quit.onclick = function () {
-              unityInstance.Quit().then(function () {
-                unityProfiler.shutDown();
-                document.querySelector("#unity-container").remove();
-                canvas = null;
-                script.remove();
-                script = null;
-              });
-            };
-#endif
+            playButton.disabled = false;
           }).catch(function (message) {
             alert(message);
             playButton.disabled = false;
+            playLabel.textContent = "Играть";
+            playHint.textContent = "свисток — кикофф";
+            playProgressWrap.hidden = true;
             landing.classList.remove("play-landing--leaving");
           });
         };
         script.onerror = function () {
           alert("Не удалось загрузить билд Unity.");
           playButton.disabled = false;
+          playLabel.textContent = "Играть";
+          playHint.textContent = "ошибка загрузки";
+          playProgressWrap.hidden = true;
           landing.classList.remove("play-landing--leaving");
         };
         document.body.appendChild(script);
@@ -192,4 +190,3 @@
     </script>
   </body>
 </html>
-
