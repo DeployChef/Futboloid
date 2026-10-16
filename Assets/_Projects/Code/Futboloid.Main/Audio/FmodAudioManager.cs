@@ -120,8 +120,8 @@ namespace Futboloid.Main.Audio
                 await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
             }
 
-            // WebGL unlock после готовности банков — иначе mixerSuspend ловит NULL critical section.
-            WebAudioGate.UnlockIfNeeded();
+            // Не звать mixerSuspend здесь: жест HTML «Играть» уже протух.
+            // Unlock — только по клику в Unity (WebAudioGate), иначе NULL critical section spam.
         }
 
         private bool AreBanksAndSamplesReady()

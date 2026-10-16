@@ -62,6 +62,17 @@ namespace FMODUnity
 
         private int loadingBanksRef = 0;
 
+        /// <summary>
+        /// WebGL: until the first real user unlock (mixerSuspend/Resume after a gesture),
+        /// OnApplicationPause must not touch the mixer — otherwise FMOD logs
+        /// FMOD_OS_CriticalSection_* NULL every frame and tanks performance.
+        /// </summary>
+#if UNITY_WEBGL && !UNITY_EDITOR
+        public static bool AllowMixerSuspendResume = false;
+#else
+        public static bool AllowMixerSuspendResume = true;
+#endif
+
         private static byte[] masterBusPrefix;
         private static byte[] eventSet3DAttributes;
         private static byte[] systemGetBus;
@@ -818,6 +829,9 @@ retry:
             if (studioSystem.isValid())
             {
                 PauseAllEvents(pauseStatus);
+
+                if (!AllowMixerSuspendResume)
+                    return;
 
                 if (pauseStatus)
                 {

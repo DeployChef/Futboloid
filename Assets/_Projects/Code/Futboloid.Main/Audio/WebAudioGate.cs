@@ -1,4 +1,5 @@
-using System.Runtime.InteropServices;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using FMODUnity;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -6,21 +7,26 @@ using UnityEngine.InputSystem;
 namespace Futboloid.Main.Audio
 {
     /// <summary>
-    /// WebGL: один раз mixerSuspend/Resume после жеста «Играть» (флаг из index.html)
-    /// или после первого жеста в билде. Повторные вызовы дают спам
-    /// FMOD_OS_CriticalSection_* NULL и лагают кадр — поэтому попытка строго одна.
+    /// WebGL: unlock FMOD webaudio только по реальному клику/тачу в Unity
+    /// (когда CoreSystem уже есть). Жест HTML «Играть» для этого бесполезен —
+    /// user activation сгорает за время загрузки билда; ранний mixerSuspend
+    /// ломает output → спам NULL critical section.
     /// </summary>
     public sealed class WebAudioGate : MonoBehaviour
     {
         public const string GameObjectName = "WebAudioGate";
 
         private static WebAudioGate _instance;
-        private bool _attempted;
+        private bool _unlocked;
+
+        public static bool IsUnlocked =>
+#if UNITY_WEBGL && !UNITY_EDITOR
+            _instance != null && _instance._unlocked;
+#else
+            true;
+#endif
 
 #if UNITY_WEBGL && !UNITY_EDITOR
-        [DllImport("__Internal")]
-        private static extern int Futboloid_HasWebAudioGesture();
-
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
         {
@@ -35,6 +41,7 @@ namespace Futboloid.Main.Audio
         private void Awake()
         {
             _instance = this;
+            RuntimeManager.AllowMixerSuspendResume = false;
         }
 
         private void OnDestroy()
@@ -43,43 +50,30 @@ namespace Futboloid.Main.Audio
                 _instance = null;
         }
 
-        /// <summary>После готовности банков. Жест лендинга уже был — unlock один раз.</summary>
-        public static void UnlockIfNeeded()
-        {
-            if (_instance == null || _instance._attempted || !RuntimeManager.IsInitialized)
-                return;
-
-            if (!HasLandingGesture())
-                return;
-
-            _instance.TryUnlockOnce();
-        }
-
         private void Update()
         {
-            if (_attempted || !RuntimeManager.IsInitialized)
+            if (_unlocked || !RuntimeManager.IsInitialized)
                 return;
 
-            // Fallback только на новый жест внутри игры (не каждый кадр).
-            if (!HasRuntimeGesture())
+            if (!HasPointerDown())
                 return;
 
             TryUnlockOnce();
         }
 
-        private static bool HasLandingGesture()
+        /// <summary>Лоадер ждёт клик: unlock → можно снимать loadingScreen.</summary>
+        public static async UniTask WaitUntilUnlockedAsync(CancellationToken cancellationToken = default)
         {
-            try
-            {
-                return Futboloid_HasWebAudioGesture() != 0;
-            }
-            catch
-            {
-                return false;
-            }
+            if (IsUnlocked)
+                return;
+
+            if (_instance == null)
+                await UniTask.WaitUntil(() => _instance != null, cancellationToken: cancellationToken);
+
+            await UniTask.WaitUntil(() => IsUnlocked, cancellationToken: cancellationToken);
         }
 
-        private static bool HasRuntimeGesture()
+        private static bool HasPointerDown()
         {
             var mouse = Mouse.current;
             if (mouse != null && mouse.leftButton.wasPressedThisFrame)
@@ -94,21 +88,24 @@ namespace Futboloid.Main.Audio
 
         private void TryUnlockOnce()
         {
-            // Сразу, до вызова FMOD — иначе при ERR_* Update будет долбить каждый жест/кадр.
-            _attempted = true;
+            if (_unlocked)
+                return;
+
+            _unlocked = true;
+            RuntimeManager.AllowMixerSuspendResume = true;
 
             try
             {
                 var core = RuntimeManager.CoreSystem;
                 if (!core.hasHandle())
                 {
-                    Debug.LogWarning("[WebAudioGate] CoreSystem has no handle — skip unlock");
+                    Debug.LogWarning("[WebAudioGate] CoreSystem has no handle");
                     return;
                 }
 
                 var suspend = core.mixerSuspend();
                 var resume = core.mixerResume();
-                Debug.Log($"[WebAudioGate] unlock once suspend={suspend} resume={resume}");
+                Debug.Log($"[WebAudioGate] unlocked suspend={suspend} resume={resume}");
             }
             catch (System.Exception e)
             {
@@ -116,9 +113,8 @@ namespace Futboloid.Main.Audio
             }
         }
 #else
-        public static void UnlockIfNeeded()
-        {
-        }
+        public static UniTask WaitUntilUnlockedAsync(CancellationToken cancellationToken = default) =>
+            UniTask.CompletedTask;
 #endif
     }
 }

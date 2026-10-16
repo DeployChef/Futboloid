@@ -2,6 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using Futboloid.Core;
 using Futboloid.Core.Audio;
+using Futboloid.Main.Audio;
 using Futboloid.Main.DI;
 using UnityEngine;
 using VContainer;
@@ -57,6 +58,17 @@ namespace Futboloid.Main
 
             var director = rootScope.Container.Resolve<IGameDirector>();
             await director.InitializeGameAsync();
+
+            // WebGL: клик по лоадеру = user gesture при живом FMOD → unlock + музыка сразу.
+            // HTML «Играть» для mixerSuspend бесполезен (activation сгорает за загрузку).
+            if (loadingScreen != null)
+            {
+                loadingScreen.blocksRaycasts = true;
+                loadingScreen.interactable = true;
+            }
+
+            await WebAudioGate.WaitUntilUnlockedAsync();
+            Debug.Log("[Startup] WebAudio unlocked — fade loader");
 
             await FadeOutLoadingAsync();
         }

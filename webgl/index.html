@@ -100,11 +100,6 @@
         showBanner: unityShowBanner,
       };
 
-      // Только флаг жеста для WebAudioGate. Не патчить AudioContext — ломает FMOD webaudio.
-      function markWebAudioGesture() {
-        window.__futboloidWebAudioGesture = true;
-      }
-
       function prepareContainer() {
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
           container.className = "unity-mobile unity-portrait";
@@ -117,8 +112,6 @@
       }
 
       function startUnity() {
-        markWebAudioGesture();
-
         playButton.disabled = true;
         playLabel.textContent = "…";
         playHint.textContent = "загрузка";
